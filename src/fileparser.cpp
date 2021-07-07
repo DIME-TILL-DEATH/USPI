@@ -152,12 +152,6 @@ bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceReg
             {
                 QJsonObject jsonObject = fieldArray[fieldIndex].toObject();
 
-//                deviceRegister->m_fields.push_back(new AbstractField);
-
-//                if(!it->second(jsonObject, *(deviceRegister->m_fields.end()-1), error))
-//                    return false;
-
-
                 if(!it->second(jsonObject, deviceRegister, error))
                     return false;
 
@@ -215,7 +209,6 @@ bool FileParser::readBitField(const QJsonObject &jsonObject, Register* deviceReg
 
 
     BitField* bitField = dynamic_cast<BitField*>(field);
-//    BitField* bitField = static_cast<BitField*>(field);
 
     if(bitField)
     {
@@ -240,7 +233,6 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
         return false;
 
     IntegerField* integerField = dynamic_cast<IntegerField*>(field);
-//        IntegerField* integerField = static_cast<IntegerField*>(field);
 
     if(integerField)
     {
@@ -280,7 +272,6 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
         return false;
 
     VariantListField* variantListField = dynamic_cast<VariantListField*>(field);
-//    VariantListField* variantListField = static_cast<VariantListField*>(field);
 
     if(variantListField)
     {

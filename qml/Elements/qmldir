@@ -1,0 +1,5 @@
+module Elements
+
+ResultField     1.0 ResultField.qml
+FieldProperties 1.0 FieldProperties.qml
+FieldTip        1.0 FieldTip.qml
