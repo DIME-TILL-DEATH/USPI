@@ -33,7 +33,9 @@ Rectangle {
         Label{
             id: _bitsPostiton
 
-            text: "Биты " + (position+size) + "..." + position + ":"
+
+            text: (size <= 1) ?  "Бит " + position
+                                :"Биты " + (position+size) + "..." + position + ":"
         }
     }
 }

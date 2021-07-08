@@ -1,16 +1,14 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-
-#include <QFile>
-#include <QDir>
+#include <QtQml>
 
 #include <QDebug>
 
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
+#include "src/logger.h"
+#include "src/dutdevice.h"
 
-#include "src/fileparser.h"
+#include "src/fieldadapter.h"
+#include "src/userinterface.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,18 +18,20 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
-    //---------------------------------------------------------------
-    FileParser jsonFile;
-
-    DUTDevice device("MT.json");
-    jsonFile.loadFile("MT.json");
-    jsonFile.readHeader(&device.m_deviceHeader);
-    jsonFile.readRegisterArray(&device.m_deviceRegisterMap);
-
-
-    //---------------------------------------------------------------
-
     QQmlApplicationEngine engine;
+    //---------------------------------------------------------------
+    app.setOrganizationName("ВНИИРТ");
+    app.setOrganizationDomain("VNIIRT");
+
+    UserInterface ui;
+    Logger log;
+
+    engine.rootContext()->setContextProperty("Backend", &ui);
+    engine.rootContext()->setContextProperty("Log", &log);
+
+    qRegisterMetaType<Register>("Register");
+    qRegisterMetaType<FieldAdapter>("FieldAdapter");
+    //---------------------------------------------------------------
 
     engine.addImportPath(":/qml");
     const QUrl url(QStringLiteral("qrc:/qml/main.qml"));

@@ -15,8 +15,6 @@ public:
 private:
     quint64 m_data;
 
-    quint8 m_size;
-
     quint32 m_valueFrom;
     quint32 m_valueTo;
 };

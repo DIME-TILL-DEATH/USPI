@@ -10,5 +10,7 @@
         <file>qml/Elements/qmldir</file>
         <file>qml/Elements/FieldProperties.qml</file>
         <file>qml/Elements/FieldTip.qml</file>
+        <file>qml/Views/qmldir</file>
+        <file>qml/Views/LogView.qml</file>
     </qresource>
 </RCC>

@@ -35,20 +35,6 @@ private:
 
     bool readRegister(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);
 
-//    static bool readAbstractField(const QJsonObject &jsonObject, AbstractField* field, ParseError* error = nullptr);
-//    static bool readBitField(const QJsonObject &jsonObject, AbstractField* field, ParseError* error = nullptr);
-//    static bool readIntegerField(const QJsonObject &jsonObject, AbstractField* field, ParseError* error = nullptr);
-//    static bool readVariantListField(const QJsonObject &jsonObject, AbstractField* field,  ParseError* error = nullptr);
-//    static bool readFixedField(const QJsonObject& jsonObject, AbstractField* field, ParseError* error = nullptr);
-
-//    std::map<QString, std::function<bool(const QJsonObject&, AbstractField*, ParseError*)> > readMethodList
-//    {
-//        {"bits",            &FileParser::readBitField},
-//        {"integers",        &FileParser::readIntegerField},
-//        {"variant_lists",   &FileParser::readVariantListField},
-//        {"fixed",           &FileParser::readFixedField}
-//    };
-
     static bool readAbstractField(const QJsonObject &jsonObject, AbstractField* field, ParseError* error = nullptr);
 
     static bool readBitField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);

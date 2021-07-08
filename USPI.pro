@@ -1,4 +1,5 @@
 QT += quick
+QT += quickcontrols2
 
 CONFIG += c++11
 
@@ -12,11 +13,14 @@ SOURCES += \
         src/abstractinterface.cpp \
         src/bitfield.cpp \
         src/dutdevice.cpp \
+        src/fieldadapter.cpp \
         src/fileparser.cpp \
         src/fixedfield.cpp \
         src/integerfield.cpp \
+        src/logger.cpp \
         src/parseerror.cpp \
         src/register.cpp \
+        src/userinterface.cpp \
         src/variantlistfield.cpp
 
 RESOURCES += qml.qrc
@@ -38,9 +42,12 @@ HEADERS += \
     src/abstractinterface.h \
     src/bitfield.h \
     src/dutdevice.h \
+    src/fieldadapter.h \
     src/fileparser.h \
     src/fixedfield.h \
     src/integerfield.h \
+    src/logger.h \
     src/parseerror.h \
     src/register.h \
+    src/userinterface.h \
     src/variantlistfield.h

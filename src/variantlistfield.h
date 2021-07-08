@@ -17,7 +17,6 @@ public:
 
 private:
     QHash<QString, quint32> m_data;
-    quint8 m_size;
 };
 
 #endif // VARIANTLISTFIELD_H

@@ -23,6 +23,15 @@ public:
         VariantListField
     };
 
+    const QString &name() const;
+    const QString &description() const;
+    const QString &comment() const;
+
+    FieldType type() const;
+
+    quint8 position() const;
+    quint8 size() const;
+
 protected:
     QString m_name;
     QString m_description;
@@ -30,6 +39,7 @@ protected:
     FieldType m_type;
 
     quint8 m_position;
+    quint8 m_size{1};
 
     friend class FileParser;
 };

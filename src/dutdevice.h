@@ -3,6 +3,7 @@
 
 #include <QString>
 
+#include "parseerror.h"
 #include "register.h"
 
 //class Register;
@@ -10,9 +11,7 @@
 class DUTDevice
 {
 public:
-    DUTDevice(const QString& fileName);
-
-    static bool fromFile(const QString& fileName);
+    bool loadFromFile(const QString& fileName, ParseError* error = nullptr);
 
     struct Header{
         QString deviceName;
@@ -20,9 +19,12 @@ public:
         quint8 registerSize;
         bool  isMSB;
     };
+
+    const Register& registerAt(quint16 registerIndex) const;
+private:
     Header m_deviceHeader;
     std::vector<Register> m_deviceRegisterMap;
-private:
+
 };
 
 #endif // DUTDEVICE_H

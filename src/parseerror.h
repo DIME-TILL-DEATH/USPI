@@ -15,6 +15,8 @@ public:
     {
         NoError,
 
+        FileError,
+
         PointerError,
 
         GlobalObjectError,

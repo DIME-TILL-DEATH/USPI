@@ -6,6 +6,8 @@ QString ParseError::errorString()
     {
         case ErrorType::NoError: return "No error";
 
+        case ErrorType::FileError: return "Can't open file: " + m_additionalErrorInfo;
+
         case ErrorType::PointerError: return "Casting pointer error: " + m_additionalErrorInfo;
 
         case ErrorType::GlobalObjectError: return "JSON global object error: " + m_additionalErrorInfo;

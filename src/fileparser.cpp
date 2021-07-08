@@ -10,7 +10,7 @@ bool FileParser::loadFile(const QString &name, ParseError* error)
     QFile deviceFile(name);
     if(!deviceFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Config file don't found!";
+        if(error != nullptr) error->setErrorType(ParseError::ErrorType::FileError, name);
         return false;
     }
     else

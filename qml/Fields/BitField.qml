@@ -6,7 +6,10 @@ import Elements 1.0
 Rectangle{
     id: _root
 
+    property int fieldIndex : 0
     property alias properties : _header
+
+    signal fieldChanged(fieldId : int, newValue : int)
 
     width: parent.width
     height: parent.height/10
@@ -32,6 +35,10 @@ Rectangle{
             padding: 0
             spacing: 0
             anchors.verticalCenter: parent.verticalCenter
+
+            onToggled: {
+                fieldChanged(fieldIndex, checkState)
+            }
         }
     }
 }

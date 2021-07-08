@@ -6,7 +6,10 @@ import Elements 1.0
 Rectangle{
     id: _root
 
+    property int fieldIndex : 0
     property alias properties : _header
+
+    signal fieldChanged(fieldId : string, newValue : int)
 
     width: parent.width
     height: parent.height/10
