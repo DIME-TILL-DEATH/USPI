@@ -7,11 +7,18 @@ class FileParser;
 class IntegerField : public AbstractField
 {
 public:
+    friend class FileParser;
+
     IntegerField();
 
     QByteArray rawData(quint16 targetRegisterSize);
 
-    friend class FileParser;
+    quint64 data() const;
+    void setData(quint64 newData);
+
+    quint32 valueFrom() const;
+    quint32 valueTo() const;
+
 private:
     quint64 m_data;
 

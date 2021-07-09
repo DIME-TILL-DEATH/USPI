@@ -5,6 +5,7 @@
 //#include "fileparser.h"
 
 class FileParser;
+class Register;
 
 class ParseError
 {
@@ -29,12 +30,15 @@ public:
 
         RegisterMapNotFound,
         RegisterHeaderError,
-        FieldContentError
+        FieldContentError,
+
+        FieldsOverLaps
     };
 
     QString errorString();
 
     friend class FileParser;
+    friend class Register;
 private:
     void setErrorType(ErrorType type, const QString& additionalErrorInfo = "");
 

@@ -4,16 +4,16 @@ import QtQuick.Controls 2.12
 Rectangle {
     id: _root
 
-    property int position : 0
-    property int size : 0
+    property var adapter
 
-    property int resultValue: 0
+    property int position : (adapter !== undefined) ? adapter.position : 0
+    property int size : (adapter !== undefined) ? adapter.size : 0
 
-    property string name: "Имя поля"
-    property string description : "описание"
-    property string comment: "комментарий"
+    property string name: (adapter !== undefined) ? adapter.name : "Имя поля"
+    property string description : (adapter !== undefined) ? adapter.description : "описание"
+    property string comment: (adapter !== undefined) ? adapter.comment : "комментарий"
 
-    width: parent.width / 8
+    width: parent.width / 6
     height: parent.height
 
     border.width: 1
@@ -34,7 +34,7 @@ Rectangle {
             id: _bitsPostiton
 
 
-            text: (size <= 1) ?  "Бит " + position
+            text: (size <= 1) ?  "Бит " + position + ":"
                                 :"Биты " + (position+size) + "..." + position + ":"
         }
     }

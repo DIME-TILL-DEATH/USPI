@@ -6,10 +6,12 @@ import Elements 1.0
 Rectangle{
     id: _root
 
-    property int fieldIndex : 0
-    property alias properties : _header
+    property var adapter
+    property int value: (adapter !== undefined) ? adapter.value : 0
 
-    signal fieldChanged(fieldId : int, newValue : int)
+    property int fieldIndex : 0
+
+    signal fieldChanged(fieldId : string, newValue : int)
 
     width: parent.width
     height: parent.height/10
@@ -17,7 +19,7 @@ Rectangle{
     radius: height/5
 
     FieldTip{
-        tipText: properties.description
+        tipText: (adapter !== undefined) ? adapter.description : "описание"
     }
 
     Row{
@@ -27,7 +29,7 @@ Rectangle{
         spacing: width / 50
 
         FieldProperties{
-            id: _header
+            adapter: _root.adapter
         }
 
         CheckBox{
@@ -36,8 +38,10 @@ Rectangle{
             spacing: 0
             anchors.verticalCenter: parent.verticalCenter
 
+            checked: value
+
             onToggled: {
-                fieldChanged(fieldIndex, checkState)
+                fieldChanged(adapter.name, checkState)
             }
         }
     }

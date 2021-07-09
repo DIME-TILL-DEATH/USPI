@@ -12,6 +12,8 @@ public:
     QByteArray rawData(quint16 targetRegisterSize);
 
     friend class FileParser;
+    quint32 data() const;
+
 private:
     quint32 m_data;
 };

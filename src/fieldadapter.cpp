@@ -1,35 +1,38 @@
 #include "fieldadapter.h"
 
 
+void FieldAdapter::qt_check_for_QGADGET_macro()
+{
+
+}
+
 FieldAdapter::FieldAdapter()
 {
 
 }
 
-FieldAdapter::FieldAdapter(AbstractField *field, quint16 fieldIndex)
-    : m_field{field},
-      m_index{fieldIndex}
+FieldAdapter::FieldAdapter(AbstractField *field)
+    : m_field{field}
 {
 }
 
-QString FieldAdapter::name()
+QString FieldAdapter::name() const
 {
     return m_field->name();
 }
 
-QString FieldAdapter::description()
+QString FieldAdapter::description() const
 {
     return m_field->description();
 }
 
-QString FieldAdapter::comment()
+QString FieldAdapter::comment() const
 {
     return m_field->comment();
 }
 
-QString FieldAdapter::type()
+QString FieldAdapter::type() const
 {
-    //return m_field->type();
     switch(m_field->type())
     {
         case AbstractField::FieldType::FixedField: return "fixed";
@@ -40,17 +43,75 @@ QString FieldAdapter::type()
     }
 }
 
-quint16 FieldAdapter::position()
+quint16 FieldAdapter::position() const
 {
     return m_field->position();
 }
 
-quint16 FieldAdapter::size()
+quint16 FieldAdapter::size() const
 {
     return m_field->size();
 }
 
-quint16 FieldAdapter::index() const
+QVariant FieldAdapter::value() const
 {
-    return m_index;
+    switch(m_field->type())
+    {
+        case AbstractField::FieldType::FixedField:
+            return dynamic_cast<FixedField*>(m_field)->data();
+
+        case AbstractField::FieldType::BitField:
+            return dynamic_cast<BitField*>(m_field)->getBit();
+
+        case AbstractField::FieldType::IntegerField:
+            return dynamic_cast<IntegerField*>(m_field)->data();
+
+        case AbstractField::FieldType::VariantListField:
+
+        return  "variant_list";
+
+        default: return "Value undefined";
+    }
+}
+
+void FieldAdapter::setValue(const QVariant &newValue)
+{
+
+    switch(m_field->type())
+    {
+        case AbstractField::FieldType::BitField:
+            dynamic_cast<BitField*>(m_field)->setBit(newValue.toBool());
+            break;
+        case AbstractField::FieldType::IntegerField:
+            dynamic_cast<IntegerField*>(m_field)->setData(newValue.toLongLong());
+            break;
+        case AbstractField::FieldType::VariantListField:
+
+
+        default: break;
+    }
+}
+
+QVariant FieldAdapter::valueFrom() const
+{
+    if(m_field->type() == AbstractField::FieldType::IntegerField)
+    {
+        return dynamic_cast<IntegerField*>(m_field)->valueFrom();
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+QVariant FieldAdapter::valueTo() const
+{
+    if(m_field->type() == AbstractField::FieldType::IntegerField)
+    {
+        return dynamic_cast<IntegerField*>(m_field)->valueTo();
+    }
+    else
+    {
+        return 0;
+    }
 }

@@ -15,3 +15,23 @@ QByteArray IntegerField::rawData(quint16 targetRegisterSize)
     }
     return result;
 }
+
+quint64 IntegerField::data() const
+{
+    return m_data;
+}
+
+void IntegerField::setData(quint64 newData)
+{
+    m_data = newData;
+}
+
+quint32 IntegerField::valueFrom() const
+{
+    return m_valueFrom;
+}
+
+quint32 IntegerField::valueTo() const
+{
+    return m_valueTo;
+}

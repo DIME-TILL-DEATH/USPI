@@ -2,6 +2,8 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.15
 
+import QtQuick.Layouts 1.15
+
 import QtQuick.Dialogs 1.3
 
 import Fields 1.0
@@ -38,33 +40,62 @@ ApplicationWindow {
             var result = Backend.loadDevice(_fileDialog.fileUrl)
 
             if(result === "No error")
-                Log.message("Карта регистров успешно загружена")
-            else
-                Log.message(result)
-
-            var reg = Backend.getRegister()
-            for(var fieldIndex=0; fieldIndex<reg.fieldsCount; fieldIndex++)
             {
-                var fieldAdapter = reg.field(fieldIndex)
-                createField(fieldAdapter)
-            }
+                Log.message("Карта регистров успешно загружена")
 
+                // delete old fields
+                for(var childIndex=0; childIndex < _columnFields.children.length; childIndex++)
+                {
+                    _columnFields.children[childIndex].destroy()
+                }
+
+                var reg = Backend.getRegister()
+                for(var fieldIndex = reg.fieldsCount-1; fieldIndex >= 0; fieldIndex--)
+                {
+                    var fieldAdapter = reg.field(fieldIndex)
+                    createField(fieldAdapter)
+                }
+            }
+            else
+            {
+                Log.message(result)
+            }
         }
         Component.onCompleted: visible = false
     }
 
-    Column{
-        id: _columnFields
+    Row{
+        anchors.fill: parent
 
-        width: parent.width * 0.8
-        height: parent.height
+        ListView{
+            id: _registerMapView
 
-        spacing: height/200
+            width: parent.width * 0.2
+            height: parent.height
+        }
+
+//        StackLayout{
+//            width: parent.width * 0.8
+//            height: parent.height
+
+            Column{
+                id: _columnFields
+
+                width: parent.width * 0.8
+                height: parent.height
+                spacing: height/200
+            }
+        }
+//    }
+
+    LogView{
+        anchors.bottom: parent.bottom
+        width: parent.width
+        height: parent.height *0.2
     }
 
-    LogView{}
-
-    function createField(fieldAdapter) {
+    function createField(fieldAdapter)
+    {
         var fieldTypeName
         switch(fieldAdapter.type){
             case "fixed" :
@@ -92,15 +123,7 @@ ApplicationWindow {
         else
         {
             field.fieldChanged.connect(fieldChanged)
-
-            field.properties.name = fieldAdapter.name
-            field.properties.description = fieldAdapter.description
-            field.properties.comment = fieldAdapter.comment
-
-            field.properties.position = fieldAdapter.position
-            field.properties.size = fieldAdapter.size
-
-            field.fieldIndex = fieldAdapter.index
+            field.adapter = fieldAdapter
         }
     }
 

@@ -29,6 +29,7 @@ public:
 private:
     QString m_name;
     quint16 m_bitSize;
+
     std::vector<AbstractField*> m_fields;
 
     FieldAdapter m_fieldAdapter;

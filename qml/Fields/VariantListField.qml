@@ -6,8 +6,7 @@ import Elements 1.0
 Rectangle{
     id: _root
 
-    property int fieldIndex : 0
-    property alias properties : _header
+    property var adapter
 
     signal fieldChanged(fieldId : string, newValue : int)
 
@@ -27,7 +26,7 @@ Rectangle{
         spacing: width / 50
 
         FieldProperties{
-            id: _header
+            adapter: _root.adapter
         }
 
         ComboBox{

@@ -8,6 +8,8 @@ bool DUTDevice::loadFromFile(const QString &fileName, ParseError *error)
     if(!jsonFile.loadFile(fileName, error)) return false;
     if(!jsonFile.readHeader(&m_deviceHeader, error)) return false;
     if(!jsonFile.readRegisterArray(&m_deviceRegisterMap, error)) return false;
+
+    if(!m_deviceRegisterMap.at(0).sortAndValidateFields(error)) return false;
     return true;
 }
 

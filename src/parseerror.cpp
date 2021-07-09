@@ -23,6 +23,8 @@ QString ParseError::errorString()
 
         case ErrorType::FieldContentError: return "Field content error: " + m_additionalErrorInfo;
 
+        case ErrorType::FieldsOverLaps: return "Fields overlaps: " + m_additionalErrorInfo;
+
         default: return "Unknown error";
     }
 }

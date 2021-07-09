@@ -5,10 +5,6 @@ import QtQuick.Controls 2.15
 Rectangle{
     id: _rootRectangle
 
-    anchors.bottom: parent.bottom
-    width: parent.width
-    height: parent.height *0.2
-
     border.width: 1
 
 
@@ -28,14 +24,14 @@ Rectangle{
 
             Text{
                 id: _text
-                leftPadding: parent.width/200
+                leftPadding: font.pixelSize
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Лог событий:"
             }
         }
 
         delegate: Text{
-            leftPadding: parent.width/200
+            leftPadding: font.pixelSize
 
             text: model.display
         }

@@ -2,8 +2,10 @@
 #define FIELDADAPTER_H
 
 #include <QObject>
+#include <QVariant>
 
 #include "abstractfield.h"
+#include "fixedfield.h"
 #include "integerfield.h"
 #include "bitfield.h"
 #include "variantlistfield.h"
@@ -21,25 +23,29 @@ class FieldAdapter
     Q_PROPERTY(quint8 position READ position)
     Q_PROPERTY(quint8 size READ size)
 
-    Q_PROPERTY(quint16 index READ index)
+    Q_PROPERTY(QVariant value READ value WRITE setValue)
+    Q_PROPERTY(QVariant valueFrom READ valueFrom)
+    Q_PROPERTY(QVariant valueTo READ valueTo)
 public:
     FieldAdapter();
-    FieldAdapter(AbstractField* field, quint16 fieldIndex = 0);
+    FieldAdapter(AbstractField* field);
 
-    QString name();
-    QString description();
-    QString comment();
+    QString name() const;
+    QString description() const;
+    QString comment() const;
 
-    QString type();
+    QString type() const;
 
-    quint16 position();
-    quint16 size();
+    quint16 position() const;
+    quint16 size() const;
 
-    quint16 index() const;
+    QVariant value() const;
+    void setValue(const QVariant& newValue);
 
+    QVariant valueFrom() const;
+    QVariant valueTo() const;
 private:
     AbstractField* m_field;
-    quint16 m_index;
 };
 Q_DECLARE_METATYPE(FieldAdapter)
 
