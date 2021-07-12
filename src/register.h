@@ -16,7 +16,9 @@ class Register
     Q_GADGET
     Q_PROPERTY(QString name READ name)
     Q_PROPERTY(quint16 fieldsCount READ fieldsCount)
+
 public:
+    friend class FileParser;
     Register();
     ~Register();
 
@@ -26,6 +28,8 @@ public:
     bool sortAndValidateFields(ParseError* error = nullptr);
 
     Q_INVOKABLE FieldAdapter field(quint16 fieldIndex);
+
+    Q_INVOKABLE QByteArray rawData();
 private:
     QString m_name;
     quint16 m_bitSize;
@@ -34,7 +38,6 @@ private:
 
     FieldAdapter m_fieldAdapter;
 
-    friend class FileParser;
 };
 Q_DECLARE_METATYPE(Register)
 

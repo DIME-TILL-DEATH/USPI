@@ -25,7 +25,7 @@ bool FileParser::loadFile(const QString &name, ParseError* error)
             QString additionalErrorInfo{"Invalid json file: " +
                                         jsonError.errorString() +
                                         " at position " +
-                                        jsonError.offset};
+                                        QString::number(jsonError.offset, 10)};
 
             if(error != nullptr) error->setErrorType(ParseError::ErrorType::GlobalObjectError, additionalErrorInfo);
             return false;
@@ -299,6 +299,7 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
                     variantValue = variantObject["value"].toDouble();
 
                     variantListField->m_data.insert(variantName, variantValue);
+                    variantListField->m_selected = variantName;
                 }
                 else
                 {

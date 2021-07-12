@@ -17,6 +17,7 @@ public:
 
     // заглушка
     Q_INVOKABLE Register getRegister(quint16 index = 0);
+    Q_INVOKABLE quint16 registerCount();
 private:
     DUTDevice m_device;
     QStringListModel logger;

@@ -6,8 +6,11 @@ import QtQuick.Layouts 1.15
 
 import QtQuick.Dialogs 1.3
 
+import Elements 1.0
 import Fields 1.0
 import Views 1.0
+
+import "CreateFunctions.js" as Scripts
 
 ApplicationWindow {
     width: 640
@@ -43,18 +46,13 @@ ApplicationWindow {
             {
                 Log.message("Карта регистров успешно загружена")
 
-                // delete old fields
-                for(var childIndex=0; childIndex < _columnFields.children.length; childIndex++)
+                _registerMap.clear()
+                for(var registerIndex=0; registerIndex < Backend.registerCount(); registerIndex++)
                 {
-                    _columnFields.children[childIndex].destroy()
+                    _registerMap.append({"register" : Backend.getRegister(registerIndex)})
                 }
 
-                var reg = Backend.getRegister()
-                for(var fieldIndex = reg.fieldsCount-1; fieldIndex >= 0; fieldIndex--)
-                {
-                    var fieldAdapter = reg.field(fieldIndex)
-                    createField(fieldAdapter)
-                }
+                Scripts.createRegisterFields(0, _fieldsView)
             }
             else
             {
@@ -64,70 +62,79 @@ ApplicationWindow {
         Component.onCompleted: visible = false
     }
 
+
     Row{
         anchors.fill: parent
+
+        padding: width / 200
+        spacing: width / 200
+
+        ListModel{
+            id: _registerMap
+        }
 
         ListView{
             id: _registerMapView
 
-            width: parent.width * 0.2
+            width: parent.width * 0.15
             height: parent.height
-        }
 
-//        StackLayout{
-//            width: parent.width * 0.8
-//            height: parent.height
+            spacing: height/200
 
-            Column{
-                id: _columnFields
+            model: _registerMap
 
-                width: parent.width * 0.8
-                height: parent.height
-                spacing: height/200
+            delegate: RegisterHeader{
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        _registerMapView.currentIndex = index
+                        Scripts.createRegisterFields(_registerMapView.currentIndex, _fieldsView)
+                    }
+                }
             }
         }
-//    }
+
+        Column{
+            id: _fieldsView
+
+            property var registerAdapter
+
+            width: parent.width * 0.6
+            height: parent.height
+            spacing: height/200
+        }
+
+    }
+
+    Rectangle{
+        id: _resultRectangle
+
+        anchors.bottom: _loggerWindow.top
+
+        width: parent.width
+        height: _text.font.pixelSize*2
+
+        border.width: 1
+
+        Text{
+            id: _text
+            leftPadding: font.pixelSize
+            anchors.verticalCenter: parent.verticalCenter
+
+            text: "Результат: 0x"
+        }
+    }
 
     LogView{
+        id: _loggerWindow
+
         anchors.bottom: parent.bottom
         width: parent.width
         height: parent.height *0.2
     }
 
-    function createField(fieldAdapter)
-    {
-        var fieldTypeName
-        switch(fieldAdapter.type){
-            case "fixed" :
-                fieldTypeName = "Fields/FixedField.qml";
-                break;
-            case "bit" :
-                fieldTypeName = "Fields/BitField.qml";
-                break;
-            case "integer" :
-                fieldTypeName = "Fields/IntegerField.qml";
-                break;
-            case "variant_list":
-                fieldTypeName = "Fields/VariantListField.qml";
-                break;
-            default:
-                Log.message("Неизвестный тип поля")
-                break;
-        }
-        var component = Qt.createComponent(fieldTypeName);
-        var field = component.createObject(_columnFields);
-
-        if (field === null) {
-            Log.message("Ошибка создания поля");
-        }
-        else
-        {
-            field.fieldChanged.connect(fieldChanged)
-            field.adapter = fieldAdapter
-        }
-    }
-
     function fieldChanged(fieldId, newValue){
-        console.log(fieldId, newValue)
+//        console.log(fieldId, newValue)
+        console.log(_fieldsView.registerAdapter.rawData())
     }
 }

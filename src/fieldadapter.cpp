@@ -67,7 +67,7 @@ QVariant FieldAdapter::value() const
             return dynamic_cast<IntegerField*>(m_field)->data();
 
         case AbstractField::FieldType::VariantListField:
-
+            return dynamic_cast<VariantListField*>(m_field)->selected();
         return  "variant_list";
 
         default: return "Value undefined";
@@ -86,8 +86,7 @@ void FieldAdapter::setValue(const QVariant &newValue)
             dynamic_cast<IntegerField*>(m_field)->setData(newValue.toLongLong());
             break;
         case AbstractField::FieldType::VariantListField:
-
-
+            dynamic_cast<VariantListField*>(m_field)->setSelected(newValue.toString());
         default: break;
     }
 }
@@ -114,4 +113,28 @@ QVariant FieldAdapter::valueTo() const
     {
         return 0;
     }
+}
+
+QVariant FieldAdapter::variantList() const
+{
+    if(m_field->type() == AbstractField::FieldType::VariantListField)
+    {
+        QStringList result;
+        VariantListField* field_ptr = dynamic_cast<VariantListField*>(m_field);
+
+        for(auto it=field_ptr->data().begin(); it != field_ptr->data().end(); it++)
+        {
+            result.append(it.key());
+        }
+        return result;
+    }
+    else
+    {
+        return value();
+    }
+}
+
+void FieldAdapter::fieldUpdated()
+{
+
 }

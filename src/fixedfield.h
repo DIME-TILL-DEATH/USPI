@@ -9,13 +9,13 @@ class FixedField : public AbstractField
 public:
     FixedField();
 
-    QByteArray rawData(quint16 targetRegisterSize);
+    QByteArray rawData(quint16 targetRegisterByteSize);
 
     friend class FileParser;
     quint32 data() const;
 
 private:
-    quint32 m_data;
+    quint64 m_data;
 };
 
 #endif // FIXEDFIELD_H

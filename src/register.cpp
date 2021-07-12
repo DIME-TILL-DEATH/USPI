@@ -38,6 +38,19 @@ bool Register::sortAndValidateFields(ParseError *error)
         }
     }
 
+    //checking size
+    for(auto it=m_fields.begin(); it != m_fields.end(); ++it)
+    {
+        if(((*it)->position() + (*it)->size()) > m_bitSize)
+        {
+            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldSizeError,
+                                                     (*it)->name() + " position " + QString::number((*it)->position(), 10) +
+                                                     " + size " + QString::number((*it)->size(), 10) + " is greater than size of target register (" +
+                                                     QString::number(m_bitSize,10) +")");
+            return false;
+        }
+    }
+
     // sorting
     AbstractField* temp;
     for(quint16 i=0; i < m_fields.size()-1; i++)
@@ -58,6 +71,16 @@ bool Register::sortAndValidateFields(ParseError *error)
 FieldAdapter Register::field(quint16 fieldIndex)
 {
     return FieldAdapter(m_fields.at(fieldIndex));
+}
+
+QByteArray Register::rawData()
+{
+    QByteArray resultData;
+    for(auto it=m_fields.begin(); it!=m_fields.end(); ++it)
+    {
+        resultData = (*it)->rawData(m_bitSize/8);
+    }
+    return resultData;
 }
 
 QString Register::name() const

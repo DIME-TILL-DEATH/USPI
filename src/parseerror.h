@@ -2,10 +2,11 @@
 #define PARSEERROR_H
 
 #include <QString>
-//#include "fileparser.h"
 
+// Может всё-таки setErrorType сделать открытым?
 class FileParser;
 class Register;
+class DUTDevice;
 
 class ParseError
 {
@@ -30,14 +31,17 @@ public:
 
         RegisterMapNotFound,
         RegisterHeaderError,
-        FieldContentError,
+        RegisterContentError,
 
+        FieldContentError,
+        FieldSizeError,
         FieldsOverLaps
     };
 
     QString errorString();
 
     friend class FileParser;
+    friend class DUTDevice;
     friend class Register;
 private:
     void setErrorType(ErrorType type, const QString& additionalErrorInfo = "");

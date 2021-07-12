@@ -11,13 +11,13 @@ public:
 
     BitField();
 
-    QByteArray rawData(quint16 targetRegisterSize);
+    QByteArray rawData(quint16 targetRegisterByteSize);
 
     bool getBit() const;
     void setBit(bool newSettled);
 
 private:
-    bool m_bit;
+    bool m_bit{false};
 };
 
 #endif // BITFIELD_H

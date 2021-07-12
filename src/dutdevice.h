@@ -20,6 +20,7 @@ public:
         bool  isMSB;
     };
 
+    quint16 registerCount();
     const Register& registerAt(quint16 registerIndex) const;
 private:
     Header m_deviceHeader;

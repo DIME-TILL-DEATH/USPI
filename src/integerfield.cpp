@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "integerfield.h"
 
 IntegerField::IntegerField()
@@ -5,15 +7,16 @@ IntegerField::IntegerField()
 
 }
 
-QByteArray IntegerField::rawData(quint16 targetRegisterSize)
+QByteArray IntegerField::rawData(quint16 targetRegisterByteSize)
 {
-    QByteArray result;
+    quint16 numByte = m_position / 8;
 
-    if(m_position + m_size <= targetRegisterSize)
-    {
-        result.setNum(m_data << m_position, 16);
-    }
-    return result;
+    QByteArray resultData;
+
+    resultData.replace(numByte, 5, shiftBitData(m_data));
+    resultData.resize(targetRegisterByteSize);
+
+    return resultData;
 }
 
 quint64 IntegerField::data() const

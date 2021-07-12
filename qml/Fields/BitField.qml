@@ -33,6 +33,8 @@ Rectangle{
         }
 
         CheckBox{
+            id: _checkBox
+
             height: parent.height*0.75
             padding: 0
             spacing: 0
@@ -41,7 +43,9 @@ Rectangle{
             checked: value
 
             onToggled: {
-                fieldChanged(adapter.name, checkState)
+
+                adapter.value = _checkBox.checked
+                fieldChanged(adapter.name, _checkBox.checked)
             }
         }
     }

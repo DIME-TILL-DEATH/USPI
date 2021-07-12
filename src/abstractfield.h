@@ -4,6 +4,8 @@
 #include <QByteArray>
 #include <QString>
 
+#include <math.h>
+
 class FileParser;
 
 class AbstractField
@@ -40,6 +42,8 @@ protected:
 
     quint8 m_position;
     quint8 m_size{1};
+
+    QByteArray shiftBitData(quint64 data);
 
     friend class FileParser;
 };

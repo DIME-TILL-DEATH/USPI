@@ -12,5 +12,7 @@
         <file>qml/Elements/FieldTip.qml</file>
         <file>qml/Views/qmldir</file>
         <file>qml/Views/LogView.qml</file>
+        <file>qml/CreateFunctions.js</file>
+        <file>qml/Elements/RegisterHeader.qml</file>
     </qresource>
 </RCC>

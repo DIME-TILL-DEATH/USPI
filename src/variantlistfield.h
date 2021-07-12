@@ -9,14 +9,20 @@ class FileParser;
 class VariantListField : public AbstractField
 {
 public:
+    friend class FileParser;
     VariantListField();
 
-    QByteArray rawData(quint16 targetRegisterSize);
+    QByteArray rawData(quint16 targetRegisterByteSize);
 
-    friend class FileParser;
+
+    const QString &selected() const;
+    void setSelected(const QString &newSelected);
+
+    const QHash<QString, quint64> &data() const;
 
 private:
-    QHash<QString, quint32> m_data;
+    QString m_selected;
+    QHash<QString, quint64> m_data;
 };
 
 #endif // VARIANTLISTFIELD_H

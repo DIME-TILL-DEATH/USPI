@@ -20,9 +20,10 @@ QString ParseError::errorString()
 
         case ErrorType::RegisterMapNotFound: return "Register map not found in config file!";
         case ErrorType::RegisterHeaderError: return "Error in register header: " + m_additionalErrorInfo;
+        case ErrorType::RegisterContentError: return "Register parse error:" + m_additionalErrorInfo;
 
         case ErrorType::FieldContentError: return "Field content error: " + m_additionalErrorInfo;
-
+        case ErrorType::FieldSizeError: return "Field size error: " + m_additionalErrorInfo;
         case ErrorType::FieldsOverLaps: return "Fields overlaps: " + m_additionalErrorInfo;
 
         default: return "Unknown error";

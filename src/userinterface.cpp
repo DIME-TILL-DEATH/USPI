@@ -18,3 +18,8 @@ Register UserInterface::getRegister(quint16 index)
 {
     return m_device.registerAt(index);
 }
+
+quint16 UserInterface::registerCount()
+{
+    return m_device.registerCount();
+}

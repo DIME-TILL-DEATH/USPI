@@ -11,7 +11,7 @@ public:
 
     IntegerField();
 
-    QByteArray rawData(quint16 targetRegisterSize);
+    QByteArray rawData(quint16 targetRegisterByteSize);
 
     quint64 data() const;
     void setData(quint64 newData);
