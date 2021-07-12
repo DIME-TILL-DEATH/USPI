@@ -11,7 +11,7 @@ QByteArray IntegerField::rawData(quint16 targetRegisterByteSize)
 {
     quint16 numByte = m_position / 8;
 
-    QByteArray resultData;
+    QByteArray resultData(targetRegisterByteSize, 0);
 
     resultData.replace(numByte, 5, shiftBitData(m_data));
     resultData.resize(targetRegisterByteSize);

@@ -5,6 +5,7 @@
 
 #include "parseerror.h"
 #include "register.h"
+#include "registeradapter.h"
 
 //class Register;
 
@@ -21,7 +22,7 @@ public:
     };
 
     quint16 registerCount();
-    const Register& registerAt(quint16 registerIndex) const;
+    RegisterAdapter registerAdapter(quint16 registerIndex);
 private:
     Header m_deviceHeader;
     std::vector<Register> m_deviceRegisterMap;

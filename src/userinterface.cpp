@@ -14,9 +14,9 @@ QString UserInterface::loadDevice(const QUrl &fileName)
     return error.errorString();
 }
 
-Register UserInterface::getRegister(quint16 index)
+RegisterAdapter UserInterface::registerAdapter(quint16 index)
 {
-    return m_device.registerAt(index);
+    return m_device.registerAdapter(index);
 }
 
 quint16 UserInterface::registerCount()

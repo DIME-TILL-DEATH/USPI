@@ -8,7 +8,7 @@ class Logger: public QStringListModel
 {
     Q_OBJECT
 public:
-    explicit Logger(QObject *parent = nullptr);
+    explicit Logger(QObject *parent = nullptr) {Q_UNUSED(parent)};
 
     Q_INVOKABLE void message(const QString &line);
 private:

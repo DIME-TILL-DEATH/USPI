@@ -1,21 +1,6 @@
 #include "fieldadapter.h"
 
 
-void FieldAdapter::qt_check_for_QGADGET_macro()
-{
-
-}
-
-FieldAdapter::FieldAdapter()
-{
-
-}
-
-FieldAdapter::FieldAdapter(AbstractField *field)
-    : m_field{field}
-{
-}
-
 QString FieldAdapter::name() const
 {
     return m_field->name();

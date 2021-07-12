@@ -63,8 +63,8 @@ Rectangle{
 
             onEditingFinished: {
                 adapter.value = parseInt(text)
-                fieldChanged(adapter.name, parseInt(text))
                 _textField.focus = false
+                fieldChanged(adapter.name, parseInt(text))
             }
         }
     }

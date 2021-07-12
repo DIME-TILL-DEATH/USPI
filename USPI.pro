@@ -20,6 +20,7 @@ SOURCES += \
         src/logger.cpp \
         src/parseerror.cpp \
         src/register.cpp \
+        src/registeradapter.cpp \
         src/userinterface.cpp \
         src/variantlistfield.cpp
 
@@ -49,5 +50,6 @@ HEADERS += \
     src/logger.h \
     src/parseerror.h \
     src/register.h \
+    src/registeradapter.h \
     src/userinterface.h \
     src/variantlistfield.h

@@ -30,8 +30,8 @@ class FieldAdapter
     Q_PROPERTY(QVariant variantList READ variantList NOTIFY fieldUpdated)
 
 public:
-    FieldAdapter();
-    FieldAdapter(AbstractField* field);
+    FieldAdapter() {};
+    FieldAdapter(AbstractField* field) : m_field{field} {};
 
     QString name() const;
     QString description() const;
@@ -49,6 +49,7 @@ public:
     QVariant valueTo() const;
 
     QVariant variantList() const;
+
 signals:
     void fieldUpdated();
 

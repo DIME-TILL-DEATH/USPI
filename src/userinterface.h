@@ -5,6 +5,7 @@
 #include <QUrl>
 #include <QStringListModel>
 
+#include "registeradapter.h"
 #include "dutdevice.h"
 
 class UserInterface : public QObject
@@ -16,7 +17,7 @@ public:
     Q_INVOKABLE QString loadDevice(const QUrl& fileName);
 
     // заглушка
-    Q_INVOKABLE Register getRegister(quint16 index = 0);
+    Q_INVOKABLE RegisterAdapter registerAdapter(quint16 index = 0);
     Q_INVOKABLE quint16 registerCount();
 private:
     DUTDevice m_device;

@@ -29,7 +29,8 @@ quint16 DUTDevice::registerCount()
     return m_deviceRegisterMap.size();
 }
 
-const Register &DUTDevice::registerAt(quint16 registerIndex) const
+RegisterAdapter DUTDevice::registerAdapter(quint16 registerIndex)
 {
-    return m_deviceRegisterMap.at(registerIndex);
+
+    return RegisterAdapter(&(m_deviceRegisterMap.at(registerIndex)));
 }

@@ -337,6 +337,11 @@ bool FileParser::readFixedField(const QJsonObject &jsonObject, Register* deviceR
     {
         fixedField->m_type = AbstractField::FieldType::FixedField;
 
+        if(jsonObject.contains("size") && jsonObject["size"].isDouble())
+        {
+            fixedField->m_size = jsonObject["size"].toDouble();
+        }
+
         if(jsonObject.contains("value") && jsonObject["value"].isDouble())
         {
             fixedField->m_data = jsonObject["value"].toDouble();

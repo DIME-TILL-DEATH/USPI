@@ -13,7 +13,7 @@ AbstractField::~AbstractField()
 
 QByteArray AbstractField::rawData(quint16 targetRegisterSize)
 {
-    return {};
+    return QByteArray(targetRegisterSize, 0);
 }
 
 const QString &AbstractField::name() const

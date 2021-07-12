@@ -2,7 +2,7 @@
 #define REGISTER_H
 
 #include <vector>
-#include <QObject>
+#include <QString>
 
 #include "abstractfield.h"
 
@@ -13,10 +13,6 @@ class FileParser;
 
 class Register
 {
-    Q_GADGET
-    Q_PROPERTY(QString name READ name)
-    Q_PROPERTY(quint16 fieldsCount READ fieldsCount)
-
 public:
     friend class FileParser;
     Register();
@@ -27,9 +23,9 @@ public:
 
     bool sortAndValidateFields(ParseError* error = nullptr);
 
-    Q_INVOKABLE FieldAdapter field(quint16 fieldIndex);
+    FieldAdapter field(quint16 fieldIndex);
 
-    Q_INVOKABLE QByteArray rawData();
+    QByteArray rawData();
 private:
     QString m_name;
     quint16 m_bitSize;
@@ -39,6 +35,5 @@ private:
     FieldAdapter m_fieldAdapter;
 
 };
-Q_DECLARE_METATYPE(Register)
 
 #endif // REGISTER_H

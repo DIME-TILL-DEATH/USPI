@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("Backend", &ui);
     engine.rootContext()->setContextProperty("Log", &log);
 
-    qRegisterMetaType<Register>("Register");
+    qRegisterMetaType<RegisterAdapter>("RegisterAdapter");
     qRegisterMetaType<FieldAdapter>("FieldAdapter");
     //---------------------------------------------------------------
 

@@ -38,7 +38,7 @@ function createRegisterFields(registerIndex, container)
         container.children[childIndex].destroy()
     }
 
-    var reg = Backend.getRegister(registerIndex)
+    var reg = Backend.registerAdapter(registerIndex)
     container.registerAdapter = reg
 
     for(var fieldIndex = reg.fieldsCount-1; fieldIndex >= 0; fieldIndex--)

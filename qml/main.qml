@@ -49,7 +49,7 @@ ApplicationWindow {
                 _registerMap.clear()
                 for(var registerIndex=0; registerIndex < Backend.registerCount(); registerIndex++)
                 {
-                    _registerMap.append({"register" : Backend.getRegister(registerIndex)})
+                    _registerMap.append({"register" : Backend.registerAdapter(registerIndex)})
                 }
 
                 Scripts.createRegisterFields(0, _fieldsView)
@@ -121,7 +121,7 @@ ApplicationWindow {
             leftPadding: font.pixelSize
             anchors.verticalCenter: parent.verticalCenter
 
-            text: "Результат: 0x"
+//            text: "Результат: 0x"
         }
     }
 
@@ -135,6 +135,7 @@ ApplicationWindow {
 
     function fieldChanged(fieldId, newValue){
 //        console.log(fieldId, newValue)
-        console.log(_fieldsView.registerAdapter.rawData())
+        console.log(_fieldsView.registerAdapter.value())
+        _text.text = "Результат: 0x" + _fieldsView.registerAdapter.value()
     }
 }
