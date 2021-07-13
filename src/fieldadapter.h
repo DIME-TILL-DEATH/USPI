@@ -14,20 +14,20 @@ class FieldAdapter
 {
     Q_GADGET
 
-    Q_PROPERTY(QString name READ name NOTIFY fieldUpdated)
-    Q_PROPERTY(QString description READ description NOTIFY fieldUpdated)
-    Q_PROPERTY(QString comment READ comment NOTIFY fieldUpdated)
+    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString description READ description)
+    Q_PROPERTY(QString comment READ comment)
 
-    Q_PROPERTY(QString type READ type NOTIFY fieldUpdated)
+    Q_PROPERTY(QString type READ type)
 
-    Q_PROPERTY(quint8 position READ position NOTIFY fieldUpdated)
-    Q_PROPERTY(quint8 size READ size NOTIFY fieldUpdated)
+    Q_PROPERTY(quint8 position READ position)
+    Q_PROPERTY(quint8 size READ size)
 
-    Q_PROPERTY(QVariant value READ value WRITE setValue NOTIFY fieldUpdated)
-    Q_PROPERTY(QVariant valueFrom READ valueFrom NOTIFY fieldUpdated)
-    Q_PROPERTY(QVariant valueTo READ valueTo NOTIFY fieldUpdated)
+    Q_PROPERTY(QVariant value READ value WRITE setValue)
+    Q_PROPERTY(QVariant valueFrom READ valueFrom)
+    Q_PROPERTY(QVariant valueTo READ valueTo)
 
-    Q_PROPERTY(QVariant variantList READ variantList NOTIFY fieldUpdated)
+    Q_PROPERTY(QVariant variantList READ variantList)
 
 public:
     FieldAdapter() {};
@@ -49,9 +49,6 @@ public:
     QVariant valueTo() const;
 
     QVariant variantList() const;
-
-signals:
-    void fieldUpdated();
 
 private:
     AbstractField* m_field;

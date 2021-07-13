@@ -119,7 +119,3 @@ QVariant FieldAdapter::variantList() const
     }
 }
 
-void FieldAdapter::fieldUpdated()
-{
-
-}

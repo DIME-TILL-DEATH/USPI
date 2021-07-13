@@ -4,14 +4,14 @@
 #include <QObject>
 #include <QVariant>
 
+#include "fieldadapter.h"
 #include "register.h"
 
 class RegisterAdapter
 {
     Q_GADGET
-    Q_PROPERTY(QString name READ name NOTIFY registerUpdated)
-    Q_PROPERTY(quint16 fieldsCount READ fieldsCount NOTIFY registerUpdated)
-
+    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(quint16 fieldsCount READ fieldsCount)
 public:
     RegisterAdapter() {};
     RegisterAdapter(Register* reg) : m_register{reg} {};
@@ -21,13 +21,7 @@ public:
 
     Q_INVOKABLE FieldAdapter field(quint16 fieldIndex);
 
-    // или сделать property
-    // либо функция, но с выбором в каком формате отображать
-    // но property тоже может быть в разных форматах. Через переменную.
     Q_INVOKABLE QString value();
-
-signals:
-    void registerUpdated();
 
 private:
     Register* m_register;

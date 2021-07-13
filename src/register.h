@@ -5,6 +5,7 @@
 #include <QString>
 
 #include "abstractfield.h"
+//#include "registeradapter.h"
 
 #include "fieldadapter.h"
 #include "parseerror.h"
@@ -23,17 +24,21 @@ public:
 
     bool sortAndValidateFields(ParseError* error = nullptr);
 
-    FieldAdapter field(quint16 fieldIndex);
+    AbstractField &field(quint16 fieldIndex);
 
     QByteArray rawData();
+
+//    RegisterAdapter &adapter();
+
 private:
     QString m_name;
     quint16 m_bitSize;
 
     std::vector<AbstractField*> m_fields;
 
-    FieldAdapter m_fieldAdapter;
-
+    bool validateSize(ParseError* error);
+    bool validateBounds(ParseError* error);
+    void sort();
 };
 
 #endif // REGISTER_H

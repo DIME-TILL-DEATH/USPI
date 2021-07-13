@@ -12,7 +12,8 @@ quint16 RegisterAdapter::fieldsCount()
 
 FieldAdapter RegisterAdapter::field(quint16 fieldIndex)
 {
-    return m_register->field(fieldIndex);
+
+    return FieldAdapter(&m_register->field(fieldIndex));
 }
 
 QString RegisterAdapter::value()
@@ -22,9 +23,4 @@ QString RegisterAdapter::value()
     std::reverse(registerData.begin(), registerData.end());
     QString result = registerData.toHex('-');
     return result;
-}
-
-void RegisterAdapter::registerUpdated()
-{
-
 }

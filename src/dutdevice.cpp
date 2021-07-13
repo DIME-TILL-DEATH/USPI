@@ -31,6 +31,5 @@ quint16 DUTDevice::registerCount()
 
 RegisterAdapter DUTDevice::registerAdapter(quint16 registerIndex)
 {
-
-    return RegisterAdapter(&(m_deviceRegisterMap.at(registerIndex)));
+      return RegisterAdapter(&m_deviceRegisterMap.at(registerIndex));
 }

@@ -13,7 +13,7 @@ Rectangle {
     property string description : (adapter !== undefined) ? adapter.description : "описание"
     property string comment: (adapter !== undefined) ? adapter.comment : "комментарий"
 
-    width: parent.width / 6
+    width: parent.width / 4
     height: parent.height
 
     border.width: 1

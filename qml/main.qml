@@ -53,6 +53,7 @@ ApplicationWindow {
                 }
 
                 Scripts.createRegisterFields(0, _fieldsView)
+                _text.text = "Результат: 0x" + _fieldsView.registerAdapter.value()
             }
             else
             {
@@ -89,6 +90,7 @@ ApplicationWindow {
                     onClicked: {
                         _registerMapView.currentIndex = index
                         Scripts.createRegisterFields(_registerMapView.currentIndex, _fieldsView)
+                        _text.text = "Результат: 0x" + _fieldsView.registerAdapter.value()
                     }
                 }
             }
@@ -120,10 +122,10 @@ ApplicationWindow {
             id: _text
             leftPadding: font.pixelSize
             anchors.verticalCenter: parent.verticalCenter
-
-//            text: "Результат: 0x"
         }
     }
+
+    property var resultText: _fieldsView.registerAdapter.value
 
     LogView{
         id: _loggerWindow
@@ -134,8 +136,10 @@ ApplicationWindow {
     }
 
     function fieldChanged(fieldId, newValue){
-//        console.log(fieldId, newValue)
-        console.log(_fieldsView.registerAdapter.value())
+//        console.log(_fieldsView.registerAdapter.value)
+        // не самое красивое решение, приходится в 3х местах копировать код
+        // но адекватного способо передавать их не через context property
+        // сделав до этого их QObject чтобы уведомлять регистр об обновлении поляя я не вижу
         _text.text = "Результат: 0x" + _fieldsView.registerAdapter.value()
     }
 }

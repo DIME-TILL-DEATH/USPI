@@ -26,7 +26,6 @@ public:
 private:
     Header m_deviceHeader;
     std::vector<Register> m_deviceRegisterMap;
-
 };
 
 #endif // DUTDEVICE_H
