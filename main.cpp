@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
     app.setOrganizationName("ВНИИРТ");
     app.setOrganizationDomain("VNIIRT");
 
-    UserInterface ui;
     Logger log;
+    UserInterface ui(&log);
 
     engine.rootContext()->setContextProperty("Backend", &ui);
     engine.rootContext()->setContextProperty("Log", &log);

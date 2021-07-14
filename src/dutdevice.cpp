@@ -24,6 +24,11 @@ bool DUTDevice::loadFromFile(const QString &fileName, ParseError *error)
     return true;
 }
 
+const QString &DUTDevice::name() const
+{
+    return m_deviceHeader.deviceName;
+}
+
 quint16 DUTDevice::registerCount()
 {
     return m_deviceRegisterMap.size();

@@ -1,3 +1,4 @@
 module Views
 
 LogView 1.0 LogView.qml
+RegisterMapView 1.0 RegisterMapView.qml

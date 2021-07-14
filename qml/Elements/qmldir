@@ -4,3 +4,5 @@ ResultField     1.0 ResultField.qml
 FieldProperties 1.0 FieldProperties.qml
 FieldTip        1.0 FieldTip.qml
 RegisterHeader  1.0 RegisterHeader.qml
+OpenFileDeviceDialog 1.0 OpenFileDeviceDialog.qml
+MainAppHeader   1.0 MainAppHeader.qml

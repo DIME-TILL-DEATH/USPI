@@ -15,11 +15,13 @@ public:
     bool loadFromFile(const QString& fileName, ParseError* error = nullptr);
 
     struct Header{
-        QString deviceName;
-        QString version;
-        quint8 registerSize;
-        bool  isMSB;
+        QString deviceName{"Выбрать"};
+        QString version{""};
+        quint8 registerSize{32};
+        bool isMSB{true};
     };
+
+    const QString& name() const;
 
     quint16 registerCount();
     RegisterAdapter registerAdapter(quint16 registerIndex);

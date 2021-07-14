@@ -31,19 +31,21 @@ function createField(fieldAdapter, container)
     }
 }
 
-function createRegisterFields(registerIndex, container)
+function createRegisterFields(registerIndex, registerMapView)
 {
-    for(var childIndex=0; childIndex < container.children.length; childIndex++)
+    for(var childIndex=0; childIndex < registerMapView.fieldsView.children.length; childIndex++)
     {
-        container.children[childIndex].destroy()
+        registerMapView.fieldsView.children[childIndex].destroy()
     }
 
     var reg = Backend.registerAdapter(registerIndex)
-    container.registerAdapter = reg
+//    var reg = registerMapView.registerMap.get(registerIndex).register
+    registerMapView.fieldsView.registerAdapter = reg
 
     for(var fieldIndex = reg.fieldsCount-1; fieldIndex >= 0; fieldIndex--)
     {
         var fieldAdapter = reg.field(fieldIndex)
-        Scripts.createField(fieldAdapter, container)
+        Scripts.createField(fieldAdapter, registerMapView.fieldsView)
     }
+    registerMapView.resultView.text = "Результат: 0x" + registerMapView.fieldsView.registerAdapter.value()
 }

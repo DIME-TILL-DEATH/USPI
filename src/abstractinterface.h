@@ -18,7 +18,7 @@ public:
     const QString &interfaceName() const;
 
 protected:
-    QString m_interfaceName;
+    QString m_interfaceName{"Abstract"};
 };
 
 #endif // ABSTRACTINTERFACE_H

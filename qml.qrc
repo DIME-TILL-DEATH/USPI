@@ -14,5 +14,8 @@
         <file>qml/Views/LogView.qml</file>
         <file>qml/CreateFunctions.js</file>
         <file>qml/Elements/RegisterHeader.qml</file>
+        <file>qml/Views/RegisterMapView.qml</file>
+        <file>qml/Elements/OpenFileDeviceDialog.qml</file>
+        <file>qml/Elements/MainAppHeader.qml</file>
     </qresource>
 </RCC>

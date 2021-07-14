@@ -13,8 +13,10 @@ import Views 1.0
 import "CreateFunctions.js" as Scripts
 
 ApplicationWindow {
-    width: 640
-    height: 480
+    id: _appWindow
+
+    width: 800
+    height: 600
     visible: true
     title: qsTr("USPI")
 
@@ -22,8 +24,8 @@ ApplicationWindow {
         Menu {
             title: qsTr("&Файл")
             Action {
-                text: qsTr("&Открыть...")
-                onTriggered: _fileDialog.open()
+                text: qsTr("&Открыть проект")
+                onTriggered:{}
             }
             MenuSeparator { }
             Action {
@@ -33,99 +35,26 @@ ApplicationWindow {
         }
     }
 
-    FileDialog {
-        id: _fileDialog
+    header: MainAppHeader{
+        width: _appWindow.width
+        height: _appWindow.height/15
 
-        title: "Выберите файл"
-        nameFilters: [ "Файлы карты регистров (*.json)", "All files (*)" ]
+        openFileDeviceDialog: _fileDeviceDialog
+    }
 
-        onAccepted: {
-            var result = Backend.loadDevice(_fileDialog.fileUrl)
+    OpenFileDeviceDialog{
+        id: _fileDeviceDialog
 
-            if(result === "No error")
-            {
-                Log.message("Карта регистров успешно загружена")
-
-                _registerMap.clear()
-                for(var registerIndex=0; registerIndex < Backend.registerCount(); registerIndex++)
-                {
-                    _registerMap.append({"register" : Backend.registerAdapter(registerIndex)})
-                }
-
-                Scripts.createRegisterFields(0, _fieldsView)
-                _text.text = "Результат: 0x" + _fieldsView.registerAdapter.value()
-            }
-            else
-            {
-                Log.message(result)
-            }
-        }
-        Component.onCompleted: visible = false
+        registerMapView: _registerMapView
     }
 
 
-    Row{
-        anchors.fill: parent
-
-        padding: width / 200
-        spacing: width / 200
-
-        ListModel{
-            id: _registerMap
-        }
-
-        ListView{
-            id: _registerMapView
-
-            width: parent.width * 0.15
-            height: parent.height
-
-            spacing: height/200
-
-            model: _registerMap
-
-            delegate: RegisterHeader{
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        _registerMapView.currentIndex = index
-                        Scripts.createRegisterFields(_registerMapView.currentIndex, _fieldsView)
-                        _text.text = "Результат: 0x" + _fieldsView.registerAdapter.value()
-                    }
-                }
-            }
-        }
-
-        Column{
-            id: _fieldsView
-
-            property var registerAdapter
-
-            width: parent.width * 0.6
-            height: parent.height
-            spacing: height/200
-        }
-
-    }
-
-    Rectangle{
-        id: _resultRectangle
-
-        anchors.bottom: _loggerWindow.top
+    RegisterMapView{
+        id: _registerMapView
 
         width: parent.width
-        height: _text.font.pixelSize*2
-
-        border.width: 1
-
-        Text{
-            id: _text
-            leftPadding: font.pixelSize
-            anchors.verticalCenter: parent.verticalCenter
-        }
+        height: parent.height *0.8
     }
-
-    property var resultText: _fieldsView.registerAdapter.value
 
     LogView{
         id: _loggerWindow
@@ -136,10 +65,6 @@ ApplicationWindow {
     }
 
     function fieldChanged(fieldId, newValue){
-//        console.log(_fieldsView.registerAdapter.value)
-        // не самое красивое решение, приходится в 3х местах копировать код
-        // но адекватного способо передавать их не через context property
-        // сделав до этого их QObject чтобы уведомлять регистр об обновлении поляя я не вижу
-        _text.text = "Результат: 0x" + _fieldsView.registerAdapter.value()
+        _registerMapView.resultView.text = "Результат: 0x" + _registerMapView.fieldsView.registerAdapter.value()
     }
 }
