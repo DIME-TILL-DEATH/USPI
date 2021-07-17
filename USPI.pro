@@ -1,5 +1,6 @@
 QT += quick
 QT += quickcontrols2
+QT += widgets
 
 CONFIG += c++11
 
@@ -14,13 +15,16 @@ SOURCES += \
         src/bitfield.cpp \
         src/dutdevice.cpp \
         src/fieldadapter.cpp \
+        src/fileinterface.cpp \
         src/fileparser.cpp \
         src/fixedfield.cpp \
         src/integerfield.cpp \
+        src/interfacessettingsadapter.cpp \
         src/logger.cpp \
         src/parseerror.cpp \
         src/register.cpp \
         src/registeradapter.cpp \
+        src/registerlistmodel.cpp \
         src/userinterface.cpp \
         src/variantlistfield.cpp
 
@@ -44,12 +48,15 @@ HEADERS += \
     src/bitfield.h \
     src/dutdevice.h \
     src/fieldadapter.h \
+    src/fileinterface.h \
     src/fileparser.h \
     src/fixedfield.h \
     src/integerfield.h \
+    src/interfacessettingsadapter.h \
     src/logger.h \
     src/parseerror.h \
     src/register.h \
     src/registeradapter.h \
+    src/registerlistmodel.h \
     src/userinterface.h \
     src/variantlistfield.h

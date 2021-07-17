@@ -23,6 +23,8 @@ public:
 
     Q_INVOKABLE QString value();
 
+    Register *getRegister() const;
+
 private:
     Register* m_register;
 };

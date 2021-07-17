@@ -24,12 +24,6 @@ FileDialog {
         {
             Log.message("Карта регистров успешно загружена")
 
-            registerMapView.registerMap.clear()
-            for(var registerIndex=0; registerIndex < Backend.registerCount(); registerIndex++)
-            {
-                registerMapView.registerMap.append({"register" : Backend.registerAdapter(registerIndex)})
-            }
-
             Scripts.createRegisterFields(0, registerMapView)
         }
         else

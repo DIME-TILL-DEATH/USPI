@@ -4,20 +4,25 @@
 #include <QByteArray>
 
 #include "register.h"
+#include "dutdevice.h"
 
 class AbstractInterface
 {
 public:
     AbstractInterface();
 
+    virtual bool writeRegister(Register* wrReg);
+    virtual bool writeSequence(const std::vector<Register*> &wrSequence);
 
-    virtual bool writeRegister(const Register& wrReg);
-    virtual bool writeSequence(const std::vector<Register>& wrSequence);
+    virtual const QString &interfaceName() const;
 
-
-    const QString &interfaceName() const;
+    const DUTDevice::Header &deviceHeader() const;
+    void setDeviceHeader(const DUTDevice::Header &newDeviceHeader);
 
 protected:
+    DUTDevice::Header m_deviceHeader;
+
+private:
     QString m_interfaceName{"Abstract"};
 };
 

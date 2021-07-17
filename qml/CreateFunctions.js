@@ -38,8 +38,8 @@ function createRegisterFields(registerIndex, registerMapView)
         registerMapView.fieldsView.children[childIndex].destroy()
     }
 
-    var reg = Backend.registerAdapter(registerIndex)
-//    var reg = registerMapView.registerMap.get(registerIndex).register
+    var reg= RegisterMapModel.getItem(registerIndex)
+
     registerMapView.fieldsView.registerAdapter = reg
 
     for(var fieldIndex = reg.fieldsCount-1; fieldIndex >= 0; fieldIndex--)

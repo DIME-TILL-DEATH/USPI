@@ -24,3 +24,8 @@ QString RegisterAdapter::value()
     QString result = registerData.toHex('-');
     return result;
 }
+
+Register *RegisterAdapter::getRegister() const
+{
+    return m_register;
+}

@@ -6,6 +6,7 @@
 
 #include "src/logger.h"
 #include "src/dutdevice.h"
+#include "src/interfacessettingsadapter.h"
 
 #include "src/fieldadapter.h"
 #include "src/userinterface.h"
@@ -23,14 +24,22 @@ int main(int argc, char *argv[])
     app.setOrganizationName("ВНИИРТ");
     app.setOrganizationDomain("VNIIRT");
 
+    QHash <QString, AbstractInterface* > avaliableInterfaces;
+
     Logger log;
-    UserInterface ui(&log);
+    InterfacesSettingsAdapter interfacesSettings(&avaliableInterfaces);
+    UserInterface ui(&avaliableInterfaces, &log);
 
     engine.rootContext()->setContextProperty("Backend", &ui);
+    engine.rootContext()->setContextProperty("InterfaceSettings", &interfacesSettings);
     engine.rootContext()->setContextProperty("Log", &log);
+    engine.rootContext()->setContextProperty("RegisterMapModel", ui.registerMapModel());
+    engine.rootContext()->setContextProperty("RegisterSequenceModel", ui.registerSequenceModel());
 
     qRegisterMetaType<RegisterAdapter>("RegisterAdapter");
     qRegisterMetaType<FieldAdapter>("FieldAdapter");
+
+    InterfacesSettingsAdapter::registerTypes();
     //---------------------------------------------------------------
 
     engine.addImportPath(":/qml");

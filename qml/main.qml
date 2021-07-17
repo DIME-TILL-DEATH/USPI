@@ -66,5 +66,10 @@ ApplicationWindow {
 
     function fieldChanged(fieldId, newValue){
         _registerMapView.resultView.text = "Результат: 0x" + _registerMapView.fieldsView.registerAdapter.value()
+
+        if(_registerMapView.autoWrite)
+        {
+            Backend.writeSequence()
+        }
     }
 }

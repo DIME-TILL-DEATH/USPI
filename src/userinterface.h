@@ -9,42 +9,49 @@
 #include "registeradapter.h"
 #include "dutdevice.h"
 #include "abstractinterface.h"
+#include "registerlistmodel.h"
+#include "fileinterface.h"
 
 class UserInterface : public QObject
 {
     Q_OBJECT
 
     Q_PROPERTY(QString dutDeviceName READ dutDeviceName NOTIFY dutDeviceUpdated)
-    Q_PROPERTY(QVector<RegisterAdapter> registerWriteSequence READ registerWriteSequence WRITE setRegisterWriteSequence)
+    Q_PROPERTY(QString currentInterface READ currentInterface WRITE setCurrentInterface NOTIFY interfaceUpdated)
+    Q_PROPERTY(QStringList avaliableInterfaces READ avaliableInterfaces NOTIFY avaliableInterfacesUpdated)
 public:
-    explicit UserInterface(Logger* log = nullptr, QObject *parent = nullptr);
+    explicit UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, Logger* log = nullptr, QObject *parent = nullptr);
+    ~UserInterface();
 
     const QString& dutDeviceName() const;
+    const QString& currentInterface() const;
+    bool setCurrentInterface(const QString& interfaceName);
 
-    void setRegisterWriteSequence(const QVector<RegisterAdapter>& sequence);
-    const QVector<RegisterAdapter>& registerWriteSequence() const;
+    RegisterListModel *registerMapModel();
+    RegisterListModel *registerSequenceModel();
+
+    QStringList avaliableInterfaces();
 
     Q_INVOKABLE QString loadDevice(const QUrl& fileName);
-
     Q_INVOKABLE bool writeSequence();
 
-    // заглушка
-    Q_INVOKABLE RegisterAdapter registerAdapter(quint16 index = 0);
-    Q_INVOKABLE quint16 registerCount();
-
+    Q_INVOKABLE void updateAvaliableInterfaces();
 
 private:
     DUTDevice m_device;
 
-    QVector<RegisterAdapter> m_registerWriteSequence;
+    RegisterListModel m_registerMapModel{m_device.deviceRegisterMap()};
+    RegisterListModel m_registerSequenceModel;
 
+    QHash <QString, AbstractInterface* >* m_avaliableInterfaces;
     AbstractInterface* m_interface_ptr{nullptr};
 
     Logger* m_log;
 
 signals:
     void dutDeviceUpdated();
-
+    void interfaceUpdated();
+    void avaliableInterfacesUpdated();
 };
 
 #endif // USERINTERFACE_H

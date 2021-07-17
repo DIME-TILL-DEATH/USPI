@@ -8,6 +8,7 @@ import QtQuick.Dialogs 1.3
 import Elements 1.0
 import Fields 1.0
 import Views 1.0
+import InterfaceSettings 1.0
 
 Rectangle{
         id: _headerRect
@@ -54,12 +55,14 @@ Rectangle{
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            ComboBox{
+            Button{
                 id: _btnChooseInterface
 
                 width: parent.width/5
                 height: _headerRect.height*0.8
                 anchors.verticalCenter: parent.verticalCenter
+
+                text: if(Backend != null) Backend.currentInterface
 
                 background: Rectangle{
                     border.width: 1
@@ -67,6 +70,24 @@ Rectangle{
 
                     color: "azure"
                     opacity: _btnChooseInterface.pressed ? 0.5 : 1
+                }
+
+                onPressed: {
+                    _interfaceSettingsWindowLoader.active = true
+                }
+            }
+
+            Loader{
+                id: _interfaceSettingsWindowLoader
+                active: false
+
+
+                sourceComponent: InterfaceSettingsWindow{
+
+                    width: _headerRect.parent.width/2
+                    height: _headerRect.parent.height/2
+
+                    onClosing: _interfaceSettingsWindowLoader.active = false
                 }
             }
         }

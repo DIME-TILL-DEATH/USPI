@@ -17,5 +17,10 @@
         <file>qml/Views/RegisterMapView.qml</file>
         <file>qml/Elements/OpenFileDeviceDialog.qml</file>
         <file>qml/Elements/MainAppHeader.qml</file>
+        <file>qml/Elements/RegisterList.qml</file>
+        <file>qml/InterfaceSettings/InterfaceSettingsWindow.qml</file>
+        <file>qml/InterfaceSettings/qmldir</file>
+        <file>qml/InterfaceSettings/AbstractInterfaceSettings.qml</file>
+        <file>qml/InterfaceSettings/FileInterfaceSettings.qml</file>
     </qresource>
 </RCC>

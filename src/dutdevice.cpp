@@ -29,12 +29,12 @@ const QString &DUTDevice::name() const
     return m_deviceHeader.deviceName;
 }
 
-quint16 DUTDevice::registerCount()
+std::vector<Register> &DUTDevice::deviceRegisterMap()
 {
-    return m_deviceRegisterMap.size();
+    return m_deviceRegisterMap;
 }
 
-RegisterAdapter DUTDevice::registerAdapter(quint16 registerIndex)
+const DUTDevice::Header &DUTDevice::deviceHeader() const
 {
-      return RegisterAdapter(&m_deviceRegisterMap.at(registerIndex));
+    return m_deviceHeader;
 }

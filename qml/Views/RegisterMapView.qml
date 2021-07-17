@@ -14,45 +14,35 @@ Item {
 
     property alias fieldsView: _fieldsView
     property alias resultView: _text
-    property alias registerMap: _registerMap
+    property alias registerView: _registerMapView
+
+    property bool autoWrite : _rbAuto.checked
 
     Row{
+        id: _row
+
         width: parent.width
         height: parent.height-_resultRectangle.height-padding-spacing
 
         padding: width / 200
         spacing: width / 200
 
-        ListModel{
-            id: _registerMap
+        function selectRegisterMap(index)
+        {
+            Scripts.createRegisterFields(index, _root)
+        }
+        Component.onCompleted: {
+            _registerMapView.delegateClicked.connect(selectRegisterMap)
         }
 
-        ListView{
+
+        RegisterList{
             id: _registerMapView
 
+            headerText: qsTr("Карта регистров:")
+
             width: parent.width * 0.15
-            height: parent.height
-
-            header:  Text {
-                    id: _headerRegisterMapText
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    text: qsTr("Карта регистров:")
-            }
-
-            spacing: height/200
-
-            model: _registerMap
-
-            delegate: RegisterHeader{
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: {
-                        _registerMapView.currentIndex = index
-                        Scripts.createRegisterFields(_registerMapView.currentIndex, _root)
-                    }
-                }
-            }
+            model: RegisterMapModel
         }
 
         Column{
@@ -60,49 +50,110 @@ Item {
 
             property var registerAdapter
 
-            width: parent.width * 0.6
+            width: parent.width * 0.47
             height: parent.height
             spacing: height/200
         }
 
         Rectangle{
-            width: parent.width*0.1
+            width: parent.width*0.18
             height: parent.height
-            color: "transparent"
             border.width: 1
+            color: "transparent"
+
+            Column{
+                anchors.fill: parent
+                spacing: parent.height/100
+                padding: parent.height/50
+
+                Button{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: ">"
+                    enabled: (_registerMapView.count>0) ? true : false
+                    onPressed: {
+                        RegisterSequenceModel.addItem(RegisterMapModel.getItem(_registerMapView.currentIndex), _registerSequenceView.currentIndex)
+                    }
+                }
+                Button{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: ">>"
+                    enabled: (_registerMapView.count>0) ? true : false
+                    onPressed: {
+                        for(var i=_registerMapView.count-1; i >= 0; i--)
+                        {
+                            RegisterSequenceModel.addItem(RegisterMapModel.getItem(i), _registerSequenceView.currentIndex)
+                        }
+                    }
+                }
+                Button{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "<"
+                    enabled: (_registerSequenceView.count>0) ? true : false
+                    onPressed: {
+                        RegisterSequenceModel.removeItem(_registerSequenceView.currentIndex)
+                    }
+                }
+                Button{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    enabled: (_registerSequenceView.count>0) ? true : false
+                    text: "<<"
+                    onPressed: {
+                        for(var i=_registerSequenceView.count-1; i >= 0; i--)
+                        {
+                            RegisterSequenceModel.removeItem(i)
+                        }
+                    }
+                }
+
+                Text{
+                    text: "Запись в устройство:"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                RadioButton{
+                    id: _rbBtn
+                    checked: true
+                    text: "По кнопке"
+                }
+                RadioButton{
+                    id: _rbAuto
+                    text: "По изменению"
+                }
+                CheckBox{
+                    id: _rbTrigger
+                    enabled: false
+                    text: "По триггеру"
+                }
+            }
         }
 
         Column{
             width: parent.width * 0.15
             height: parent.height
 
-            Text {
-                id: _headerQueText
-                anchors.horizontalCenter: parent.horizontalCenter
+            spacing: height/200
+            padding: height/200
 
-                text: qsTr("Порядок:")
-            }
+            RegisterList{
+                id: _registerSequenceView
 
-            ListView{
-                width: parent.width
-                height: parent.height-_headerQueText.height-_btnWrite.height
+                headerText: qsTr("Порядок записи:")
+
+                height: parent.height-_btnWrite.height-parent.padding*4
+                model: RegisterSequenceModel
             }
 
             Button{
                 id: _btnWrite
-                width: parent.width*0.6
 
+                width: parent.width*0.6
                 anchors.horizontalCenter: parent.horizontalCenter
+
+                enabled: _rbBtn.checked ? true : false
 
                 text: "Записать"
 
                 onPressed: {
-
-                    var writeSequenceArray = []
-                    writeSequenceArray.push(_registerMap.get(2).register)
-                    writeSequenceArray.push(_registerMap.get(1).register)
-
-                    Backend.registerWriteSequence = writeSequenceArray
                     Backend.writeSequence()
                 }
             }

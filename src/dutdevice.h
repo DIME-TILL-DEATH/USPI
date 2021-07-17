@@ -23,11 +23,12 @@ public:
 
     const QString& name() const;
 
-    quint16 registerCount();
-    RegisterAdapter registerAdapter(quint16 registerIndex);
+    std::vector<Register>& deviceRegisterMap();
+    const Header &deviceHeader() const;
+
 private:
     Header m_deviceHeader;
-    std::vector<Register> m_deviceRegisterMap;
+    std::vector<Register> m_deviceRegisterMap{};
 };
 
 #endif // DUTDEVICE_H

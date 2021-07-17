@@ -6,3 +6,4 @@ FieldTip        1.0 FieldTip.qml
 RegisterHeader  1.0 RegisterHeader.qml
 OpenFileDeviceDialog 1.0 OpenFileDeviceDialog.qml
 MainAppHeader   1.0 MainAppHeader.qml
+RegisterList    1.0 RegisterList.qml
