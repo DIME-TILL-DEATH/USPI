@@ -27,7 +27,8 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     //---------------------------------------------------------------
     app.setOrganizationName("ВНИИРТ");
-    app.setOrganizationDomain("VNIIRT");
+//    app.setOrganizationDomain("vniirt.ru");
+    app.setApplicationName("USPI");
 
     QHash <QString, AbstractInterface* > avaliableInterfaces;
     InterfacesSettingsAdapter interfacesSettings(&avaliableInterfaces);

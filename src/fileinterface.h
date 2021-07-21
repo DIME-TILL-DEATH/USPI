@@ -5,6 +5,8 @@
 #include <QTextStream>
 #include <QTextCodec>
 
+#include <QSettings>
+
 #include "abstractinterface.h"
 
 class FileInterface : public AbstractInterface
@@ -26,9 +28,11 @@ public:
 private:
     QString m_interfaceName{"File"};
 
-    QString m_hexSeparator{""};
-    QString m_binarySeparator{""};
-    QString m_filePath{"result.txt"};
+    QString m_hexSeparator;
+    QString m_binarySeparator;
+    QString m_filePath;
+
+    QSettings m_settings;
 };
 
 #endif // FILEINTERFACE_H

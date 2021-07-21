@@ -49,6 +49,10 @@ Item {
             onTextChanged: {
                 InterfaceSettings.fileInterfaceSettings.filePath = text
             }
+
+            onAccepted: {
+                focus = false
+            }
         }
 
         Text{
@@ -65,6 +69,9 @@ Item {
             onTextChanged: {
                 InterfaceSettings.fileInterfaceSettings.hexSeparator = text
             }
+            onAccepted: {
+                focus = false
+            }
         }
 
         Text{
@@ -80,6 +87,9 @@ Item {
 
             onTextChanged: {
                 InterfaceSettings.fileInterfaceSettings.binSeparator = text
+            }
+            onAccepted: {
+                focus = false
             }
         }
     }

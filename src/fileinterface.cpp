@@ -2,7 +2,11 @@
 
 FileInterface::FileInterface()
 {
-
+    m_settings.beginGroup("FileInterface");
+    m_filePath = m_settings.value("filePath", "result.txt").toString();
+    m_hexSeparator = m_settings.value("hexSeparator", "").toString();
+    m_binarySeparator = m_settings.value("binarySeparator", "").toString();
+    m_settings.endGroup();
 }
 
 bool FileInterface::writeSequence(const std::vector<Register *> &wrSequence)
@@ -62,6 +66,7 @@ const QString &FileInterface::hexSeparator() const
 void FileInterface::setHexSeparator(const QString &newHexSeparator)
 {
     m_hexSeparator = newHexSeparator;
+    m_settings.setValue("FileInterface/hexSeparator", m_hexSeparator);
 }
 
 const QString &FileInterface::binarySeparator() const
@@ -72,6 +77,7 @@ const QString &FileInterface::binarySeparator() const
 void FileInterface::setBinarySeparator(const QString &newBinarySeparator)
 {
     m_binarySeparator = newBinarySeparator;
+    m_settings.setValue("FileInterface/binarySeparator", m_binarySeparator);
 }
 
 const QString &FileInterface::filePath() const
@@ -82,4 +88,5 @@ const QString &FileInterface::filePath() const
 void FileInterface::setFilePath(const QString &newFilePath)
 {
     m_filePath = newFilePath;
+    m_settings.setValue("FileInterface/filePath", m_filePath);
 }
