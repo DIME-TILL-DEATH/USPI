@@ -18,17 +18,9 @@ FileDialog {
     nameFilters: [ "Файлы карты регистров (*.json)", "All files (*)" ]
 
     onAccepted: {
-        var result = Backend.loadDevice(_fileDialog.fileUrl)
-
-        if(result === "No error")
+        if(Backend.loadDevice(_fileDialog.fileUrl))
         {
-            Log.message("Карта регистров успешно загружена")
-
             Scripts.createRegisterFields(0, registerMapView)
-        }
-        else
-        {
-            Log.message(result)
         }
     }
     Component.onCompleted: visible = false

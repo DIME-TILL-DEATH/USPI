@@ -46,15 +46,20 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
     return false;
 }
 
-QString UserInterface::loadDevice(const QUrl &fileName)
+bool UserInterface::loadDevice(const QUrl &fileName)
 {
     ParseError error;
-    m_device.loadFromFile(fileName.toLocalFile(), &error);
+    if(!m_device.loadFromFile(fileName.toLocalFile(), &error))
+    {
+        qWarning() << error.errorString();
+        return false;
+    }
 
     emit dutDeviceUpdated();
     m_registerMapModel.resetModel(m_device.deviceRegisterMap());
 
-    return error.errorString();
+    qInfo() << "Карта регистров для устройства '" << m_device.name() << "' загружена";
+    return true;
 }
 
 bool UserInterface::writeSequence()

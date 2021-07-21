@@ -33,7 +33,8 @@ Rectangle{
         delegate: Text{
             leftPadding: font.pixelSize
 
-            text: model.display
+            text: msgText
+            color: msgColor
         }
     }
 }

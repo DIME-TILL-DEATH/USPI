@@ -1,3 +1,5 @@
+#include <QTime>
+
 #include "logger.h"
 
 void Logger::messageOutputHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -14,10 +16,62 @@ void Logger::setAsMessageHandlerForApp()
     qInstallMessageHandler(messageOutputHandler);
 }
 
-void Logger::message(const QString& line)
+QHash<int, QByteArray> Logger::roleNames() const
 {
-    m_list.append(line);
-    this->setStringList(m_list);
+    QHash<int, QByteArray> roles;
+    roles[ListRoles::MsgText] = "msgText";
+    roles[ListRoles::MsgColor] = "msgColor";
+    return roles;
+}
+
+int Logger::rowCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent)
+    return static_cast<int>(m_data.size());
+}
+
+QVariant Logger::data(const QModelIndex &index, int role) const
+{
+    if(!index.isValid() || index.row() > rowCount(index))
+    {
+        return {};
+    }
+
+    switch(role)
+    {
+        case ListRoles::MsgText:
+        {
+            return QVariant::fromValue(m_data.at(index.row()).text);
+        }
+        case ListRoles::MsgColor:
+        {
+            return QVariant::fromValue(m_data.at(index.row()).color);
+        }
+        default:
+        {
+            return true;
+        }
+    }
+}
+
+bool Logger::insertRows(int row, int count, const QModelIndex &parent)
+{
+    beginInsertRows(parent, row, row+count-1);
+    m_data.insert(m_data.begin()+row, count, LogMessage());
+    endInsertRows();
+    return true;
+}
+
+void Logger::message(const QString& line, QColor color)
+{
+    insertRows(m_data.size(), 1);
+
+    LogMessage msg;
+    msg.text = line;
+    msg.color = color;
+    m_data.at(m_data.size()-1) = msg;
+
+    emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
 }
 
 void Logger::messageOutputHandlerImplementation(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -35,10 +89,10 @@ void Logger::messageOutputHandlerImplementation(QtMsgType type, const QMessageLo
                 break;
 
             case QtInfoMsg:
-                message("Лог: " + msg);
+                message("Лог (" + QTime::currentTime().toString() +"): " + msg);
                 break;
             case QtWarningMsg:
-                message("Ошибка: " + msg);
+                message("Ошибка (" + QTime::currentTime().toString() +"): " +  msg, Qt::red);
                 break;
 
             case QtCriticalMsg:

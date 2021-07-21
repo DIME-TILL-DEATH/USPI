@@ -33,7 +33,7 @@ public:
 
     QStringList avaliableInterfaces();
 
-    Q_INVOKABLE QString loadDevice(const QUrl& fileName);
+    Q_INVOKABLE bool loadDevice(const QUrl& fileName);
     Q_INVOKABLE bool writeSequence();
 
     Q_INVOKABLE bool loadSession(const QUrl& fileName);
