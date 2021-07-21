@@ -2,19 +2,12 @@
 
 #include "parseerror.h"
 
-UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, Logger* logDevice, QObject *parent)
+UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent)
     : QObject(parent),
       m_saver{&m_device, &m_registerMapModel, &m_registerSequenceModel},
-      m_avaliableInterfaces{avaliableInterfaces},
-      m_log{logDevice}
+      m_avaliableInterfaces{avaliableInterfaces}
 {
     updateAvaliableInterfaces();
-    //dummy
-    if(m_log == nullptr)
-    {
-        m_log = new Logger();
-    }
-
     if(m_interface_ptr == nullptr)
     {
         m_interface_ptr = m_avaliableInterfaces->value("File");
@@ -49,7 +42,7 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
             return true;
         }
     }
-    m_log->message("Error in setting interface: interface not found");
+    qWarning() << ("Error in setting interface: interface not found");
     return false;
 }
 
@@ -84,18 +77,18 @@ bool UserInterface::writeSequence()
 
         if(!m_interface_ptr->writeSequence(wrSequence))
         {
-            m_log->message("Error while writing sequnce to interface '" + m_interface_ptr->interfaceName()+ "'");
+            qWarning() << ("Error while writing sequnce to interface '" + m_interface_ptr->interfaceName()+ "'");
             return false;
         }
         else
         {
-            m_log->message(resultMessage);
+            qInfo() << resultMessage;
             return true;
         }
     }
     else
     {
-        m_log->message("Null interface pointer");
+        qWarning() << ("Null interface pointer");
         return false;
     }
 }

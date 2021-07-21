@@ -21,7 +21,7 @@ class UserInterface : public QObject
     Q_PROPERTY(QString currentInterface READ currentInterface WRITE setCurrentInterface NOTIFY interfaceUpdated)
     Q_PROPERTY(QStringList avaliableInterfaces READ avaliableInterfaces NOTIFY avaliableInterfacesUpdated)
 public:
-    explicit UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, Logger* log = nullptr, QObject *parent = nullptr);
+    explicit UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent = nullptr);
     ~UserInterface();
 
     const QString& dutDeviceName() const;
@@ -51,8 +51,6 @@ private:
 
     QHash <QString, AbstractInterface* >* m_avaliableInterfaces;
     AbstractInterface* m_interface_ptr{nullptr};
-
-    Logger* m_log;
 
 signals:
     void dutDeviceUpdated();

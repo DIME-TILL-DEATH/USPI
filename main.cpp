@@ -4,6 +4,8 @@
 
 #include <QDebug>
 
+#include <functional>
+
 #include "src/logger.h"
 #include "src/dutdevice.h"
 #include "src/interfacessettingsadapter.h"
@@ -11,11 +13,14 @@
 #include "src/fieldadapter.h"
 #include "src/userinterface.h"
 
+Logger* Logger::currentHandler = nullptr;
+
 int main(int argc, char *argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
+
 
     QGuiApplication app(argc, argv);
 
@@ -25,10 +30,12 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("VNIIRT");
 
     QHash <QString, AbstractInterface* > avaliableInterfaces;
+    InterfacesSettingsAdapter interfacesSettings(&avaliableInterfaces);
+
+    UserInterface ui(&avaliableInterfaces);
 
     Logger log;
-    InterfacesSettingsAdapter interfacesSettings(&avaliableInterfaces);
-    UserInterface ui(&avaliableInterfaces, &log);
+    log.setAsMessageHandlerForApp();
 
     engine.rootContext()->setContextProperty("Backend", &ui);
     engine.rootContext()->setContextProperty("InterfaceSettings", &interfacesSettings);
