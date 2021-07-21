@@ -1,19 +1,24 @@
 #ifndef FIXEDFIELD_H
 #define FIXEDFIELD_H
 
+#include <QDataStream>
+
 #include "abstractfield.h"
 
 class FileParser;
 class FixedField : public AbstractField
 {
 public:
-    FixedField();
+    FixedField() {};
+    FixedField(AbstractField field) : AbstractField{field} {};
 
     QByteArray rawData(quint16 targetRegisterByteSize);
 
     friend class FileParser;
     quint32 data() const;
 
+    friend QDataStream& operator<<(QDataStream& stream, const FixedField& field);
+    friend QDataStream& operator>>(QDataStream& stream, FixedField& field);
 private:
     quint64 m_data;
 };

@@ -20,6 +20,7 @@ QString RegisterAdapter::value()
 {
     QByteArray registerData = m_register->rawData();
 
+    // MSB. Надо как-то добавить чтобы проверял как выводить для данного устроцства. MSB или LSB
     std::reverse(registerData.begin(), registerData.end());
     QString result = registerData.toHex('-');
     return result;

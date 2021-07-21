@@ -53,6 +53,11 @@ QByteArray Register::rawData()
     return QByteArray(resultDataChar, arraySize);
 }
 
+quint16 Register::uniqueId() const
+{
+    return m_uniqueId;
+}
+
 bool Register::validateSize(ParseError *error)
 {
     for(auto it=m_fields.begin(); it != m_fields.end(); ++it)
@@ -191,4 +196,104 @@ void Register::sort()
 QString Register::name() const
 {
     return m_name;
+}
+
+QDataStream& operator<<(QDataStream& stream, const Register& reg)
+{
+    stream << reg.m_name;
+    stream << reg.m_uniqueId;
+    stream << reg.m_bitSize;
+
+    size_t fieldsCount = reg.m_fields.size();
+    stream << fieldsCount;
+
+    for(auto it = reg.m_fields.begin(); it != reg.m_fields.end(); ++it)
+    {
+        stream << *(*it);
+
+        switch ((*it)->type())
+        {
+            case AbstractField::FieldType::BitField:
+            {
+                BitField* field_ptr = dynamic_cast<BitField*>(*it);
+                stream << *field_ptr;
+                break;
+            }
+            case AbstractField::FieldType::FixedField:
+            {
+                FixedField* field_ptr = dynamic_cast<FixedField*>(*it);
+                stream << *field_ptr;
+                break;
+            }
+            case AbstractField::FieldType::IntegerField:
+            {
+                IntegerField* field_ptr = dynamic_cast<IntegerField*>(*it);
+                stream << *field_ptr;
+                break;
+            }
+            case AbstractField::FieldType::VariantListField:
+            {
+                VariantListField* field_ptr = dynamic_cast<VariantListField*>(*it);
+                stream << *field_ptr;
+                break;
+            }
+            default:
+                stream << *it;
+        }
+    }
+    return stream;
+}
+
+QDataStream& operator>>(QDataStream& stream, Register& reg)
+{
+    stream >> reg.m_name;
+    stream >> reg.m_uniqueId;
+    stream >> reg.m_bitSize;
+
+    size_t fieldsCount;
+    stream >> fieldsCount;
+
+    reg.m_fields.clear();
+
+    for(size_t i=0; i<fieldsCount; ++i)
+    {
+        AbstractField baseField;
+        stream >> baseField;
+
+        switch (baseField.type())
+        {
+            case AbstractField::FieldType::BitField:
+            {
+                BitField field(baseField);
+                stream >> field;
+                reg.m_fields.push_back(new BitField(field));
+                break;
+            }
+            case AbstractField::FieldType::FixedField:
+            {
+                FixedField field(baseField);
+                stream >> field;
+                reg.m_fields.push_back(new FixedField(field));
+                break;
+            }
+            case AbstractField::FieldType::IntegerField:
+            {
+                IntegerField field(baseField);
+                stream >> field;
+                reg.m_fields.push_back(new IntegerField(field));
+                break;
+            }
+            case AbstractField::FieldType::VariantListField:
+            {
+                VariantListField field(baseField);
+                stream >> field;
+                reg.m_fields.push_back(new VariantListField(field));
+                break;
+            }
+            default:
+            {
+            }
+        }
+    }
+    return stream;
 }

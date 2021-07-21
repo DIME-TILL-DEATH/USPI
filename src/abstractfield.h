@@ -3,6 +3,7 @@
 
 #include <QByteArray>
 #include <QString>
+#include <QDataStream>
 
 #include <math.h>
 
@@ -33,6 +34,9 @@ public:
 
     quint8 position() const;
     quint8 size() const;
+
+    friend QDataStream& operator<<(QDataStream& stream, const AbstractField& field);
+    friend QDataStream& operator>>(QDataStream& stream, AbstractField& field);
 
 protected:
     QString m_name;

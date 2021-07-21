@@ -73,3 +73,25 @@ QByteArray AbstractField::shiftBitData(quint64 data)
 
     return resultData;
 }
+
+QDataStream& operator<<(QDataStream& stream, const AbstractField& field)
+{
+    stream << field.m_name;
+    stream << field.m_type;
+    stream << field.m_position;
+    stream << field.m_size;
+    stream << field.m_comment;
+    stream << field.m_description;
+    return stream;
+}
+
+QDataStream& operator>>(QDataStream& stream, AbstractField& field)
+{
+    stream >> field.m_name;
+    stream >> field.m_type;
+    stream >> field.m_position;
+    stream >> field.m_size;
+    stream >> field.m_comment;
+    stream >> field.m_description;
+    return stream;
+}

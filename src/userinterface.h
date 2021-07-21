@@ -11,6 +11,7 @@
 #include "abstractinterface.h"
 #include "registerlistmodel.h"
 #include "fileinterface.h"
+#include "sessionsaver.h"
 
 class UserInterface : public QObject
 {
@@ -35,6 +36,9 @@ public:
     Q_INVOKABLE QString loadDevice(const QUrl& fileName);
     Q_INVOKABLE bool writeSequence();
 
+    Q_INVOKABLE bool loadSession(const QUrl& fileName);
+    Q_INVOKABLE bool saveSession(const QUrl& fileName);
+
     Q_INVOKABLE void updateAvaliableInterfaces();
 
 private:
@@ -42,6 +46,8 @@ private:
 
     RegisterListModel m_registerMapModel{m_device.deviceRegisterMap()};
     RegisterListModel m_registerSequenceModel;
+
+    SessionSaver m_saver;
 
     QHash <QString, AbstractInterface* >* m_avaliableInterfaces;
     AbstractInterface* m_interface_ptr{nullptr};

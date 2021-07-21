@@ -2,11 +2,6 @@
 
 #include "fixedfield.h"
 
-FixedField::FixedField()
-{
-
-}
-
 QByteArray FixedField::rawData(quint16 targetRegisterByteSize)
 {
     quint16 numByte = m_position / 8;
@@ -22,4 +17,16 @@ QByteArray FixedField::rawData(quint16 targetRegisterByteSize)
 quint32 FixedField::data() const
 {
     return m_data;
+}
+
+QDataStream& operator<<(QDataStream& stream, const FixedField& field)
+{
+    stream << field.m_data;
+    return stream;
+}
+
+QDataStream& operator>>(QDataStream& stream, FixedField& field)
+{
+    stream >> field.m_data;
+    return stream;
 }

@@ -109,6 +109,8 @@ bool FileParser::readRegisterArray(std::vector<Register> *registerMap, ParseErro
             if(!readRegister(registerObject, &deviceRegister, error))
                 return false;
 
+            deviceRegister.m_uniqueId = registerIndex + 0xAA; // просто смещение, чтобы unqiqueId не мог быть 0
+
             registerMap->push_back(deviceRegister);
         }
         return true;
@@ -158,6 +160,7 @@ bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceReg
             }
         }
     }
+
     return true;
 }
 

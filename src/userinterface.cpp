@@ -4,6 +4,7 @@
 
 UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, Logger* logDevice, QObject *parent)
     : QObject(parent),
+      m_saver{&m_device, &m_registerMapModel, &m_registerSequenceModel},
       m_avaliableInterfaces{avaliableInterfaces},
       m_log{logDevice}
 {
@@ -97,6 +98,21 @@ bool UserInterface::writeSequence()
         m_log->message("Null interface pointer");
         return false;
     }
+}
+
+bool UserInterface::loadSession(const QUrl& fileName)
+{
+    if(m_saver.loadSession(fileName.toLocalFile()))
+    {
+        emit dutDeviceUpdated();
+        return true;
+    }
+    else return false;
+}
+
+bool UserInterface::saveSession(const QUrl& fileName)
+{
+    return m_saver.saveSession(fileName.toLocalFile());
 }
 
 QStringList UserInterface::avaliableInterfaces()

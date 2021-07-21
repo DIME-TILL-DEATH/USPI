@@ -51,7 +51,6 @@ QVariant RegisterListModel::data(const QModelIndex &index, int role) const
 bool RegisterListModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     beginInsertRows(parent, row, row+count-1);
-
     m_data.insert(m_data.begin()+row, count, RegisterAdapter());
     endInsertRows();
     return true;
@@ -64,6 +63,13 @@ bool RegisterListModel::removeRows(int row, int count, const QModelIndex &parent
     endRemoveRows();
 
     return true;
+}
+
+void RegisterListModel::resetModel()
+{
+    beginResetModel();
+    m_data.clear();
+    endResetModel();
 }
 
 void RegisterListModel::resetModel(std::vector<Register> &registerList)

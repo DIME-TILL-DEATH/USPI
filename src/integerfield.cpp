@@ -2,11 +2,6 @@
 
 #include "integerfield.h"
 
-IntegerField::IntegerField()
-{
-
-}
-
 QByteArray IntegerField::rawData(quint16 targetRegisterByteSize)
 {
     quint16 numByte = m_position / 8;
@@ -37,4 +32,20 @@ quint32 IntegerField::valueFrom() const
 quint32 IntegerField::valueTo() const
 {
     return m_valueTo;
+}
+
+QDataStream& operator<<(QDataStream& stream, const IntegerField& field)
+{
+    stream << field.m_data;
+    stream << field.m_valueFrom;
+    stream << field.m_valueTo;
+    return stream;
+}
+
+QDataStream& operator>>(QDataStream& stream, IntegerField& field)
+{
+    stream >> field.m_data;
+    stream >> field.m_valueFrom;
+    stream >> field.m_valueTo;
+    return stream;
 }

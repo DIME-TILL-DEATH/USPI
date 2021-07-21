@@ -1,6 +1,8 @@
 #ifndef INTEGERFIELD_H
 #define INTEGERFIELD_H
 
+#include <QDataStream>
+
 #include "abstractfield.h"
 
 class FileParser;
@@ -9,7 +11,8 @@ class IntegerField : public AbstractField
 public:
     friend class FileParser;
 
-    IntegerField();
+    IntegerField() {};
+    IntegerField(AbstractField field) : AbstractField{field} {};
 
     QByteArray rawData(quint16 targetRegisterByteSize);
 
@@ -18,6 +21,9 @@ public:
 
     quint32 valueFrom() const;
     quint32 valueTo() const;
+
+    friend QDataStream& operator<<(QDataStream& stream, const IntegerField& field);
+    friend QDataStream& operator>>(QDataStream& stream, IntegerField& field);
 
 private:
     quint64 m_data;

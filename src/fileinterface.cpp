@@ -24,14 +24,22 @@ bool FileInterface::writeSequence(const std::vector<Register *> &wrSequence)
     for(auto it = wrSequence.begin(); it != wrSequence.end(); ++it)
     {
         out << (*it)->name() << ":\n";
-        out << "Hexadecimal: 0x" << (*it)->rawData().toHex(m_hexSeparator.data()->toLatin1()) << "\n";
+
+        QByteArray rawData = (*it)->rawData();
+
+        if(m_deviceHeader.isMSB) std::reverse(rawData.begin(), rawData.end());
+
+        out << "Hexadecimal: 0x" << rawData.toHex(m_hexSeparator.data()->toLatin1()) << "\n";
 
         out << "Binary: 0b";
 
-        for(int i=0; i< (*it)->rawData().size() ; ++i)
+        for(int i=0; i< rawData.size() ; ++i)
         {
-            char oneByte = (*it)->rawData().at(i);
+            uchar oneByte = rawData.at(i);
             QString byteToBinary = QString("%1").arg(oneByte, 8, 2, QLatin1Char('0'));
+
+             if(!m_deviceHeader.isMSB) std::reverse(byteToBinary.begin(), byteToBinary.end());
+
             out << byteToBinary << m_binarySeparator;
         }
         out << "\n";

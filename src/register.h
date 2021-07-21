@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <QString>
+#include <QDataStream>
 
 #include "abstractfield.h"
 //#include "registeradapter.h"
@@ -30,7 +31,14 @@ public:
 
 //    RegisterAdapter &adapter();
 
+    friend QDataStream& operator<<(QDataStream& stream, const Register& reg);
+    friend QDataStream& operator>>(QDataStream& stream, Register& reg);
+
+    quint16 uniqueId() const;
+
 private:
+    quint16 m_uniqueId;
+
     QString m_name;
     quint16 m_bitSize;
 

@@ -23,7 +23,7 @@ public:
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
-
+    void resetModel();
     void resetModel(std::vector<Register> &registerList);
 
     Q_INVOKABLE void addItem(RegisterAdapter item, quint16 index);

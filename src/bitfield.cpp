@@ -1,10 +1,5 @@
 #include "bitfield.h"
 
-BitField::BitField()
-{
-
-}
-
 QByteArray BitField::rawData(quint16 targetRegisterByteSize)
 {
     QByteArray resultData(targetRegisterByteSize, 0);
@@ -27,4 +22,16 @@ bool BitField::getBit() const
 void BitField::setBit(bool newSettled)
 {
     m_bit = newSettled;
+}
+
+QDataStream& operator<<(QDataStream& stream, const BitField& field)
+{
+    stream << field.m_bit;
+    return stream;
+}
+
+QDataStream& operator>>(QDataStream& stream, BitField& field)
+{
+    stream >> field.m_bit;
+    return stream;
 }

@@ -23,9 +23,44 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: qsTr("&Файл")
+
+            FileDialog {
+                id: _sessionSaveDialog
+
+                selectExisting: false
+
+                title: "Выберите файл"
+                nameFilters: [ "Файлы сессий (*.ses)", "All files (*)" ]
+
+                onAccepted: {
+                    var result = Backend.saveSession(fileUrl)
+                }
+                Component.onCompleted: visible = false
+            }
+            FileDialog {
+                id: _sessionLoadDialog
+
+                title: "Выберите файл"
+                nameFilters: [ "Файлы сессий (*.ses)", "All files (*)" ]
+
+                onAccepted: {
+                    var result = Backend.loadSession(fileUrl)
+                    Scripts.createRegisterFields(0, _registerMapView)
+                }
+                Component.onCompleted: visible = false
+            }
+
+            Action {
+                text: qsTr("&Сохранить проект")
+                onTriggered:{
+                    _sessionSaveDialog.visible = true
+                }
+            }
             Action {
                 text: qsTr("&Открыть проект")
-                onTriggered:{}
+                onTriggered:{
+                    _sessionLoadDialog.visible = true
+                }
             }
             MenuSeparator { }
             Action {

@@ -1,10 +1,5 @@
 #include "variantlistfield.h"
 
-VariantListField::VariantListField()
-{
-
-}
-
 QByteArray VariantListField::rawData(quint16 targetRegisterByteSize)
 {
     quint64 data = m_data.value(m_selected);
@@ -32,4 +27,18 @@ void VariantListField::setSelected(const QString &newSelected)
 const QHash<QString, quint64> &VariantListField::data() const
 {
     return m_data;
+}
+
+QDataStream& operator<<(QDataStream& stream, VariantListField& field)
+{
+    stream << field.m_data;
+    stream << field.m_selected;
+    return stream;
+}
+
+QDataStream& operator>>(QDataStream& stream, VariantListField& field)
+{
+    stream >> field.m_data;
+    stream >> field.m_selected;
+    return stream;
 }

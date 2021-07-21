@@ -25,6 +25,7 @@ SOURCES += \
         src/register.cpp \
         src/registeradapter.cpp \
         src/registerlistmodel.cpp \
+        src/sessionsaver.cpp \
         src/userinterface.cpp \
         src/variantlistfield.cpp
 
@@ -58,5 +59,6 @@ HEADERS += \
     src/register.h \
     src/registeradapter.h \
     src/registerlistmodel.h \
+    src/sessionsaver.h \
     src/userinterface.h \
     src/variantlistfield.h
