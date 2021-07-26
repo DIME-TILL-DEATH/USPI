@@ -9,6 +9,13 @@ Register::~Register()
 {
 }
 
+bool operator==(const Register& lr, const Register& rr)
+{
+    if(lr.name() != rr.name()) return false;
+    if(lr.uniqueId() != rr.uniqueId()) return false;
+    return true;
+}
+
 quint16 Register::fieldsCount()
 {
     return m_fields.size();

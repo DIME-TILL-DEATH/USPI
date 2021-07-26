@@ -49,4 +49,6 @@ private:
     void sort();
 };
 
+bool operator==(const Register& lr, const Register& rr);
+
 #endif // REGISTER_H
