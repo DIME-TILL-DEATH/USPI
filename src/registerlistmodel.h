@@ -27,6 +27,7 @@ public:
     void resetModel(std::vector<Register> &registerList);
 
     Q_INVOKABLE void addItem(RegisterAdapter item, quint16 index);
+    Q_INVOKABLE void changeItem(RegisterAdapter item, quint16 index);
     Q_INVOKABLE void removeItem(quint16 index);
     Q_INVOKABLE RegisterAdapter getItem(quint16 index);
 
@@ -36,6 +37,7 @@ private:
 
     enum ListRoles{
         RegisterAdapterRole= Qt::UserRole + 1,
+        isLocalRole
     };
 };
 

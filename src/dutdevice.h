@@ -34,6 +34,10 @@ public:
     friend QDataStream& operator>>(QDataStream& stream, DUTDevice& device);
 private:
     Header m_deviceHeader;
+
+    // RegisterAdapter хранит ссылку на элемент вектора.
+    // Если вектор реаллоцируется ссылка протухнет!
+    // Переделать на std::array, чтобы размещение в памяти было статичное и ссылки не протухали
     std::vector<Register> m_deviceRegisterMap{};
 };
 

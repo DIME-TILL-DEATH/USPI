@@ -9,7 +9,7 @@ ListView{
 
     property string headerText : ""
 
-    signal delegateClicked(index : int)
+    signal delegateClicked(registerAdapter : var)
 
     width: parent.width
     height: parent.height
@@ -32,7 +32,7 @@ ListView{
             anchors.fill: parent
             onClicked: {
                 _rootList.currentIndex = index
-                delegateClicked(index)
+                delegateClicked(register)
             }
         }
     }

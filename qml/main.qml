@@ -45,7 +45,7 @@ ApplicationWindow {
 
                 onAccepted: {
                     var result = Backend.loadSession(fileUrl)
-                    Scripts.createRegisterFields(0, _registerMapView)
+                    Scripts.createRegisterFields(RegisterMapModel.getItem(0), _registerMapView)
                 }
                 Component.onCompleted: visible = false
             }

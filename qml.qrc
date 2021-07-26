@@ -6,7 +6,6 @@
         <file>qml/Fields/VariantListField.qml</file>
         <file>qml/Fields/IntegerField.qml</file>
         <file>qml/Fields/qmldir</file>
-        <file>qml/Elements/ResultField.qml</file>
         <file>qml/Elements/qmldir</file>
         <file>qml/Elements/FieldProperties.qml</file>
         <file>qml/Elements/FieldTip.qml</file>
@@ -22,5 +21,6 @@
         <file>qml/InterfaceSettings/qmldir</file>
         <file>qml/InterfaceSettings/AbstractInterfaceSettings.qml</file>
         <file>qml/InterfaceSettings/FileInterfaceSettings.qml</file>
+        <file>qml/Elements/SequenceControlPanel.qml</file>
     </qresource>
 </RCC>

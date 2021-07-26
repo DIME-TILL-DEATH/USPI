@@ -25,8 +25,13 @@ public:
 
     Register *getRegister() const;
 
+    bool isLocal() const;
+    void setIsLocal(bool newIsLocal);
+
 private:
+    // хранить итератор на вектор чтобы ссылки не протухали?
     Register* m_register;
+    bool m_isLocal{false};
 };
 Q_DECLARE_METATYPE(RegisterAdapter)
 

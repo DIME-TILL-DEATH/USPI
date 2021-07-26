@@ -133,6 +133,30 @@ void UserInterface::updateAvaliableInterfaces()
     emit avaliableInterfacesUpdated();
 }
 
+void UserInterface::changeWriteItemLocal(quint16 index)
+{
+    if(!m_registerSequenceModel.registerAdaptersList().at(index).isLocal())
+    {
+        Register regCopy = *m_registerSequenceModel.registerAdaptersList().at(index).getRegister();
+        m_localRegisterMap.push_back(regCopy);
+
+        RegisterAdapter adapter(&(m_localRegisterMap.back()));
+        adapter.setIsLocal(true);
+        m_registerSequenceModel.changeItem(adapter, index);
+    }
+    else
+    {
+        Register& regRef = *m_registerSequenceModel.registerAdaptersList().at(index).getRegister();
+        quint16 uniqueId = regRef.uniqueId();
+//        m_localRegisterMap.removeOne(regRef);
+        m_localRegisterMap.erase(std::find(m_localRegisterMap.begin(), m_localRegisterMap.end(), regRef));
+
+        RegisterAdapter adapter(m_device.registerByUniqueId(uniqueId));
+        adapter.setIsLocal(false);
+        m_registerSequenceModel.changeItem(adapter, index);
+    }
+}
+
 RegisterListModel* UserInterface::registerMapModel()
 {
     return &m_registerMapModel;

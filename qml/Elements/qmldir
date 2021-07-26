@@ -1,9 +1,9 @@
 module Elements
 
-ResultField     1.0 ResultField.qml
-FieldProperties 1.0 FieldProperties.qml
-FieldTip        1.0 FieldTip.qml
-RegisterHeader  1.0 RegisterHeader.qml
+FieldProperties      1.0 FieldProperties.qml
+FieldTip             1.0 FieldTip.qml
+RegisterHeader       1.0 RegisterHeader.qml
 OpenFileDeviceDialog 1.0 OpenFileDeviceDialog.qml
-MainAppHeader   1.0 MainAppHeader.qml
-RegisterList    1.0 RegisterList.qml
+MainAppHeader        1.0 MainAppHeader.qml
+RegisterList         1.0 RegisterList.qml
+SequenceControlPanel 1.0 SequenceControlPanel.qml

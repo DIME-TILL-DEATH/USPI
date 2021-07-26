@@ -90,9 +90,11 @@ void Logger::messageOutputHandlerImplementation(QtMsgType type, const QMessageLo
 
             case QtInfoMsg:
                 message("Лог (" + QTime::currentTime().toString() +"): " + msg);
+//                std::cout << localMsg.constData() << std::flush;
                 break;
             case QtWarningMsg:
                 message("Ошибка (" + QTime::currentTime().toString() +"): " +  msg, Qt::red);
+                std::cout << localMsg.constData() << std::flush;
                 break;
 
             case QtCriticalMsg:

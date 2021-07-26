@@ -31,8 +31,8 @@ Rectangle{
             adapter: _root.adapter
         }
 
-        ResultField{
-            resultValue: _root.value
+        Label{
+            text: "0x" + _root.value.toString(16)
 
             anchors.verticalCenter: parent.verticalCenter
 

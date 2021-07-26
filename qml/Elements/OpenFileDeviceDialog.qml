@@ -20,7 +20,7 @@ FileDialog {
     onAccepted: {
         if(Backend.loadDevice(_fileDialog.fileUrl))
         {
-            Scripts.createRegisterFields(0, registerMapView)
+            Scripts.createRegisterFields(RegisterMapModel.getItem(0), registerMapView)
         }
     }
     Component.onCompleted: visible = false

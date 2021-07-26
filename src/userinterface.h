@@ -41,8 +41,14 @@ public:
 
     Q_INVOKABLE void updateAvaliableInterfaces();
 
+    // нейминг не очень
+    Q_INVOKABLE void changeWriteItemLocal(quint16 index);
+
 private:
     DUTDevice m_device;
+
+//    QHash<quint16, Register> m_localRegisterMap; // index in sequence - Register
+    std::list<Register> m_localRegisterMap;
 
     RegisterListModel m_registerMapModel{m_device.deviceRegisterMap()};
     RegisterListModel m_registerSequenceModel;
@@ -51,6 +57,8 @@ private:
 
     QHash <QString, AbstractInterface* >* m_avaliableInterfaces;
     AbstractInterface* m_interface_ptr{nullptr};
+
+    quint32 m_globalRegIdCounter;
 
 signals:
     void dutDeviceUpdated();

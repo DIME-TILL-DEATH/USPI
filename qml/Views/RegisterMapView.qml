@@ -16,7 +16,7 @@ Item {
     property alias resultView: _text
     property alias registerView: _registerMapView
 
-    property bool autoWrite : _rbAuto.checked
+    property bool autoWrite : _sequenceControlPanel.rbAuto.checked
 
     Row{
         id: _row
@@ -27,10 +27,11 @@ Item {
         padding: width / 200
         spacing: width / 200
 
-        function selectRegisterMap(index)
+        function selectRegisterMap(registerAdapter)
         {
-            Scripts.createRegisterFields(index, _root)
+            Scripts.createRegisterFields(registerAdapter, _root)
         }
+
         Component.onCompleted: {
             _registerMapView.delegateClicked.connect(selectRegisterMap)
         }
@@ -55,76 +56,11 @@ Item {
             spacing: height/200
         }
 
-        Rectangle{
-            width: parent.width*0.18
-            height: parent.height
-            border.width: 1
-            color: "transparent"
+        SequenceControlPanel{
+            id: _sequenceControlPanel
 
-            Column{
-                anchors.fill: parent
-                spacing: parent.height/100
-                padding: parent.height/50
-
-                Button{
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: ">"
-                    enabled: (_registerMapView.count>0) ? true : false
-                    onPressed: {
-                        RegisterSequenceModel.addItem(RegisterMapModel.getItem(_registerMapView.currentIndex), _registerSequenceView.currentIndex)
-                    }
-                }
-                Button{
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: ">>"
-                    enabled: (_registerMapView.count>0) ? true : false
-                    onPressed: {
-                        for(var i=_registerMapView.count-1; i >= 0; i--)
-                        {
-                            RegisterSequenceModel.addItem(RegisterMapModel.getItem(i), _registerSequenceView.currentIndex)
-                        }
-                    }
-                }
-                Button{
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "<"
-                    enabled: (_registerSequenceView.count>0) ? true : false
-                    onPressed: {
-                        RegisterSequenceModel.removeItem(_registerSequenceView.currentIndex)
-                    }
-                }
-                Button{
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    enabled: (_registerSequenceView.count>0) ? true : false
-                    text: "<<"
-                    onPressed: {
-                        for(var i=_registerSequenceView.count-1; i >= 0; i--)
-                        {
-                            RegisterSequenceModel.removeItem(i)
-                        }
-                    }
-                }
-
-                Text{
-                    text: "Запись в устройство:"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                RadioButton{
-                    id: _rbBtn
-                    checked: true
-                    text: "По кнопке"
-                }
-                RadioButton{
-                    id: _rbAuto
-                    text: "По изменению"
-                }
-                CheckBox{
-                    id: _rbTrigger
-                    enabled: false
-                    text: "По триггеру"
-                }
-            }
+            registerMapView: _registerMapView
+            registerSequenceView: _registerSequenceView
         }
 
         Column{
@@ -141,7 +77,50 @@ Item {
 
                 height: parent.height-_btnWrite.height-parent.padding*4
                 model: RegisterSequenceModel
+
+                delegate: RegisterHeader{
+
+                    color: isLocal ?
+                               (ListView.isCurrentItem ? "green" : "grey") :
+                               (ListView.isCurrentItem ? "skyblue" : "transparent")
+
+                    MouseArea{
+                        id: _ma
+                        anchors.fill: parent
+                        acceptedButtons: Qt.AllButtons
+                        onClicked: {
+                            if(mouse.button & Qt.RightButton)
+                            {
+                                _sequenceOptionsMenu.popup()
+                            }
+                            else
+                            {
+                                _registerSequenceView.currentIndex = index
+                                if(isLocal)
+                                {
+                                    Scripts.createRegisterFields(register, _root)
+                                }
+                            }
+                        }
+
+                        Menu{
+                            id: _sequenceOptionsMenu
+                            MenuItem{
+                                text: "индивидуально"
+                                checkable: true
+                                onTriggered: {
+                                    Backend.changeWriteItemLocal(index)
+                                }
+                            }
+            //                MenuSeparator{}
+            //                MenuItem{
+            //                    text: "пауза"
+            //                }
+                        }
+                    }
+                }
             }
+
 
             Button{
                 id: _btnWrite
@@ -149,7 +128,7 @@ Item {
                 width: parent.width*0.6
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                enabled: _rbBtn.checked ? true : false
+                enabled: _sequenceControlPanel.rbBtn.checked ? true : false
 
                 text: "Записать"
 

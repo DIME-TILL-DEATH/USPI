@@ -30,3 +30,13 @@ Register *RegisterAdapter::getRegister() const
 {
     return m_register;
 }
+
+bool RegisterAdapter::isLocal() const
+{
+    return m_isLocal;
+}
+
+void RegisterAdapter::setIsLocal(bool newIsLocal)
+{
+    m_isLocal = newIsLocal;
+}

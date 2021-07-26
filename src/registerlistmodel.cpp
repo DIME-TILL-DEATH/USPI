@@ -19,6 +19,7 @@ QHash<int, QByteArray> RegisterListModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[ListRoles::RegisterAdapterRole] = "register";
+    roles[ListRoles::isLocalRole] = "isLocal";
     return roles;
 }
 
@@ -39,7 +40,15 @@ QVariant RegisterListModel::data(const QModelIndex &index, int role) const
     {
         case ListRoles::RegisterAdapterRole:
         {
+            RegisterAdapter adapter_ptr = m_data.at(index.row());
+            Register* reg = adapter_ptr.getRegister();
+            QByteArray result = reg->rawData();
+
             return QVariant::fromValue(m_data.at(index.row()));
+        }
+        case ListRoles::isLocalRole:
+        {
+            return m_data.at(index.row()).isLocal();
         }
         default:
         {
@@ -86,6 +95,12 @@ void RegisterListModel::resetModel(std::vector<Register> &registerList)
 void RegisterListModel::addItem(RegisterAdapter item, quint16 index)
 {
     insertRows(index, 1);
+    m_data.at(index) = item;
+    emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
+}
+
+void RegisterListModel::changeItem(RegisterAdapter item, quint16 index)
+{
     m_data.at(index) = item;
     emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
 }
