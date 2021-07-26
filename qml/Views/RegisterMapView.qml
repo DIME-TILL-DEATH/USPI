@@ -96,10 +96,8 @@ Item {
                             else
                             {
                                 _registerSequenceView.currentIndex = index
-                                if(isLocal)
-                                {
-                                    Scripts.createRegisterFields(register, _root)
-                                }
+                                Scripts.createRegisterFields(register, _root)
+
                             }
                         }
 

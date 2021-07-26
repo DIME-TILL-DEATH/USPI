@@ -51,6 +51,7 @@ public:
     QVariant variantList() const;
 
 private:
+    // при такой логике надо везде проверять что m_field != nullptr
     AbstractField* m_field;
 
 };

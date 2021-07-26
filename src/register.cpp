@@ -7,6 +7,50 @@ Register::Register()
 
 Register::~Register()
 {
+    for(auto it = m_fields.begin(); it != m_fields.end(); ++it)
+    {
+        delete *it;
+    }
+}
+
+Register::Register(const Register &src_reg)
+     : m_uniqueId{src_reg.m_uniqueId},
+       m_name{src_reg.m_name},
+       m_bitSize{src_reg.m_bitSize}
+{
+    // Создаём свои объекты AbstractField и ссылки на них помещаем в вектор m_fields
+    // объекты будут удалены в деструкторе
+    for(auto it = src_reg.m_fields.begin(); it != src_reg.m_fields.end(); ++it)
+    {
+        switch ((*it)->type())
+        {
+            case AbstractField::FieldType::BitField:
+            {
+                BitField* field_ptr = new BitField(*(dynamic_cast<BitField*>(*it)));
+                m_fields.push_back(field_ptr);
+                break;
+            }
+            case AbstractField::FieldType::FixedField:
+            {
+                FixedField* field_ptr = new FixedField(*(dynamic_cast<FixedField*>(*it)));
+                m_fields.push_back(field_ptr);
+                break;
+            }
+            case AbstractField::FieldType::IntegerField:
+            {
+                IntegerField* field_ptr = new IntegerField(*(dynamic_cast<IntegerField*>(*it)));
+                m_fields.push_back(field_ptr);
+                break;
+            }
+            case AbstractField::FieldType::VariantListField:
+            {
+                VariantListField* field_ptr = new VariantListField(*(dynamic_cast<VariantListField*>(*it)));
+                m_fields.push_back(field_ptr);
+                break;
+            }
+            default:{break;}
+        }
+    }
 }
 
 bool operator==(const Register& lr, const Register& rr)
