@@ -16,7 +16,10 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
 
 UserInterface::~UserInterface()
 {
-
+    for(auto it = m_avaliableInterfaces->begin(); it != m_avaliableInterfaces->end(); ++it)
+    {
+        delete *it;
+    }
 }
 
 const QString &UserInterface::dutDeviceName() const
@@ -125,12 +128,26 @@ QStringList UserInterface::avaliableInterfaces()
 
 void UserInterface::updateAvaliableInterfaces()
 {
+    QString prevSelectedInterface = m_avaliableInterfaces->key(m_interface_ptr);
+
+    for(auto it = m_avaliableInterfaces->begin(); it != m_avaliableInterfaces->end(); ++it)
+    {
+        delete *it;
+    }
     m_avaliableInterfaces->clear();
 
-    m_avaliableInterfaces->insert(AbstractInterface().interfaceName(), new AbstractInterface());
-    m_avaliableInterfaces->insert(FileInterface().interfaceName(), new FileInterface());
+    AbstractInterface* abstractInterface = new AbstractInterface();
+    FileInterface* fileInterface = new FileInterface();
+    USBInterface* usbInterface = new USBInterface();
+
+    m_avaliableInterfaces->insert(abstractInterface->interfaceName(), abstractInterface);
+    m_avaliableInterfaces->insert(fileInterface->interfaceName(), fileInterface);
+    m_avaliableInterfaces->insert(usbInterface->interfaceName(), usbInterface);
+
+    m_interface_ptr = m_avaliableInterfaces->value(prevSelectedInterface);
 
     emit avaliableInterfacesUpdated();
+    emit interfaceUpdated();
 }
 
 void UserInterface::changeWriteItemLocal(quint16 index)

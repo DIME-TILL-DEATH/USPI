@@ -8,10 +8,12 @@
 #include "logger.h"
 #include "registeradapter.h"
 #include "dutdevice.h"
-#include "abstractinterface.h"
 #include "registerlistmodel.h"
-#include "fileinterface.h"
 #include "sessionsaver.h"
+
+#include "abstractinterface.h"
+#include "fileinterface.h"
+#include "usbinterface.h"
 
 class UserInterface : public QObject
 {

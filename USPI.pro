@@ -27,6 +27,7 @@ SOURCES += \
         src/registeradapter.cpp \
         src/registerlistmodel.cpp \
         src/sessionsaver.cpp \
+        src/usbinterface.cpp \
         src/userinterface.cpp \
         src/variantlistfield.cpp
 
@@ -61,5 +62,10 @@ HEADERS += \
     src/registeradapter.h \
     src/registerlistmodel.h \
     src/sessionsaver.h \
+    src/usbinterface.h \
     src/userinterface.h \
     src/variantlistfield.h
+
+INCLUDEPATH += $$PWD/libusb/include
+LIBS += -L$$PWD/libusb/static -lusb-1.0
+#LIBS += -lusb-1.0

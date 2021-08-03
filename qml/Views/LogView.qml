@@ -7,30 +7,42 @@ Rectangle{
 
     border.width: 1
 
+    Rectangle{
+        id: _header
+
+        width: _rootRectangle.width
+        height: _text.font.pixelSize*2
+
+        color: "azure"
+        border.width: 1
+
+        Text{
+            id: _text
+            leftPadding: font.pixelSize
+            anchors.verticalCenter: parent.verticalCenter
+            text: "Лог событий:"
+        }
+    }
+
 
     ListView{
         id: _loggerWindow
 
-        anchors.fill: parent
+        clip: true
+
+        width: parent.width
+        height: parent.height - _header.height
+
+        anchors.top: _header.bottom
 
         model: Log
 
-        header: Rectangle{
-            width: _rootRectangle.width
-            height: _text.font.pixelSize*2
-
-            color: "azure"
-            border.width: 1
-
-            Text{
-                id: _text
-                leftPadding: font.pixelSize
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Лог событий:"
-            }
+        ScrollBar.vertical: ScrollBar{
+            policy: ScrollBar.AlwaysOn
         }
 
         delegate: Text{
+
             leftPadding: font.pixelSize
 
             text: msgText

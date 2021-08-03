@@ -10,6 +10,7 @@ class AbstractInterface
 {
 public:
     AbstractInterface();
+    virtual ~AbstractInterface() {};
 
     virtual bool writeRegister(Register* wrReg);
     virtual bool writeSequence(const std::vector<Register*> &wrSequence);
