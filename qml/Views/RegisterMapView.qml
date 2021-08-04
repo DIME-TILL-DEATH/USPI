@@ -41,9 +41,9 @@ Item {
             id: _registerMapView
 
             headerText: qsTr("Карта регистров:")
+            model: RegisterMapModel
 
             width: parent.width * 0.15
-            model: RegisterMapModel
         }
 
         Column{
@@ -74,9 +74,9 @@ Item {
                 id: _registerSequenceView
 
                 headerText: qsTr("Порядок записи:")
+                model: RegisterSequenceModel
 
                 height: parent.height-_btnWrite.height-parent.padding*4
-                model: RegisterSequenceModel
 
                 delegate: RegisterHeader{
 

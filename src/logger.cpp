@@ -85,7 +85,7 @@ void Logger::messageOutputHandlerImplementation(QtMsgType type, const QMessageLo
         {
             case QtDebugMsg:
                 fprintf(stdout, "Debug: %s \n(%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
-                std::cout << std::flush;
+                std::cout << std::endl << std::flush;
                 break;
 
             case QtInfoMsg:
@@ -94,16 +94,16 @@ void Logger::messageOutputHandlerImplementation(QtMsgType type, const QMessageLo
                 break;
             case QtWarningMsg:
                 message("Ошибка (" + QTime::currentTime().toString() +"): " +  msg, Qt::red);
-                std::cout << localMsg.constData() << std::flush;
+                std::cout << localMsg.constData() << std::endl << std::flush;
                 break;
 
             case QtCriticalMsg:
                 fprintf(stdout, "Critical: %s \n(%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
-                std::cout << std::flush;
+                std::cout << std::endl << std::flush;
                 break;
             case QtFatalMsg:
                 fprintf(stdout, "Fatal: %s \n(%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
-                std::cout << std::flush;
+                std::cout << std::endl << std::flush;
                 break;
         }
     }
