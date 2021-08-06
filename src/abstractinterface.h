@@ -22,6 +22,7 @@ public:
 
 protected:
     DUTDevice::Header m_deviceHeader;
+    bool isActive{true};
 
 private:
     QString m_interfaceName{"Abstract"};

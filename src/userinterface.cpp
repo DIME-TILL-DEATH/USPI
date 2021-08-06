@@ -7,6 +7,10 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
       m_saver{&m_device, &m_registerMapModel, &m_registerSequenceModel},
       m_avaliableInterfaces{avaliableInterfaces}
 {
+    m_abstractInterface = new AbstractInterface();
+    m_fileInterface = new FileInterface();
+    m_usbInterface = new USB::USBInterface();
+
     updateAvaliableInterfaces();
     if(m_interface_ptr == nullptr)
     {
@@ -16,10 +20,9 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
 
 UserInterface::~UserInterface()
 {
-    for(auto it = m_avaliableInterfaces->begin(); it != m_avaliableInterfaces->end(); ++it)
-    {
-        delete *it;
-    }
+    delete m_abstractInterface;
+    delete m_fileInterface;
+    delete m_usbInterface;
 }
 
 const QString &UserInterface::dutDeviceName() const
@@ -130,19 +133,11 @@ void UserInterface::updateAvaliableInterfaces()
 {
     QString prevSelectedInterface = m_avaliableInterfaces->key(m_interface_ptr);
 
-    for(auto it = m_avaliableInterfaces->begin(); it != m_avaliableInterfaces->end(); ++it)
-    {
-        delete *it;
-    }
     m_avaliableInterfaces->clear();
 
-    AbstractInterface* abstractInterface = new AbstractInterface();
-    FileInterface* fileInterface = new FileInterface();
-    USBInterface* usbInterface = new USBInterface();
-
-    m_avaliableInterfaces->insert(abstractInterface->interfaceName(), abstractInterface);
-    m_avaliableInterfaces->insert(fileInterface->interfaceName(), fileInterface);
-    m_avaliableInterfaces->insert(usbInterface->interfaceName(), usbInterface);
+    m_avaliableInterfaces->insert(m_abstractInterface->interfaceName(), m_abstractInterface);
+    m_avaliableInterfaces->insert(m_fileInterface->interfaceName(), m_fileInterface);
+    m_avaliableInterfaces->insert(m_usbInterface->interfaceName(), m_usbInterface);
 
     m_interface_ptr = m_avaliableInterfaces->value(prevSelectedInterface);
 

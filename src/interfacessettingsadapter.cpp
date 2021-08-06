@@ -1,5 +1,7 @@
 #include "interfacessettingsadapter.h"
 
+using namespace USB;
+
 InterfacesSettingsAdapter::InterfacesSettingsAdapter( QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent)
     : QObject(parent),
       m_avaliableInterfaces{avaliableInterfaces}
@@ -10,6 +12,7 @@ InterfacesSettingsAdapter::InterfacesSettingsAdapter( QHash <QString, AbstractIn
 void InterfacesSettingsAdapter::registerTypes()
 {
     qRegisterMetaType<FileInterfaceSettings>("FileInterfaceSettings");
+    qRegisterMetaType<USBInterfaceSettings>("USBInterfaceSettings");
 }
 
 FileInterfaceSettings InterfacesSettingsAdapter::fileInterfaceSettings()
@@ -44,4 +47,25 @@ void InterfacesSettingsAdapter::setFileInterfaceSettings(const FileInterfaceSett
         fileInterface_ptr->setBinarySeparator(newSettings.m_binSeparator);
         fileInterface_ptr->setHexSeparator(newSettings.m_hexSeparator);
     }
+}
+
+USBInterfaceSettings InterfacesSettingsAdapter::usbInterfaceSettings()
+{
+    USBInterfaceSettings answer;
+
+    AbstractInterface* abstract_ptr = m_avaliableInterfaces->value(USB::interfaceNameString);
+
+    USBInterface* usbInterface_ptr = dynamic_cast<USBInterface*>(abstract_ptr);
+
+    if(usbInterface_ptr != nullptr)
+    {
+        answer.deviceName = usbInterface_ptr->activeDevice().deviceName;
+        answer.deviceInfo = usbInterface_ptr->activeDevice().deviceInfo;
+    }
+    return answer;
+}
+
+void InterfacesSettingsAdapter::setUSBInterfaceSettings(const USBInterfaceSettings &newSettings)
+{
+
 }

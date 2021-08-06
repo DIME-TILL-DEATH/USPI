@@ -17,6 +17,7 @@ ApplicationWindow {
         switch(_comboInterfaces.textAt(index))
         {
             case "File": _settingsPageLoader.source = "FileInterfaceSettings.qml"; break;
+            case "USB": _settingsPageLoader.source = "USBInterfaceSettings.qml"; break;
             case "Abstract": _settingsPageLoader.source = "AbstractInterfaceSettings.qml"; break;
             default: _settingsPageLoader.sourceComponent = undefined
         }

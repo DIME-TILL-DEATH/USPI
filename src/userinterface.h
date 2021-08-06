@@ -62,6 +62,10 @@ private:
 
     quint32 m_globalRegIdCounter;
 
+    AbstractInterface* m_abstractInterface;
+    FileInterface* m_fileInterface;
+    USB::USBInterface* m_usbInterface;
+
 signals:
     void dutDeviceUpdated();
     void interfaceUpdated();

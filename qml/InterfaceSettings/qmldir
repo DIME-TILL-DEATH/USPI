@@ -3,3 +3,4 @@ module InterfaceSettings
 InterfaceSettingsWindow 1.0 InterfaceSettingsWindow.qml
 AbstractInterfaceSettings 1.0 AbstractInterfaceSettings.qml
 FileInterfaceSettings 1.0 FileInterfaceSettings.qml
+USBInterfaceSettings 1.0 USBInterfaceSettings.qml
