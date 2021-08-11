@@ -1,7 +1,8 @@
 #include "sessionsaver.h"
 
-SessionSaver::SessionSaver(DUTDevice *device, RegisterListModel *registerMapModel, RegisterListModel *registerWriteSequenceModel)
+SessionSaver::SessionSaver(DUTDevice *device, std::list<Register>* localRegisterMap, RegisterListModel *registerMapModel, RegisterListModel *registerWriteSequenceModel)
     :m_device{device},
+      m_localRegisterMap{localRegisterMap},
      m_registerMapModel{registerMapModel},
      m_registerWriteSequenceModel{registerWriteSequenceModel}
 {
@@ -26,9 +27,17 @@ bool SessionSaver::saveSession(const QString &filePath)
                 ++it)
         {
             outFile << (*it).getRegister()->uniqueId();
+
+            bool isLocalRegister = (*it).isLocal();
+            outFile << isLocalRegister;
+
+            if(isLocalRegister)
+            {
+                outFile << *((*it).getRegister());
+            }
         }
 
-        qDebug() << "Сессия" << filePath << "сохранена";
+        qInfo() << "Сессия" << filePath << "сохранена";
         file.close();
         return true;
     }
@@ -62,9 +71,28 @@ bool SessionSaver::loadSession(const QString &filePath)
             quint16 registerUniqueId;
             inFile >> registerUniqueId;
 
-            Register* reg_ptr = m_device->registerByUniqueId(registerUniqueId);
+            Register* reg_ptr;
 
-            if(reg_ptr != nullptr) m_registerWriteSequenceModel->addItem(RegisterAdapter(reg_ptr), i);
+
+            bool isLocal;
+            inFile >> isLocal;
+
+            if(isLocal)
+            {
+                Register localRegister;
+                inFile >> localRegister;
+                m_localRegisterMap->push_back(localRegister);
+                reg_ptr = &(m_localRegisterMap->back());
+            }
+            else
+            {
+                reg_ptr = m_device->registerByUniqueId(registerUniqueId);
+            }
+            RegisterAdapter regAdapter(reg_ptr);
+
+            regAdapter.setIsLocal(isLocal);
+
+            if(reg_ptr != nullptr) m_registerWriteSequenceModel->addItem(regAdapter, i);
         }
         file.close();
         qInfo() << "Сессия" << filePath << "загружена";

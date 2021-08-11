@@ -1,4 +1,5 @@
-import QtQuick 2.0
+import QtQuick 2.12
+import QtQuick.Controls 2.15
 
 Item {
     property int baseMargins: parent.width/40
@@ -11,12 +12,18 @@ Item {
         }
 
         Text{
+            id: _text1
+
             text: qsTr("USB интерфейс.")
             height: font.pixelSize*2
         }
 
         Text{
+            id: _text2
+
             text: "Имя устройства: " + InterfaceSettings.usbInterfaceSettings.deviceName
+
+            font.family: "Arial"
 
             width: parent.width
             height: font.pixelSize*4
@@ -30,9 +37,13 @@ Item {
 
         ListView{
             width: parent.width
-            height: parent.height*0.5
+            height: parent.height - _text1.height - _text2.height - 10
 
             model: InterfaceSettings.usbInterfaceSettings.deviceInfo
+
+            ScrollBar.vertical: ScrollBar{
+                policy: ScrollBar.AlwaysOn
+            }
 
             delegate: Text{
                 text: modelData

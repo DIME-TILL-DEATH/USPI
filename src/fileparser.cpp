@@ -251,10 +251,19 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
             integerField->m_valueFrom = jsonObject["valueFrom"].toDouble();
             integerField->m_data = integerField->m_valueFrom;
         }
+        else
+        {
+            integerField->m_valueFrom = 0;
+            integerField->m_data = 0;
+        }
 
         if(jsonObject.contains("valueTo") && jsonObject["valueTo"].isDouble())
         {
             integerField->m_valueTo = jsonObject["valueTo"].toDouble();
+        }
+        else
+        {
+            integerField->m_valueTo = pow(2, integerField->m_size)-1;
         }
         return true;
     }

@@ -47,6 +47,11 @@ Rectangle{
 
             text: msgText
             color: msgColor
+
+            Component.onCompleted: {
+                _loggerWindow.positionViewAtEnd()
+            }
         }
+
     }
 }

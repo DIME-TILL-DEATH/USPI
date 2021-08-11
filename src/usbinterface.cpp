@@ -17,16 +17,6 @@ USBInterface::USBInterface()
     {
         libusb_set_option(m_USBSession, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_WARNING);
 
-//        rtnValue = libusb_hotplug_register_callback(m_USBSession, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
-//                                                    LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT, 0, m_VID, m_PID,
-//                                                    LIBUSB_HOTPLUG_MATCH_ANY, hotplugCallback, NULL,
-//                                                    &callbackHandle);
-
-//        qInfo() << libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG);
-//        if (rtnValue != LIBUSB_SUCCESS)
-//        {
-//            qWarning() << "Failed to register callback:" << libusb_error_name(rtnValue);
-//        }
         initUSB();
     }
 }
@@ -63,22 +53,29 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
         // и отослать за раз bulk transfer. В начале пакета или перед каждым регистром указывать
         // режим - SPI, MSB/LSB, размер регистра(в битах, но отсылка с заполнением до байта),
         // размер в посылке в байтах
-        char* rawData = (*it)->rawData().data();
-        int dataSize = (*it)->rawData().size();
+
+        // на HID отправляет только по 8 байт. Если провбовать отослать меньше, то выдаёт ошибку
+        int bufferSize = 256;
+
+        QByteArray regData = (*it)->rawData();
+
+        char* rawData = regData.data();
+        int dataSize = regData.size();
 
         rtnValue = libusb_bulk_transfer(m_activeDevice.handle,
-                                        (m_activeDevice.endpointAddress | LIBUSB_ENDPOINT_OUT), // write
+                                        2, // write
                                         (unsigned char*)rawData,
-                                        dataSize,
+                                        bufferSize,
                                         &actualWrittenBytes,
                                         m_timeout);
+
 
         if(rtnValue < 0)
         {
             qWarning() << "Failed send to USB device:" << libusb_error_name(rtnValue);
             return false;
         }
-        if(dataSize != actualWrittenBytes)
+        if(dataSize > actualWrittenBytes)
         {
             qWarning() << "Sended: " << actualWrittenBytes << ", while data size is: " << dataSize;
             return false;
@@ -122,7 +119,7 @@ bool USBInterface::initUSB()
 
     if(m_activeDevice.handle == nullptr)
     {
-        qWarning() << "Can't open flash";
+        qWarning() << "Can't open device";
         return false;
     }
 
@@ -166,7 +163,7 @@ bool USBInterface::initDevice(USBDevice& device)
         libusb_get_string_descriptor_ascii(device.handle, device.deviceDescriptor.iProduct, product, 200);
         libusb_get_string_descriptor_ascii(device.handle, device.deviceDescriptor.iManufacturer, manufacturer, 200);
 
-        device.deviceName = QString::fromUtf8(reinterpret_cast<const char*>(manufacturer)).simplified() +
+        device.deviceName = QString::fromLatin1(reinterpret_cast<const char*>(manufacturer)).simplified() +
                         "|" +
                        QString::fromUtf8(reinterpret_cast<const char*>(product)).simplified();
 
@@ -185,40 +182,6 @@ void USBInterface::closeDevice(USBDevice& device)
         device.handle = nullptr;
     }
 }
-
-//int USBInterface::hotplugCallback(libusb_context *context, libusb_device *device, libusb_hotplug_event event, void *userData)
-//{
-//    static libusb_device_handle *dev_handle = NULL;
-//    struct libusb_device_descriptor desc;
-//    int rtnValue;
-
-//    (void)libusb_get_device_descriptor(device, &desc);
-
-//    if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED)
-//    {
-//      rtnValue = libusb_open(device, &dev_handle);
-//      if (rtnValue != LIBUSB_SUCCESS)
-//      {
-//        qWarning() << "Could not open USB device";
-//      }
-//      qInfo() << "connected";
-//    }
-//    else if (LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT == event)
-//    {
-//      if (dev_handle)
-//      {
-//        libusb_close(dev_handle);
-//        dev_handle = NULL;
-//      }
-//      qInfo() << "disconnected";
-//    }
-//    else
-//    {
-//      qWarning() << "Unhandled event: " << event;
-//    }
-
-//    return 0;
-//}
 
 QStringList USBInterface::deviceInfo(libusb_device *dev)
 {
@@ -250,25 +213,38 @@ QStringList USBInterface::deviceInfo(libusb_device *dev)
         for(int i=0; i<(int)config->bNumInterfaces; i++)
         {
             inter = &config->interface[i];
-            deviceInfo << "Number of alternate settings: " + QString::number(inter->num_altsetting);
+            deviceInfo << "Number of alternate settings: " + QString::number(inter->num_altsetting) +"\n";
 
             for(int j=0; j<inter->num_altsetting; j++)
             {
                 interdesc = &inter->altsetting[j];
                 deviceInfo << "Interface Number: " + QString::number(interdesc->bInterfaceNumber);
-                deviceInfo << "Number of endpoints: " + QString::number(interdesc->bNumEndpoints);
+                deviceInfo << "Number of endpoints: " + QString::number(interdesc->bNumEndpoints) + "\n";
 
                 for(int k=0; k<(int)interdesc->bNumEndpoints; k++)
                 {
                     epdesc = &interdesc->endpoint[k];
-                    deviceInfo << "Descriptor Type: " + QString::number(epdesc->bDescriptorType);
+//                    deviceInfo << "Descriptor Type: " + QString::number(epdesc->bDescriptorType);
                     deviceInfo << "EP Address: " + QString::number(epdesc->bEndpointAddress);
+                    deviceInfo << "EP type: " + epTypeString(*epdesc);
+                    deviceInfo << "EP packet max size:" + QString::number(epdesc->wMaxPacketSize) + "\n";
                 }
             }
         }
 
         libusb_free_config_descriptor(config);
         return deviceInfo;
+}
+
+QString USBInterface::epTypeString(const libusb_endpoint_descriptor& epDescriptor)
+{
+    switch(epDescriptor.bmAttributes & 0x3)
+    {
+        case LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK: return "Bulk"; break;
+        case LIBUSB_ENDPOINT_TRANSFER_TYPE_CONTROL: return "Control"; break;
+        case LIBUSB_ENDPOINT_TRANSFER_TYPE_INTERRUPT: return "Interrupt"; break;
+        case LIBUSB_ENDPOINT_TRANSFER_TYPE_ISOCHRONOUS: return "Isochronius"; break;
+    }
 }
 
 }

@@ -17,7 +17,7 @@ struct USBDevice{
     libusb_device_descriptor deviceDescriptor;
 
     int interfaceNumber{0};
-    unsigned char endpointAddress{0};
+    unsigned char endpointAddress{2};
 
     QString deviceName;
     QStringList deviceInfo;
@@ -29,12 +29,11 @@ public:
     USBInterface();
     ~USBInterface();
 
-
+    /** Write data to register */
     bool writeRegister(Register* wrReg) override;
     bool writeSequence(const std::vector<Register*> &wrSequence) override;
 
     const QString &interfaceName() const override;
-
 
     const USBDevice &activeDevice() const;
 
@@ -50,8 +49,8 @@ private:
     // поддерживаемому типу, если да, открывать и сохранять указатели в list/vector и далее
     // позволять пользователю выбирать активное устройство (m_activeDevice_ptr или итератор). Отправлять через него.
     // не забывать что ссылки на элемент вектора протухают при изменении содержания!!!
-    int m_VID{0x2109}; //0x1221 -  //0x04D8 - microchip
-    int m_PID{0x0102}; //0x3234 -
+    int m_VID{0x1A86}; //0x2109 - billboard //0x04D8 - microchip
+    int m_PID{0xE008}; //0x0102 - billboard
 
     int m_timeout{1000};
 
@@ -60,11 +59,9 @@ private:
     bool initDevice(USBDevice& device);
     void closeDevice(USBDevice& device);
 
-//    libusb_hotplug_callback_handle callbackHandle;
-//    static int hotplugCallback(struct libusb_context *context, struct libusb_device *device,
-//                        libusb_hotplug_event event, void *userData);
 
     QStringList deviceInfo(libusb_device *dev);
+    QString epTypeString(const libusb_endpoint_descriptor& epDescriptor);
 };
 }
 

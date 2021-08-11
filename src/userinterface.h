@@ -49,7 +49,6 @@ public:
 private:
     DUTDevice m_device;
 
-//    QHash<quint16, Register> m_localRegisterMap; // index in sequence - Register
     std::list<Register> m_localRegisterMap;
 
     RegisterListModel m_registerMapModel{m_device.deviceRegisterMap()};

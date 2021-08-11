@@ -13,6 +13,7 @@ class SessionSaver
 {
 public:
     SessionSaver(DUTDevice* device,
+                 std::list<Register>* localRegisterMap,
                  RegisterListModel* registerMap,
                  RegisterListModel* registerWriteSequenceModel);
 
@@ -23,6 +24,7 @@ private:
     QString m_sessionSaverVersion{"v.0.1 alfa"};
 
     DUTDevice* m_device;
+    std::list<Register>* m_localRegisterMap;
     RegisterListModel* m_registerMapModel;
     RegisterListModel* m_registerWriteSequenceModel;
 };

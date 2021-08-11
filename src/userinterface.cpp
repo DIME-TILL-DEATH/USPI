@@ -4,7 +4,7 @@
 
 UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent)
     : QObject(parent),
-      m_saver{&m_device, &m_registerMapModel, &m_registerSequenceModel},
+      m_saver{&m_device, &m_localRegisterMap, &m_registerMapModel, &m_registerSequenceModel},
       m_avaliableInterfaces{avaliableInterfaces}
 {
     m_abstractInterface = new AbstractInterface();

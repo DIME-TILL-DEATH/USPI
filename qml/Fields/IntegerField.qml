@@ -20,7 +20,8 @@ Rectangle{
     radius: height/5
 
     FieldTip{
-        tipText: (adapter !== undefined) ? adapter.description : "описание"
+        tipText: (adapter !== undefined) ? "min: " + adapter.valueFrom + "\nmax: " +adapter.valueTo + "\n" + adapter.description
+                                         : "описание"
     }
 
     Row{
