@@ -265,6 +265,25 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
         {
             integerField->m_valueTo = pow(2, integerField->m_size)-1;
         }
+
+        if(jsonObject.contains("scale") && jsonObject["scale"].isObject())
+        {
+            QJsonObject scaleObject = jsonObject["scale"].toObject();
+            if(scaleObject.contains("coefficient") && scaleObject["coefficient"].isDouble())
+            {
+                integerField->m_scaleCoefficient = scaleObject["coefficient"].toDouble();
+            }
+
+            if(scaleObject.contains("offset") && scaleObject["offset"].isDouble())
+            {
+                integerField->m_scaleOffset = scaleObject["offset"].toDouble();
+            }
+
+            if(scaleObject.contains("units") && scaleObject["units"].isString())
+            {
+                integerField->m_scaleUnits = scaleObject["units"].toString();
+            }
+        }
         return true;
     }
     else

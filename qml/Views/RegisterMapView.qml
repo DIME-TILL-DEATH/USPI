@@ -30,6 +30,7 @@ Item {
         function selectRegisterMap(registerAdapter)
         {
             Scripts.createRegisterFields(registerAdapter, _root)
+            _flickable.contentY = 0
         }
 
         Component.onCompleted: {
@@ -46,14 +47,29 @@ Item {
             width: parent.width * 0.15
         }
 
-        Column{
-            id: _fieldsView
+        Flickable{
+            id: _flickable
+            width: _row.width * 0.47
+            height: _row.height
 
-            property var registerAdapter
+            contentHeight: (_fieldsView.children.length+1) * height/10 // 10 - число полей на экране. Также жёстко задано в fields. Вынести в файл Styles
 
-            width: parent.width * 0.47
-            height: parent.height
-            spacing: height/200
+            ScrollBar.vertical: ScrollBar{
+                id: _flickScrollBar
+
+                policy: (_flickable.contentHeight > _flickable.height) ?
+                            ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+            }
+
+            Column{
+                id: _fieldsView
+
+                property var registerAdapter
+
+                width: _flickable.width - _flickScrollBar.width
+                height: _flickable.height
+                spacing: height/200
+            }
         }
 
         SequenceControlPanel{

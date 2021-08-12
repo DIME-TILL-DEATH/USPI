@@ -25,11 +25,19 @@ public:
     friend QDataStream& operator<<(QDataStream& stream, const IntegerField& field);
     friend QDataStream& operator>>(QDataStream& stream, IntegerField& field);
 
+    qreal scaleCoefficient() const;
+    qreal scaleOffset() const;
+    const QString &scaleUnits() const;
+
 private:
     quint64 m_data;
 
     quint32 m_valueFrom;
     quint32 m_valueTo;
+
+    qreal m_scaleCoefficient{1};
+    qreal m_scaleOffset{0};
+    QString m_scaleUnits;
 };
 
 #endif // INTEGERFIELD_H

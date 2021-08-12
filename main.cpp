@@ -44,9 +44,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("RegisterMapModel", ui.registerMapModel());
     engine.rootContext()->setContextProperty("RegisterSequenceModel", ui.registerSequenceModel());
 
-    qRegisterMetaType<RegisterAdapter>("RegisterAdapter");
-    qRegisterMetaType<FieldAdapter>("FieldAdapter");
-
+    RegisterAdapter::registerTypes();
+    FieldAdapter::registerTypes();
     InterfacesSettingsAdapter::registerTypes();
     //---------------------------------------------------------------
 

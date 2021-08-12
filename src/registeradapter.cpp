@@ -1,5 +1,10 @@
 #include "registeradapter.h"
 
+void RegisterAdapter::registerTypes()
+{
+    qRegisterMetaType<RegisterAdapter>("RegisterAdapter");
+}
+
 QString RegisterAdapter::name() const
 {
     return m_register->name();

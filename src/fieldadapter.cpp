@@ -1,6 +1,12 @@
 #include "fieldadapter.h"
 
 
+void FieldAdapter::registerTypes()
+{
+    qRegisterMetaType<FieldAdapter>("FieldAdapter");
+    qRegisterMetaType<FieldScale>("IntegerFieldScaler");
+}
+
 QString FieldAdapter::name() const
 {
     return m_field->name();
@@ -117,5 +123,23 @@ QVariant FieldAdapter::variantList() const
     {
         return value();
     }
+}
+
+FieldScale FieldAdapter::fieldScale() const
+{
+    FieldScale answer;
+
+    answer.coefficient=1;
+    answer.offset=0;
+
+    if(m_field->type() == AbstractField::FieldType::IntegerField)
+    {
+        IntegerField* field_ptr = dynamic_cast<IntegerField*>(m_field);
+
+        answer.coefficient = field_ptr->scaleCoefficient();
+        answer.offset = field_ptr->scaleOffset();
+        answer.units = field_ptr->scaleUnits();
+    }
+    return answer;
 }
 

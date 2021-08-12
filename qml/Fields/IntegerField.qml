@@ -8,9 +8,14 @@ Rectangle{
 
     property var adapter
 
+    // property не обновляется само при изменении в адаптере
     property int value: (adapter !== undefined) ? adapter.value : 0
     property int valueFrom : (adapter !== undefined) ? adapter.valueFrom : 0
     property int valueTo: (adapter !== undefined) ? adapter.valueTo : 255
+
+//    property double scale: (adapter !== undefined) ? adapter.fieldScale.coefficient : 1
+//    property double offset : (adapter !== undefined) ? adapter.fieldScale.offset : 0
+//    property string units: (adapter !== undefined) ? adapter.fieldScale.units : ""
 
     signal fieldChanged(fieldId : string, newValue : int)
 
@@ -35,7 +40,7 @@ Rectangle{
         }
 
         TextField{
-            id: _textField
+            id: _textField1
 
             height: parent.height*0.75
             anchors.verticalCenter: parent.verticalCenter
@@ -51,22 +56,52 @@ Rectangle{
             }
 
             background: Rectangle {
-                     implicitWidth: _textField.font.pointSize * 10
-                     implicitHeight: _textField.font.pointSize
+                     implicitWidth: _textField1.font.pointSize * 10
+                     implicitHeight: _textField1.font.pointSize
 
-                     color: (parseInt(_textField.text) < _root.valueFrom) |
-                            (parseInt(_textField.text) > _root.valueTo) ?
+                     color: (parseInt(_textField1.text) < _root.valueFrom) |
+                            (parseInt(_textField1.text) > _root.valueTo) ?
                                 "red" : "transparent"
 
-                     border.color: _textField.activeFocus ? "blue" : "gray"
+                     border.color: _textField1.activeFocus ? "blue" : "gray"
                  }
 
 
             onEditingFinished: {
                 adapter.value = parseInt(text)
-                _textField.focus = false
+                _textField1.focus = false
                 fieldChanged(adapter.name, parseInt(text))
+
+                _textField2.text = (adapter.value * adapter.fieldScale.coefficient + adapter.fieldScale.offset).toFixed(2)
             }
+
+            onTextEdited: {
+                _textField2.text = (parseFloat(_textField1.text) * adapter.fieldScale.coefficient + adapter.fieldScale.offset).toFixed(2)
+            }
+        }
+
+
+        Text{
+            anchors.verticalCenter: parent.verticalCenter
+
+            text: "="
+            visible: (adapter !== undefined) ? (adapter.fieldScale.coefficient !== 1) : false
+        }
+
+        Text{
+            id: _textField2
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            text: (adapter !== undefined) ? (adapter.value * adapter.fieldScale.coefficient + adapter.fieldScale.offset).toFixed(2) : 0
+            visible: (adapter !== undefined) ? (adapter.fieldScale.coefficient !== 1) : false
+        }
+
+        Text{
+            anchors.verticalCenter: parent.verticalCenter
+
+            text: (adapter !== undefined) ? adapter.fieldScale.units : ""
+            visible: (adapter !== undefined) ? (adapter.fieldScale.coefficient !== 1) : false
         }
     }
 }

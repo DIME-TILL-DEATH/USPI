@@ -16,6 +16,8 @@ public:
     RegisterAdapter() {};
     RegisterAdapter(Register* reg) : m_register{reg} {};
 
+    static void registerTypes();
+
     QString name() const;
     quint16 fieldsCount();
 
