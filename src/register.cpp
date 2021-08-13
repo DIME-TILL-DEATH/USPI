@@ -232,6 +232,12 @@ void Register::sort()
             if(m_fields.at(j)->position() > m_fields.at(j+1)->position())
             {
                 temp = m_fields.at(j);
+
+//                if(temp->type() == AbstractField::FieldType::VariantListField)
+//                {
+//                    sortVariantList(dynamic_cast<VariantListField*>(temp));
+//                }
+
                 m_fields.at(j) = m_fields.at(j+1);
                 m_fields.at(j+1) = temp;
             }
@@ -239,9 +245,21 @@ void Register::sort()
     }
 }
 
-//RegisterAdapter &Register::adapter()
+//void Register::sortVariantList(VariantListField *field)
 //{
-//    return m_adapter;
+//    for(quint16 i=0; i < field->data().size()-1; i++)
+//    {
+//        for(auto it_j=field->data().begin();
+//            it_j != field->data().end()-i-1;
+//            ++it_j)
+//        {
+//            if(field.at(j)->position() > m_fields.at(j+1)->position())
+//            {
+//                m_fields.at(j) = m_fields.at(j+1);
+//                m_fields.at(j+1) = temp;
+//            }
+//        }
+//    }
 //}
 
 QString Register::name() const

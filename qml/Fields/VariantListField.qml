@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import QtQuick.Controls 2.12
 
 import Elements 1.0
@@ -17,7 +17,6 @@ Rectangle{
 
     FieldTip{
         tipText: (adapter !== undefined) ? adapter.description : "описание"
-//        tipText:  adapter.description
     }
 
     Row{
@@ -27,6 +26,7 @@ Rectangle{
         spacing: width / 50
 
         FieldProperties{
+            id: _fieldProperties
             adapter: _root.adapter
         }
 
@@ -34,20 +34,47 @@ Rectangle{
             id: _comboBox
 
             height: parent.height*0.75
+            width: (parent.width - _fieldProperties.width)*0.8
+
             anchors.verticalCenter: parent.verticalCenter
 
             model: (adapter !== undefined) ? adapter.variantList : 0
 
 
             background: Rectangle {
-                     implicitWidth: 120
-                     implicitHeight: 40
                      border.color: _comboBox.down ? "blue" : "gray"
                      border.width: _comboBox.visualFocus ? 2 : 1
                      radius: 2
                  }
 
             currentIndex: (adapter !== undefined) ? find(adapter.value, Qt.MatchFixedString) : 0
+
+            contentItem: Text{
+                leftPadding: _comboBox.width/25
+
+                text: _comboBox.displayText
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+                maximumLineCount: 1
+            }
+
+            delegate: ItemDelegate {
+                id: _delegate
+                 width: _comboBox.width
+                 contentItem: Text {
+                     text: modelData
+                     font{
+                         family: _comboBox.font.family
+                         pointSize: _comboBox.font.pointSize
+                         bold: (_comboBox.currentIndex==index) ? true : false
+                     }
+                     verticalAlignment: Text.AlignVCenter
+
+                     elide: Text.ElideRight
+                     wrapMode: Text.WordWrap
+                 }
+                 highlighted: _comboBox.highlightedIndex == index
+             }
 
             onActivated: {
                 _root.adapter.value = textAt(index)
