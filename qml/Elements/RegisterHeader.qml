@@ -1,5 +1,7 @@
 import QtQuick 2.15
 
+import StyleSettings 1.0
+
 import "../CreateFunctions.js" as Scripts
 
 Rectangle{
@@ -9,7 +11,7 @@ Rectangle{
     border.width: 1
     radius: width/10
 
-    color: ListView.isCurrentItem ? "skyblue" : "transparent"
+    color: ListView.isCurrentItem ? Style.regHeaderActiveGlobal : Style.regHeaderPassiveGlobal
 
     Text{
         text: register.name

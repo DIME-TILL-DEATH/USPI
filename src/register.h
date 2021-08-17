@@ -51,8 +51,6 @@ private:
     bool validateSize(ParseError* error);
     bool validateBounds(ParseError* error);
     void sort();
-    /** Sort variants in variant list fields in ascending order(by value) **/
-    void sortVariantList(VariantListField* field);
 };
 
 bool operator==(const Register& lr, const Register& rr);

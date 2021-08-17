@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
+import StyleSettings 1.0
 import Elements 1.0
 
 Rectangle{
@@ -13,14 +14,10 @@ Rectangle{
     property int valueFrom : (adapter !== undefined) ? adapter.valueFrom : 0
     property int valueTo: (adapter !== undefined) ? adapter.valueTo : 255
 
-//    property double scale: (adapter !== undefined) ? adapter.fieldScale.coefficient : 1
-//    property double offset : (adapter !== undefined) ? adapter.fieldScale.offset : 0
-//    property string units: (adapter !== undefined) ? adapter.fieldScale.units : ""
-
     signal fieldChanged(fieldId : string, newValue : int)
 
     width: parent.width
-    height: parent.height/10
+    height: parent.height/Style.fieldsOnScreen
     border.width: 1
     radius: height/5
 
@@ -63,7 +60,7 @@ Rectangle{
                             (parseInt(_textField1.text) > _root.valueTo) ?
                                 "red" : "transparent"
 
-                     border.color: _textField1.activeFocus ? "blue" : "gray"
+                     border.color: _textField1.activeFocus ? Style.borderColorActive : Style.borderColorPassive
                  }
 
 

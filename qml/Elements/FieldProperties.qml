@@ -38,4 +38,12 @@ Rectangle {
                                 :"Биты " + (position+size) + "..." + position + ":"
         }
     }
+
+    MouseArea{
+        id: _mouseArea
+        anchors.fill: parent
+        onClicked: {
+
+        }
+    }
 }

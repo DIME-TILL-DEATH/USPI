@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.12
 
+import StyleSettings 1.0
 import Elements 1.0
 
 Rectangle{
@@ -14,7 +15,7 @@ Rectangle{
     signal fieldChanged(fieldId : string, newValue : int)
 
     width: parent.width
-    height: parent.height/10
+    height: parent.height/Style.fieldsOnScreen
     border.width: 1
     radius: height/5
 

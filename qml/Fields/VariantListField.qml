@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 
+import StyleSettings 1.0
 import Elements 1.0
 
 Rectangle{
@@ -11,7 +12,7 @@ Rectangle{
     signal fieldChanged(fieldId : string, newValue : int)
 
     width: parent.width
-    height: parent.height/10
+    height: parent.height/Style.fieldsOnScreen
     border.width: 1
     radius: height/5
 
@@ -34,7 +35,7 @@ Rectangle{
             id: _comboBox
 
             height: parent.height*0.75
-            width: (parent.width - _fieldProperties.width)*0.8
+            width: (parent.width - _fieldProperties.width)*0.9
 
             anchors.verticalCenter: parent.verticalCenter
 
@@ -42,7 +43,7 @@ Rectangle{
 
 
             background: Rectangle {
-                     border.color: _comboBox.down ? "blue" : "gray"
+                     border.color: _comboBox.down ? Style.borderColorActive : Style.borderColorPassive
                      border.width: _comboBox.visualFocus ? 2 : 1
                      radius: 2
                  }

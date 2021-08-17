@@ -5,6 +5,8 @@ import QtQuick.Layouts 1.15
 
 import QtQuick.Dialogs 1.3
 
+import StyleSettings 1.0
+
 import Elements 1.0
 import Fields 1.0
 import Views 1.0
@@ -16,7 +18,7 @@ Rectangle{
         property var openFileDeviceDialog
 
         border.width: 1
-        color: "palegreen"
+        color: Style.headerColor
 
         Row{
             anchors.fill: parent
@@ -39,9 +41,9 @@ Rectangle{
 
                 background: Rectangle{
                     border.width: 1
-                    border.color: "blue"
+                    border.color: Style.headerButtonBorderColor
 
-                    color: "azure"
+                    color: Style.headerButtonBackgroundColor
                     opacity: _btnChooseDevice.pressed ? 0.5 : 1
                 }
                 onPressed: {
@@ -66,9 +68,9 @@ Rectangle{
 
                 background: Rectangle{
                     border.width: 1
-                    border.color: "blue"
+                    border.color: Style.headerButtonBorderColor
 
-                    color: "azure"
+                    color: Style.headerButtonBackgroundColor
                     opacity: _btnChooseInterface.pressed ? 0.5 : 1
                 }
 

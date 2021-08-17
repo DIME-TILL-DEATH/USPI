@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 
 import QtQuick.Layouts 1.15
 
+import StyleSettings 1.0
 import Elements 1.0
 import Fields 1.0
 import Views 1.0
@@ -52,7 +53,7 @@ Item {
             width: _row.width * 0.47
             height: _row.height
 
-            contentHeight: (_fieldsView.children.length+1) * height/10 // 10 - число полей на экране. Также жёстко задано в fields. Вынести в файл Styles
+            contentHeight: (_fieldsView.children.length+1) * height/Style.fieldsOnScreen
 
             ScrollBar.vertical: ScrollBar{
                 id: _flickScrollBar
@@ -97,8 +98,8 @@ Item {
                 delegate: RegisterHeader{
 
                     color: isLocal ?
-                               (ListView.isCurrentItem ? "green" : "grey") :
-                               (ListView.isCurrentItem ? "skyblue" : "transparent")
+                               (ListView.isCurrentItem ? Style.regHeaderActiveLocal : Style.regHeaderPassiveLocal) :
+                               (ListView.isCurrentItem ? Style.regHeaderActiveGlobal : Style.regHeaderPassiveGlobal)
 
                     MouseArea{
                         id: _ma

@@ -329,7 +329,7 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
                     variantName = variantObject["name"].toString();
                     variantValue = variantObject["value"].toDouble();
 
-                    variantListField->m_data.insert(variantName, variantValue);
+                    variantListField->m_data.insert(variantValue, variantName);
                     variantListField->m_selected = variantName;
                 }
                 else

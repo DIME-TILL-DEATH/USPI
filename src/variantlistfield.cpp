@@ -2,7 +2,7 @@
 
 QByteArray VariantListField::rawData(quint16 targetRegisterByteSize)
 {
-    quint64 data = m_data.value(m_selected);
+    quint64 data = m_data.key(m_selected);
 
     quint16 numByte = m_position / 8;
 
@@ -24,7 +24,7 @@ void VariantListField::setSelected(const QString &newSelected)
     m_selected = newSelected;
 }
 
-const QHash<QString, quint64> &VariantListField::data() const
+const QMap<quint64, QString> &VariantListField::data() const
 {
     return m_data;
 }

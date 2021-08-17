@@ -23,5 +23,7 @@
         <file>qml/InterfaceSettings/FileInterfaceSettings.qml</file>
         <file>qml/Elements/SequenceControlPanel.qml</file>
         <file>qml/InterfaceSettings/USBInterfaceSettings.qml</file>
+        <file>qml/StyleSettings/qmldir</file>
+        <file>qml/StyleSettings/Style.qml</file>
     </qresource>
 </RCC>

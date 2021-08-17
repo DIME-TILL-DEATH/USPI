@@ -1,7 +1,7 @@
 #ifndef VARIANTLISTFIELD_H
 #define VARIANTLISTFIELD_H
 
-#include <QHash>
+#include <QMap>
 #include <QDataStream>
 
 #include "abstractfield.h"
@@ -21,14 +21,14 @@ public:
     const QString &selected() const;
     void setSelected(const QString &newSelected);
 
-    const QHash<QString, quint64> &data() const;
+    const QMap<quint64, QString> &data() const;
 
     friend QDataStream& operator<<(QDataStream& stream, VariantListField& field);
     friend QDataStream& operator>>(QDataStream& stream, VariantListField& field);
 
 private:
     QString m_selected;
-    QHash<QString, quint64> m_data;
+    QMap<quint64, QString> m_data;
 };
 
 #endif // VARIANTLISTFIELD_H

@@ -10,7 +10,7 @@ Item {
         id: _toolTip
 
         delay: 1000
-        timeout: 5000
+        timeout: 10000
         visible: _mouseArea.containsMouse
         text: tipText
 

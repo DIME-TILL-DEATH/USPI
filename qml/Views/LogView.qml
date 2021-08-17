@@ -2,6 +2,8 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.15
 
+import StyleSettings 1.0
+
 Rectangle{
     id: _rootRectangle
 
@@ -13,7 +15,7 @@ Rectangle{
         width: _rootRectangle.width
         height: _text.font.pixelSize*2
 
-        color: "azure"
+        color: Style.logHeader
         border.width: 1
 
         Text{
@@ -43,10 +45,15 @@ Rectangle{
 
         delegate: Text{
 
+            width: _loggerWindow.width
+
             leftPadding: font.pixelSize
 
             text: msgText
             color: msgColor
+
+            elide: Text.ElideRight
+            wrapMode: Text.WordWrap
 
             Component.onCompleted: {
                 _loggerWindow.positionViewAtEnd()

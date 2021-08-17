@@ -72,28 +72,36 @@ bool UserInterface::writeSequence()
 {
     if(m_interface_ptr != nullptr )
     {
-        QString resultMessage("Запись через '" + m_interface_ptr->interfaceName() + "' в регистры ");
-
-        std::vector<Register*> wrSequence;
-        for(auto it = m_registerSequenceModel.registerAdaptersList().begin();
-            it != m_registerSequenceModel.registerAdaptersList().end();
-            ++it)
+        if(m_registerSequenceModel.registerAdaptersList().size()>0)
         {
-            wrSequence.push_back((*it).getRegister());
-            resultMessage.append("'"+(*it).name()+"', ");
-        }
-        resultMessage.chop(2);
+            QString resultMessage("Запись через '" + m_interface_ptr->interfaceName() + "' в регистры: ");
 
-        m_interface_ptr->setDeviceHeader(m_device.deviceHeader());
+            std::vector<Register*> wrSequence;
+            for(auto it = m_registerSequenceModel.registerAdaptersList().begin();
+                it != m_registerSequenceModel.registerAdaptersList().end();
+                ++it)
+            {
+                wrSequence.push_back((*it).getRegister());
+                resultMessage.append("'"+(*it).name()+"', ");
+            }
+            resultMessage.chop(2);
 
-        if(!m_interface_ptr->writeSequence(wrSequence))
-        {
-            qWarning() << ("Error while writing sequnce to interface '" + m_interface_ptr->interfaceName()+ "'");
-            return false;
+            m_interface_ptr->setDeviceHeader(m_device.deviceHeader());
+
+            if(!m_interface_ptr->writeSequence(wrSequence))
+            {
+                qWarning() << ("Error while writing sequnce to interface '" + m_interface_ptr->interfaceName()+ "'");
+                return false;
+            }
+            else
+            {
+                qInfo() << resultMessage;
+                return true;
+            }
         }
         else
         {
-            qInfo() << resultMessage;
+            qInfo() << "Очередь записи пуста";
             return true;
         }
     }

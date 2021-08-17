@@ -115,7 +115,8 @@ QVariant FieldAdapter::variantList() const
 
         for(auto it=field_ptr->data().begin(); it != field_ptr->data().end(); it++)
         {
-            result.append(it.key());
+            result.append(it.value()); // + " - 0x" + QString::number(it.key(), 16));
+
         }
         return result;
     }

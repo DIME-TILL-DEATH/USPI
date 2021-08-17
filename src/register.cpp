@@ -175,12 +175,12 @@ bool Register::validateSize(ParseError *error)
             case AbstractField::FieldType::VariantListField:
             {
                 VariantListField* field_ptr = dynamic_cast<VariantListField*>(*it);
-                for(auto it_hash = field_ptr->data().begin(); it_hash != field_ptr->data().end(); ++it_hash)
+                for(auto it_map = field_ptr->data().begin(); it_map != field_ptr->data().end(); ++it_map)
                 {
-                    if(it_hash.value() > pow(2, field_ptr->size()))
+                    if(it_map.key() > pow(2, field_ptr->size()))
                     {
                         if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldSizeError, "'"+field_ptr->name()+"'" +
-                                                                 " value '" + QString::number(it_hash.value() , 10) +
+                                                                 " value '" + QString::number(it_map.key() , 10) +
                                                                  "' is greater than avaliable field size '" + QString::number(field_ptr->size(), 10)+"'");
                                 return false;
                     }
@@ -232,35 +232,12 @@ void Register::sort()
             if(m_fields.at(j)->position() > m_fields.at(j+1)->position())
             {
                 temp = m_fields.at(j);
-
-//                if(temp->type() == AbstractField::FieldType::VariantListField)
-//                {
-//                    sortVariantList(dynamic_cast<VariantListField*>(temp));
-//                }
-
                 m_fields.at(j) = m_fields.at(j+1);
                 m_fields.at(j+1) = temp;
             }
         }
     }
 }
-
-//void Register::sortVariantList(VariantListField *field)
-//{
-//    for(quint16 i=0; i < field->data().size()-1; i++)
-//    {
-//        for(auto it_j=field->data().begin();
-//            it_j != field->data().end()-i-1;
-//            ++it_j)
-//        {
-//            if(field.at(j)->position() > m_fields.at(j+1)->position())
-//            {
-//                m_fields.at(j) = m_fields.at(j+1);
-//                m_fields.at(j+1) = temp;
-//            }
-//        }
-//    }
-//}
 
 QString Register::name() const
 {
