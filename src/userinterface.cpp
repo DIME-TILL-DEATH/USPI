@@ -1,3 +1,5 @@
+#include <QGuiApplication>
+
 #include "userinterface.h"
 
 #include "parseerror.h"
@@ -16,6 +18,14 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
     {
         m_interface_ptr = m_avaliableInterfaces->value("File");
     }
+
+    QFont font = QGuiApplication::font();
+
+    // TODO: QSettings. Настройки отображения приложения
+//    font.setFamily("Times new roman");
+//    font.setPointSize(9);
+    font.setStyleStrategy(QFont::NoSubpixelAntialias);
+    QGuiApplication::setFont(font);
 }
 
 UserInterface::~UserInterface()

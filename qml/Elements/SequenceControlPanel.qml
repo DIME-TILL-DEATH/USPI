@@ -11,6 +11,9 @@ Rectangle{
     property var registerMapView
     property var registerSequenceView
 
+    property int btnWidth : width*0.9
+    property int btnHeight : height/10
+
     property alias rbAuto: _rbAuto
     property alias rbBtn: _rbBtn
 
@@ -25,7 +28,10 @@ Rectangle{
         padding: parent.height/50
 
         Button{
+            width: btnWidth
+            height: btnHeight
             anchors.horizontalCenter: parent.horizontalCenter
+
             text: ">"
             enabled: (registerMapView.count>0) ? true : false
             onPressed: {
@@ -33,7 +39,10 @@ Rectangle{
             }
         }
         Button{
+            width: btnWidth
+            height: btnHeight
             anchors.horizontalCenter: parent.horizontalCenter
+
             text: ">>"
             enabled: (registerMapView.count>0) ? true : false
             onPressed: {
@@ -44,7 +53,10 @@ Rectangle{
             }
         }
         Button{
+            width: btnWidth
+            height: btnHeight
             anchors.horizontalCenter: parent.horizontalCenter
+
             text: "<"
             enabled: (registerSequenceView.count>0) ? true : false
             onPressed: {
@@ -52,7 +64,10 @@ Rectangle{
             }
         }
         Button{
+            width: btnWidth
+            height: btnHeight
             anchors.horizontalCenter: parent.horizontalCenter
+
             enabled: (registerSequenceView.count>0) ? true : false
             text: "<<"
             onPressed: {
@@ -70,15 +85,27 @@ Rectangle{
 
         RadioButton{
             id: _rbBtn
+
+            width: btnWidth
+            height: btnHeight
+
             checked: true
             text: "По кнопке"
         }
         RadioButton{
             id: _rbAuto
+
+            width: btnWidth
+            height: btnHeight
+
             text: "По изменению"
         }
         CheckBox{
             id: _rbTrigger
+
+            width: btnWidth
+            height: btnHeight
+
             enabled: false
             text: "По триггеру"
         }

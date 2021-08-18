@@ -30,13 +30,6 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("vniirt.ru");
     app.setApplicationName("USPI");
 
-    QFont font = QGuiApplication::font();
-    // TODO: вынести в настройки
-//    font.setFamily("Times new roman");
-//    font.setPointSize(9);
-    font.setStyleStrategy(QFont::NoSubpixelAntialias);
-    QGuiApplication::setFont(font);
-
     QHash <QString, AbstractInterface* > avaliableInterfaces;
     InterfacesSettingsAdapter interfacesSettings(&avaliableInterfaces);
 

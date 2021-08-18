@@ -31,7 +31,7 @@ public:
     void setIsLocal(bool newIsLocal);
 
 private:
-    // хранить итератор на вектор чтобы ссылки не протухали?
+    // хранить итератор на вектор чтобы ссылки на контейнер не протухали?
     Register* m_register;
     bool m_isLocal{false};
 };

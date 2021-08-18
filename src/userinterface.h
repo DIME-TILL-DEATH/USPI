@@ -65,6 +65,8 @@ private:
     FileInterface* m_fileInterface;
     USB::USBInterface* m_usbInterface;
 
+    QSettings m_applicationSettings;
+
 signals:
     void dutDeviceUpdated();
     void interfaceUpdated();
