@@ -71,6 +71,7 @@ public:
 
 private:
     // при такой логике надо везде проверять что m_field != nullptr
+    // shared или unique ptr?
     AbstractField* m_field;
 
 };

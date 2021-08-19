@@ -92,7 +92,7 @@ bool FileParser::readHeader(DUTDevice::Header* header, ParseError *error)
     }
 }
 
-bool FileParser::readRegisterArray(std::vector<Register> *registerMap, ParseError *error)
+bool FileParser::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("registers") && m_deviceGlobalObject["registers"].isArray())
     {
@@ -104,14 +104,14 @@ bool FileParser::readRegisterArray(std::vector<Register> *registerMap, ParseErro
         for (int registerIndex = 0; registerIndex < registerArray.size(); ++registerIndex)
         {
             QJsonObject registerObject = registerArray[registerIndex].toObject();
-            Register deviceRegister;
+            Register* deviceRegister = new Register;
 
-            if(!readRegister(registerObject, &deviceRegister, error))
+            if(!readRegister(registerObject, deviceRegister, error))
                 return false;
 
-            deviceRegister.m_uniqueId = registerIndex + 0xAA; // просто смещение, чтобы unqiqueId не мог быть 0
+            deviceRegister->m_uniqueId = registerIndex + 0xAA; // просто смещение, чтобы unqiqueId не мог быть 0
 
-            registerMap->push_back(deviceRegister);
+            registerMap->push_back(std::shared_ptr<Register>(deviceRegister));
         }
         return true;
     }

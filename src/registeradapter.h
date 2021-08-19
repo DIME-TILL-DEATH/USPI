@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVariant>
+#include <memory>
 
 #include "fieldadapter.h"
 #include "register.h"
@@ -14,7 +15,8 @@ class RegisterAdapter
     Q_PROPERTY(quint16 fieldsCount READ fieldsCount)
 public:
     RegisterAdapter() {};
-    RegisterAdapter(Register* reg) : m_register{reg} {};
+//    RegisterAdapter(Register* reg) : m_register{reg} {};
+    RegisterAdapter(std::shared_ptr<Register> reg) : m_register{reg} {};
 
     static void registerTypes();
 
@@ -31,8 +33,8 @@ public:
     void setIsLocal(bool newIsLocal);
 
 private:
-    // хранить итератор на вектор чтобы ссылки на контейнер не протухали?
-    Register* m_register;
+    std::shared_ptr<Register> m_register;
+
     bool m_isLocal{false};
 };
 Q_DECLARE_METATYPE(RegisterAdapter)

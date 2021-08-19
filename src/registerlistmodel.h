@@ -12,7 +12,7 @@ class RegisterListModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    explicit RegisterListModel(std::vector<Register> &registerList, QObject *parent = nullptr);
+    explicit RegisterListModel(std::vector<std::shared_ptr<Register> > &registerList, QObject *parent = nullptr);
     RegisterListModel(std::vector<RegisterAdapter> &adapterList, QObject *parent = nullptr);
     RegisterListModel(QObject *parent = nullptr) : QAbstractListModel{parent} {};
 
@@ -24,7 +24,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     void resetModel();
-    void resetModel(std::vector<Register> &registerList);
+    void resetModel(std::vector<std::shared_ptr<Register> > &registerList);
 
     Q_INVOKABLE void addItem(RegisterAdapter item, quint16 index);
     Q_INVOKABLE void changeItem(RegisterAdapter item, quint16 index);

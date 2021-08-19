@@ -11,11 +11,11 @@ bool DUTDevice::loadFromFile(const QString &fileName, ParseError *error)
 
     for(auto it=m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)
     {
-        if(!(*it).sortAndValidateFields(error))
+        if(!(*it)->sortAndValidateFields(error))
         {
             ParseError fieldError;
             fieldError.setErrorType(ParseError::ErrorType::RegisterContentError,
-                                    " '" +(*it).name() + "', "+
+                                    " '" +(*it)->name() + "', "+
                                     error->errorString());
             *error = fieldError;
             return false;
@@ -29,7 +29,7 @@ const QString &DUTDevice::name() const
     return m_deviceHeader.deviceName;
 }
 
-std::vector<Register> &DUTDevice::deviceRegisterMap()
+std::vector<std::shared_ptr<Register> > &DUTDevice::deviceRegisterMap()
 {
     return m_deviceRegisterMap;
 }
@@ -39,18 +39,11 @@ const DUTDevice::Header &DUTDevice::deviceHeader() const
     return m_deviceHeader;
 }
 
-Register *DUTDevice::registerByUniqueId(quint16 uniqueId)
+std::shared_ptr<Register> DUTDevice::registerByUniqueId(quint16 uniqueId)
 {
-    // Хранить QHash/QMap в DUTDevice пока не выйдет, тк
-    // много где используется получение вектора
-    // регистров по неконстантной ссылке, в итоге вектор могут изменить,
-    // связный список останется старым. Возможно надо переделать на возврат
-    // вектора по константной ссылке, а для редактирования использовать
-    // отдельные методы и в них править связный список, но не факт что это эффективнее и потянет за собой меньше ошибок
-    // если этот метод не понадобится нигде кроме загрузки сессии, то можно "забить"....
     for(auto it = m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)
     {
-        if((*it).uniqueId() == uniqueId) return &(*it);
+        if((*it)->uniqueId() == uniqueId) return (*it);
     }
     return nullptr;
 }
@@ -70,7 +63,7 @@ QDataStream& operator<<(QDataStream& stream, const DUTDevice& device)
             it != device.m_deviceRegisterMap.end();
             ++it)
     {
-        stream << (*it);
+        stream << (*(*it));
     }
     return stream;
 }
@@ -90,9 +83,9 @@ QDataStream& operator>>(QDataStream& stream, DUTDevice& device)
     device.m_deviceRegisterMap.clear();
     for(quint16 i=0; i < registerMapSize; i++)
     {
-        Register readedRegister;
-        stream >> readedRegister;
-        device.m_deviceRegisterMap.push_back(readedRegister);
+        Register* readedRegister_ptr = new Register;
+        stream >> *readedRegister_ptr;
+        device.m_deviceRegisterMap.push_back(std::shared_ptr<Register>(readedRegister_ptr));
     }
     return stream;
 }

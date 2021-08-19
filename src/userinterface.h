@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QUrl>
 #include <QStringListModel>
+#include <memory>
 
 #include "logger.h"
 #include "registeradapter.h"
@@ -49,7 +50,7 @@ public:
 private:
     DUTDevice m_device;
 
-    std::list<Register> m_localRegisterMap;
+    std::vector<std::shared_ptr<Register> > m_localRegisterMap;
 
     RegisterListModel m_registerMapModel{m_device.deviceRegisterMap()};
     RegisterListModel m_registerSequenceModel;

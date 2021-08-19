@@ -33,8 +33,6 @@ public:
 
     QByteArray rawData();
 
-//    RegisterAdapter &adapter();
-
     friend QDataStream& operator<<(QDataStream& stream, const Register& reg);
     friend QDataStream& operator>>(QDataStream& stream, Register& reg);
 
@@ -46,6 +44,7 @@ private:
     QString m_name;
     quint16 m_bitSize;
 
+    // shared pointer?
     std::vector<AbstractField*> m_fields;
 
     bool validateSize(ParseError* error);

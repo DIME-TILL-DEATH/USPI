@@ -1,11 +1,11 @@
 #include "registerlistmodel.h"
 
-RegisterListModel::RegisterListModel(std::vector<Register> &registerList, QObject *parent)
+RegisterListModel::RegisterListModel(std::vector<std::shared_ptr<Register> > &registerList, QObject *parent)
     : QAbstractListModel(parent)
 {
     for(auto it = registerList.begin(); it != registerList.end(); ++it)
     {
-        m_data.push_back(RegisterAdapter(&(*it)));
+        m_data.push_back(RegisterAdapter(*it));
     }
 }
 
@@ -81,13 +81,13 @@ void RegisterListModel::resetModel()
     endResetModel();
 }
 
-void RegisterListModel::resetModel(std::vector<Register> &registerList)
+void RegisterListModel::resetModel(std::vector<std::shared_ptr<Register> > &registerList)
 {
     beginResetModel();
     m_data.clear();
     for(auto it = registerList.begin(); it != registerList.end(); ++it)
     {
-        m_data.push_back(RegisterAdapter(&(*it)));
+        m_data.push_back(RegisterAdapter(*it));
     }
     endResetModel();
 }

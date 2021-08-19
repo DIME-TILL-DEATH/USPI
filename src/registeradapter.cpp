@@ -33,7 +33,7 @@ QString RegisterAdapter::value()
 
 Register *RegisterAdapter::getRegister() const
 {
-    return m_register;
+    return m_register.get();
 }
 
 bool RegisterAdapter::isLocal() const

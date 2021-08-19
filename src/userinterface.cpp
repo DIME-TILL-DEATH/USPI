@@ -167,19 +167,19 @@ void UserInterface::changeWriteItemLocal(quint16 index)
 {
     if(!m_registerSequenceModel.registerAdaptersList().at(index).isLocal())
     {
-        Register regCopy = *m_registerSequenceModel.registerAdaptersList().at(index).getRegister();
-        m_localRegisterMap.push_back(regCopy);
+        Register* regCopy_ptr = new Register(*(m_registerSequenceModel.registerAdaptersList().at(index).getRegister()));
+        m_localRegisterMap.push_back(std::shared_ptr<Register>(regCopy_ptr));
 
-        RegisterAdapter adapter(&(m_localRegisterMap.back()));
+        RegisterAdapter adapter(m_localRegisterMap.back());
         adapter.setIsLocal(true);
         m_registerSequenceModel.changeItem(adapter, index);
     }
     else
     {
-        Register& regRef = *m_registerSequenceModel.registerAdaptersList().at(index).getRegister();
-        quint16 uniqueId = regRef.uniqueId();
-//        m_localRegisterMap.removeOne(regRef);
-        m_localRegisterMap.erase(std::find(m_localRegisterMap.begin(), m_localRegisterMap.end(), regRef));
+        Register* regRef = m_registerSequenceModel.registerAdaptersList().at(index).getRegister();
+        quint16 uniqueId = regRef->uniqueId();
+        m_localRegisterMap.erase(std::find_if(m_localRegisterMap.begin(), m_localRegisterMap.end(),
+                                              [&](std::shared_ptr<Register> const& ptr) -> bool {return *ptr == *regRef;}));
 
         RegisterAdapter adapter(m_device.registerByUniqueId(uniqueId));
         adapter.setIsLocal(false);

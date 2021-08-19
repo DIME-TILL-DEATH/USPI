@@ -1,6 +1,6 @@
 #include "sessionsaver.h"
 
-SessionSaver::SessionSaver(DUTDevice *device, std::list<Register>* localRegisterMap, RegisterListModel *registerMapModel, RegisterListModel *registerWriteSequenceModel)
+SessionSaver::SessionSaver(DUTDevice *device, std::vector<std::shared_ptr<Register> >* localRegisterMap, RegisterListModel *registerMapModel, RegisterListModel *registerWriteSequenceModel)
     :m_device{device},
       m_localRegisterMap{localRegisterMap},
      m_registerMapModel{registerMapModel},
@@ -71,7 +71,7 @@ bool SessionSaver::loadSession(const QString &filePath)
             quint16 registerUniqueId;
             inFile >> registerUniqueId;
 
-            Register* reg_ptr;
+            std::shared_ptr<Register> reg_ptr;
 
 
             bool isLocal;
@@ -79,10 +79,10 @@ bool SessionSaver::loadSession(const QString &filePath)
 
             if(isLocal)
             {
-                Register localRegister;
-                inFile >> localRegister;
-                m_localRegisterMap->push_back(localRegister);
-                reg_ptr = &(m_localRegisterMap->back());
+                Register* localRegister_ptr = new Register;
+                inFile >> *localRegister_ptr;
+                m_localRegisterMap->push_back(std::shared_ptr<Register>(localRegister_ptr));
+                reg_ptr = m_localRegisterMap->back();
             }
             else
             {
@@ -100,7 +100,6 @@ bool SessionSaver::loadSession(const QString &filePath)
     }
     else
     {
-        // или всё-таки Logger вручную? Привести к единному варианту
         qWarning() << "Невозможно открыть файл " << filePath;
         return false;
     }

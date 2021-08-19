@@ -29,7 +29,7 @@ public:
     bool loadFile(const QString& name, ParseError* error = nullptr);
 
     bool readHeader(DUTDevice::Header *header, ParseError* error = nullptr);
-    bool readRegisterArray(std::vector<Register> *registerMap, ParseError* error = nullptr);
+    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, ParseError* error = nullptr);
 
 private:
     QJsonObject m_deviceGlobalObject;
