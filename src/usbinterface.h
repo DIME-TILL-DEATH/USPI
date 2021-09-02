@@ -9,6 +9,11 @@
 namespace USB
 {
 
+#define SPI 7
+#define PARALLEL 6
+#define ORDER 5
+#define TRIGGER 4
+
 static QString interfaceNameString = "USB";
 
 struct USBDevice{
@@ -17,7 +22,7 @@ struct USBDevice{
     libusb_device_descriptor deviceDescriptor;
 
     int interfaceNumber{0};
-    unsigned char endpointAddress{2};
+    unsigned char endpointAddress{4};
 
     QString deviceName;
     QStringList deviceInfo;
@@ -49,8 +54,8 @@ private:
     // поддерживаемому типу, если да, открывать и сохранять указатели в list/vector и далее
     // позволять пользователю выбирать активное устройство (m_activeDevice_ptr или итератор). Отправлять через него.
     // не забывать что ссылки на элемент вектора протухают при изменении содержания!!!
-    int m_VID{0x1A86}; //0x2109 - billboard //0x04D8 - microchip
-    int m_PID{0xE008}; //0x0102 - billboard
+    int m_VID{0x03EB}; //0x03EB - Atmel //0x04D8 - microchip
+    int m_PID{0x204F}; //0x2FF0 - ATMega32U2 DFU
 
     int m_timeout{1000};
 
@@ -62,6 +67,9 @@ private:
 
     QStringList deviceInfo(libusb_device *dev);
     QString epTypeString(const libusb_endpoint_descriptor& epDescriptor);
+    QString deviceSpeedString(libusb_device *dev);
+
+    QByteArray formHeader(const std::vector<Register*> &wrSequence);
 };
 }
 

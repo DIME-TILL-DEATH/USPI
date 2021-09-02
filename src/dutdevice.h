@@ -30,7 +30,6 @@ public:
     std::vector<std::shared_ptr<Register> > &deviceRegisterMap();
     const Header &deviceHeader() const;
 
-    // shared pointer?
     std::shared_ptr<Register> registerByUniqueId(quint16 uniqueId);
 
     friend QDataStream& operator<<(QDataStream& stream, const DUTDevice& device);

@@ -32,8 +32,30 @@ USBInterface::~USBInterface()
 
 bool USBInterface::writeRegister(Register *wrReg)
 {
+     QByteArray regData = wrReg->rawData();
 
-    return false;
+    char* rawData = regData.data();
+    int dataSize = regData.size();
+
+    int actualWrittenBytes;
+    int rtnValue = libusb_bulk_transfer(m_activeDevice.handle,
+                                    m_activeDevice.endpointAddress | LIBUSB_ENDPOINT_OUT,
+                                    (unsigned char*)rawData,
+                                    dataSize,
+                                    &actualWrittenBytes,
+                                    m_timeout);
+
+    if(rtnValue < 0)
+    {
+        qWarning() << "Failed send to USB device:" << libusb_error_name(rtnValue);
+        return false;
+    }
+    if(dataSize > actualWrittenBytes)
+    {
+        qWarning() << "Sended: " << actualWrittenBytes << ", while data size is: " << dataSize;
+        return false;
+    }
+    return true;
 }
 
 bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
@@ -47,32 +69,49 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
     int actualWrittenBytes = 0;
     int rtnValue = 0;
 
+    QByteArray header = formHeader(wrSequence);
+
+    rtnValue = libusb_bulk_transfer(m_activeDevice.handle,
+                                    m_activeDevice.endpointAddress | LIBUSB_ENDPOINT_OUT,
+                                    (unsigned char*)header.data(),
+                                    header.size(),
+                                    &actualWrittenBytes,
+                                    m_timeout);
+    if(rtnValue < 0)
+    {
+        qWarning() << "Failed send to USB device:" << libusb_strerror(rtnValue);
+        return false;
+    }
+
     for(auto it = wrSequence.begin(); it != wrSequence.end(); ++it)
     {
-        // лучше собрать большой QByteArray из всех регистров, преобразовать
-        // и отослать за раз bulk transfer. В начале пакета или перед каждым регистром указывать
-        // режим - SPI, MSB/LSB, размер регистра(в битах, но отсылка с заполнением до байта),
-        // размер в посылке в байтах
-
-        // на HID отправляет только по 8 байт. Если провбовать отослать меньше, то выдаёт ошибку
-        int bufferSize = 256;
-
         QByteArray regData = (*it)->rawData();
+
+        if(m_deviceHeader.isMSB)
+        {
+            std::reverse(regData.begin(), regData.end());
+        }
+        else
+        {
+            for(QByteArray::iterator it=regData.begin();it!=regData.end();++it)
+            {
+                reverseByte(*it);
+            }
+        }
 
         char* rawData = regData.data();
         int dataSize = regData.size();
 
         rtnValue = libusb_bulk_transfer(m_activeDevice.handle,
-                                        2, // write
+                                        m_activeDevice.endpointAddress | LIBUSB_ENDPOINT_OUT,
                                         (unsigned char*)rawData,
-                                        bufferSize,
+                                        dataSize,
                                         &actualWrittenBytes,
                                         m_timeout);
 
-
         if(rtnValue < 0)
         {
-            qWarning() << "Failed send to USB device:" << libusb_error_name(rtnValue);
+            qWarning() << "Failed send to USB device:" << libusb_strerror(rtnValue);
             return false;
         }
         if(dataSize > actualWrittenBytes)
@@ -199,7 +238,9 @@ QStringList USBInterface::deviceInfo(libusb_device *dev)
         deviceInfo << "VendorID: 0x" + QString::number(desc.idVendor, 16);
         deviceInfo << "ProductID: 0x" + QString::number(desc.idProduct, 16);
         deviceInfo << "Device Class: " + QString::number(desc.bDeviceClass);
+        deviceInfo << "Connection speed: " + deviceSpeedString(dev);
         deviceInfo << "Number of possible configurations: " + QString::number(desc.bNumConfigurations);
+
 
         libusb_config_descriptor *config;
 
@@ -227,6 +268,7 @@ QStringList USBInterface::deviceInfo(libusb_device *dev)
 //                    deviceInfo << "Descriptor Type: " + QString::number(epdesc->bDescriptorType);
                     deviceInfo << "EP Address: " + QString::number(epdesc->bEndpointAddress);
                     deviceInfo << "EP type: " + epTypeString(*epdesc);
+                    deviceInfo << "EP direction: " + QString((epdesc->bEndpointAddress & 0x80) ? "IN" : "OUT");
                     deviceInfo << "EP packet max size:" + QString::number(epdesc->wMaxPacketSize) + "\n";
                 }
             }
@@ -244,7 +286,35 @@ QString USBInterface::epTypeString(const libusb_endpoint_descriptor& epDescripto
         case LIBUSB_ENDPOINT_TRANSFER_TYPE_CONTROL: return "Control"; break;
         case LIBUSB_ENDPOINT_TRANSFER_TYPE_INTERRUPT: return "Interrupt"; break;
         case LIBUSB_ENDPOINT_TRANSFER_TYPE_ISOCHRONOUS: return "Isochronius"; break;
+        default: return "Unkwnown";
     }
+}
+
+QString USBInterface::deviceSpeedString(libusb_device *dev)
+{
+    switch(libusb_get_device_speed(dev))
+    {
+        case LIBUSB_SPEED_UNKNOWN: return "Unknown"; break;
+        case LIBUSB_SPEED_LOW : return " Low speed (1.5MBit/s)"; break;
+        case LIBUSB_SPEED_FULL : return "Full speed (12MBit/s)"; break;
+        case LIBUSB_SPEED_HIGH : return "High speed (480MBit/s)"; break;
+        case LIBUSB_SPEED_SUPER : return "Super speed (5000MBit/s)"; break;
+        case LIBUSB_SPEED_SUPER_PLUS  : return "Super speed plus (10000MBit/s)"; break;
+        default: return "Unknown return code";
+    }
+}
+
+QByteArray USBInterface::formHeader(const std::vector<Register *> &wrSequence)
+{
+    uchar reservedByte = 0x00;
+
+    QByteArray result;
+    result.append((1 << SPI)|(0<<PARALLEL)|(m_deviceHeader.isMSB<<ORDER)|(0<<TRIGGER));
+    result.append(wrSequence.size());
+    result.append(m_deviceHeader.registerSize);
+    result.append(reservedByte); //reserved byte
+
+    return result;
 }
 
 }

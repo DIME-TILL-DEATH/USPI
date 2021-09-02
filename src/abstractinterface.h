@@ -23,6 +23,7 @@ public:
 protected:
     DUTDevice::Header m_deviceHeader;
     bool isActive{true};
+    void reverseByte(char& byte);
 
 private:
     QString m_interfaceName{"Abstract"};

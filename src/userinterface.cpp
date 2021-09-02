@@ -16,7 +16,7 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
     updateAvaliableInterfaces();
     if(m_interface_ptr == nullptr)
     {
-        m_interface_ptr = m_avaliableInterfaces->value("File");
+        m_interface_ptr = m_avaliableInterfaces->value("USB");
     }
 
     QFont font = QGuiApplication::font();

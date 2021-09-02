@@ -31,3 +31,10 @@ void AbstractInterface::setDeviceHeader(const DUTDevice::Header &newDeviceHeader
 {
     m_deviceHeader = newDeviceHeader;
 }
+
+void AbstractInterface::reverseByte(char &byte)
+{
+    byte = ((byte & 0x55) <<  1) | ((byte & 0xAA) >>  1);
+    byte = ((byte & 0x33) <<  2) | ((byte & 0xCC) >>  2);
+    byte = ((byte & 0x0F) <<  4) | ((byte & 0xF0) >>  4);
+}

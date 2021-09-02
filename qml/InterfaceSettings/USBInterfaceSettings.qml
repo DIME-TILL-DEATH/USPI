@@ -23,7 +23,7 @@ Item {
 
             text: "Имя устройства: " + InterfaceSettings.usbInterfaceSettings.deviceName
 
-            font.family: "Arial"
+//            font.family: "Arial"
 
             width: parent.width
             height: font.pixelSize*4
