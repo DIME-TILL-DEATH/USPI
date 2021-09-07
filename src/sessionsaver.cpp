@@ -12,7 +12,7 @@ SessionSaver::SessionSaver(DUTDevice *device, std::vector<std::shared_ptr<Regist
 bool SessionSaver::saveSession(const QString &filePath)
 {
     QFile file(filePath);
-    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+    if(file.open(QIODevice::WriteOnly))
     {
         QDataStream outFile(&file);
 
@@ -52,7 +52,7 @@ bool SessionSaver::saveSession(const QString &filePath)
 bool SessionSaver::loadSession(const QString &filePath)
 {
     QFile file(filePath);
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if(file.open(QIODevice::ReadOnly))
     {
         QDataStream inFile(&file);
 

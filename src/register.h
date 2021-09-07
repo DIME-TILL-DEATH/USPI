@@ -38,6 +38,8 @@ public:
 
     quint16 uniqueId() const;
 
+    quint16 bitSize() const;
+
 private:
     quint16 m_uniqueId;
 

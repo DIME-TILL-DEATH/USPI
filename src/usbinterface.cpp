@@ -32,7 +32,8 @@ USBInterface::~USBInterface()
 
 bool USBInterface::writeRegister(Register *wrReg)
 {
-     QByteArray regData = wrReg->rawData();
+    // Warn! Method doesn't tested!!!
+    QByteArray regData = wrReg->rawData();
 
     char* rawData = regData.data();
     int dataSize = regData.size();
@@ -85,7 +86,9 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
 
     for(auto it = wrSequence.begin(); it != wrSequence.end(); ++it)
     {
-        QByteArray regData = (*it)->rawData();
+        QByteArray regData;
+
+        regData = (*it)->rawData();
 
         if(m_deviceHeader.isMSB)
         {
@@ -98,6 +101,9 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
                 reverseByte(*it);
             }
         }
+
+        regData.prepend((uchar)0x00); //reserved byte
+        regData.prepend((*it)->bitSize());
 
         char* rawData = regData.data();
         int dataSize = regData.size();

@@ -35,7 +35,7 @@ Rectangle {
 
 
             text: (size <= 1) ?  "Бит " + position + ":"
-                                :"Биты " + (position+size) + "..." + position + ":"
+                                :"Биты " + (position+size-1) + "..." + position + ":"
         }
     }
 

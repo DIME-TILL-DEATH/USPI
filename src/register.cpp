@@ -109,6 +109,11 @@ quint16 Register::uniqueId() const
     return m_uniqueId;
 }
 
+quint16 Register::bitSize() const
+{
+    return m_bitSize;
+}
+
 bool Register::validateSize(ParseError *error)
 {
     for(auto it=m_fields.begin(); it != m_fields.end(); ++it)

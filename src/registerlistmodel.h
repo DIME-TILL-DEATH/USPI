@@ -26,10 +26,10 @@ public:
     void resetModel();
     void resetModel(std::vector<std::shared_ptr<Register> > &registerList);
 
-    Q_INVOKABLE void addItem(RegisterAdapter item, quint16 index);
-    Q_INVOKABLE void changeItem(RegisterAdapter item, quint16 index);
-    Q_INVOKABLE void removeItem(quint16 index);
-    Q_INVOKABLE RegisterAdapter getItem(quint16 index);
+    Q_INVOKABLE void addItem(RegisterAdapter item, qint16 index);
+    Q_INVOKABLE void changeItem(RegisterAdapter item, qint16 index);
+    Q_INVOKABLE void removeItem(qint16 index);
+    Q_INVOKABLE RegisterAdapter getItem(qint16 index);
 
     std::vector<RegisterAdapter>& registerAdaptersList();
 private:

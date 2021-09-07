@@ -54,10 +54,6 @@ Item{
             }
         }
 
-        Component.onCompleted: {
-            currentIndex = 0
-        }
-
         //==========================================================
         remove: Transition {
                 NumberAnimation { property: "opacity"; to: 0; duration: 500  }

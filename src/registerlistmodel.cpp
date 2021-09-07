@@ -92,27 +92,30 @@ void RegisterListModel::resetModel(std::vector<std::shared_ptr<Register> > &regi
     endResetModel();
 }
 
-void RegisterListModel::addItem(RegisterAdapter item, quint16 index)
+void RegisterListModel::addItem(RegisterAdapter item, qint16 index)
 {
+    if(index<0) index=0; // when no items in list, index=-1
+    else index += 1;
+
     insertRows(index, 1);
     m_data.at(index) = item;
     emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
 }
 
-void RegisterListModel::changeItem(RegisterAdapter item, quint16 index)
+void RegisterListModel::changeItem(RegisterAdapter item, qint16 index)
 {
     m_data.at(index) = item;
     emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
 }
 
-void RegisterListModel::removeItem(quint16 index)
+void RegisterListModel::removeItem(qint16 index)
 {
     removeRows(index, 1);
 
     emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
 }
 
-RegisterAdapter RegisterListModel::getItem(quint16 index)
+RegisterAdapter RegisterListModel::getItem(qint16 index)
 {
     return m_data.at(index);
 }
