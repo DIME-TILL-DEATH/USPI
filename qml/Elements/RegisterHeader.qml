@@ -15,6 +15,18 @@ Rectangle{
 
     Text{
         text: register.name
+
+        leftPadding: width/10
+        rightPadding: width/10
+        width: parent.width
+
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+
+        elide: Text.ElideMiddle
+        wrapMode: Text.WordWrap
+        maximumLineCount: 2
+
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
     }

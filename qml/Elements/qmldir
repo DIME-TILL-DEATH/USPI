@@ -1,6 +1,6 @@
 module Elements
 
-FieldProperties      1.0 FieldProperties.qml
+FieldHeader          1.0 FieldHeader.qml
 FieldTip             1.0 FieldTip.qml
 RegisterHeader       1.0 RegisterHeader.qml
 OpenFileDeviceDialog 1.0 OpenFileDeviceDialog.qml

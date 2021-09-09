@@ -12,10 +12,13 @@ Item {
         delay: 1000
         timeout: 10000
         visible: _mouseArea.containsMouse
-        text: tipText
 
-//        x: _mouseArea.mouseX
-//        y: _mouseArea.mouseY
+        contentItem: Text{
+            text: tipText
+
+            //elide: Text.ElideRight
+           // wrapMode: Text.WordWrap
+        }
     }
 
     MouseArea{

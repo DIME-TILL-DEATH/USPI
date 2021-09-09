@@ -24,12 +24,12 @@ void IntegerField::setData(quint64 newData)
     m_data = newData;
 }
 
-quint32 IntegerField::valueFrom() const
+quint64 IntegerField::valueFrom() const
 {
     return m_valueFrom;
 }
 
-quint32 IntegerField::valueTo() const
+quint64 IntegerField::valueTo() const
 {
     return m_valueTo;
 }

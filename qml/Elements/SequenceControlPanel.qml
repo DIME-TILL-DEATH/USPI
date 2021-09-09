@@ -33,9 +33,13 @@ Rectangle{
             anchors.horizontalCenter: parent.horizontalCenter
 
             text: ">"
-            enabled: (registerMapView.count>0) ? true : false
+            enabled: (registerMapView.currentIndex >= 0) ? true : false
             onPressed: {
-                RegisterSequenceModel.addItem(RegisterMapModel.getItem(registerMapView.currentIndex), registerSequenceView.currentIndex)
+                var index
+                if(registerSequenceView.count>0) index = registerSequenceView.currentIndex+1
+                else index = 0
+
+                RegisterSequenceModel.addItem(RegisterMapModel.getItem(registerMapView.currentIndex), index)
             }
         }
         Button{
@@ -48,7 +52,11 @@ Rectangle{
             onPressed: {
                 for(var i=_registerMapView.count-1; i >= 0; i--)
                 {
-                    RegisterSequenceModel.addItem(RegisterMapModel.getItem(i), registerSequenceView.currentIndex)
+                    var index
+                    if(registerSequenceView.count>0) index = registerSequenceView.currentIndex+1
+                    else index = 0
+
+                    RegisterSequenceModel.addItem(RegisterMapModel.getItem(i), index)
                 }
             }
         }

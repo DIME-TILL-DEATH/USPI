@@ -95,7 +95,6 @@ void RegisterListModel::resetModel(std::vector<std::shared_ptr<Register> > &regi
 void RegisterListModel::addItem(RegisterAdapter item, qint16 index)
 {
     if(index<0) index=0; // when no items in list, index=-1
-    else index += 1;
 
     insertRows(index, 1);
     m_data.at(index) = item;

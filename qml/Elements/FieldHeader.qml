@@ -24,15 +24,19 @@ Rectangle {
 
         anchors.verticalCenter: parent.verticalCenter
 
-        Label{
+        Text{
             id: _fieldName
 
+            width: _root.width-parent.padding*2
+
             text: name
+            elide: Text.ElideMiddle
         }
 
-        Label{
+        Text{
             id: _bitsPostiton
 
+            width: _root.width-parent.padding*2
 
             text: (size <= 1) ?  "Бит " + position + ":"
                                 :"Биты " + (position+size-1) + "..." + position + ":"

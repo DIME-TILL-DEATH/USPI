@@ -19,8 +19,8 @@ public:
     quint64 data() const;
     void setData(quint64 newData);
 
-    quint32 valueFrom() const;
-    quint32 valueTo() const;
+    quint64 valueFrom() const;
+    quint64 valueTo() const;
 
     friend QDataStream& operator<<(QDataStream& stream, const IntegerField& field);
     friend QDataStream& operator>>(QDataStream& stream, IntegerField& field);
@@ -32,8 +32,8 @@ public:
 private:
     quint64 m_data;
 
-    quint32 m_valueFrom;
-    quint32 m_valueTo;
+    quint64 m_valueFrom;
+    quint64 m_valueTo;
 
     qreal m_scaleCoefficient{1};
     qreal m_scaleOffset{0};

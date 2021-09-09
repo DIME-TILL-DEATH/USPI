@@ -72,6 +72,7 @@ bool UserInterface::loadDevice(const QUrl &fileName)
     }
 
     emit dutDeviceUpdated();
+    m_registerSequenceModel.resetModel();
     m_registerMapModel.resetModel(m_device.deviceRegisterMap());
 
     qInfo() << "Карта регистров для устройства '" << m_device.name() << "' загружена";
@@ -155,6 +156,8 @@ void UserInterface::updateAvaliableInterfaces()
 
     m_avaliableInterfaces->insert(m_abstractInterface->interfaceName(), m_abstractInterface);
     m_avaliableInterfaces->insert(m_fileInterface->interfaceName(), m_fileInterface);
+
+    m_usbInterface->refreshUSBDevices();
     m_avaliableInterfaces->insert(m_usbInterface->interfaceName(), m_usbInterface);
 
     m_interface_ptr = m_avaliableInterfaces->value(prevSelectedInterface);

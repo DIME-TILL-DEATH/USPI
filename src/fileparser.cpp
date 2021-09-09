@@ -137,6 +137,11 @@ bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceReg
     {
         deviceRegister->m_bitSize = jsonObject["size"].toDouble();
     }
+    else
+    {
+        //TODO: default value from header:
+        //deviceRegister->m_bitSize =
+    }
 
     // clear previous pointers
     for(auto it = deviceRegister->m_fields.begin(); it!= deviceRegister->m_fields.end(); ++it)
@@ -217,6 +222,10 @@ bool FileParser::readBitField(const QJsonObject &jsonObject, Register* deviceReg
     {
         bitField->m_type = AbstractField::FieldType::BitField;
 
+        if(jsonObject.contains("default_value") && jsonObject["default_value"].isBool())
+        {
+           bitField->m_bit = jsonObject["default_value"].toBool();
+        }
         return true;
     }
     else
@@ -265,6 +274,12 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
         {
             integerField->m_valueTo = pow(2, integerField->m_size)-1;
         }
+
+        if(jsonObject.contains("default_value") && jsonObject["default_value"].isDouble())
+        {
+           integerField->m_data = jsonObject["default_value"].toDouble();
+        }
+        return true;
 
         if(jsonObject.contains("scale") && jsonObject["scale"].isObject())
         {
@@ -337,6 +352,15 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
                     if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, "variant field error.");
                     return false;
                 }
+            }
+
+            if(jsonObject.contains("default_value") && jsonObject["default_value"].isString())
+            {
+               QString defaultString = jsonObject["default_value"].toString();
+
+               //TODO: сделать проверку наличия строки по-умолчаниюв  перечне вариантов
+               //std::find_if(variantListField->m_data.begin(), variantListField->m_data.end(), defaultString);
+               variantListField->m_selected = defaultString;
             }
         }
         else

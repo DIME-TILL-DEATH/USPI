@@ -19,7 +19,7 @@ Rectangle{
     radius: height/5
 
     FieldTip{
-        tipText: (adapter !== undefined) ? adapter.description : "описание"
+        tipText: (adapter !== undefined) ? adapter.name + ":\n\n" + adapter.description : "описание"
     }
 
     Row{
@@ -28,7 +28,7 @@ Rectangle{
 
         spacing: width / 50
 
-        FieldProperties{
+        FieldHeader{
             adapter: _root.adapter
         }
 

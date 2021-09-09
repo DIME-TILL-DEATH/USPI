@@ -22,7 +22,7 @@ Rectangle{
     radius: height/5
 
     FieldTip{
-        tipText: (adapter !== undefined) ? "min: " + adapter.valueFrom + "\nmax: " +adapter.valueTo + "\n" + adapter.description
+        tipText: (adapter !== undefined) ? adapter.name + ":\n\n" + "min: " + adapter.valueFrom + "\nmax: " +adapter.valueTo + "\n" + adapter.description
                                          : "описание"
     }
 
@@ -32,7 +32,7 @@ Rectangle{
 
         spacing: width / 50
 
-        FieldProperties{
+        FieldHeader{
             adapter: _root.adapter
         }
 
@@ -47,10 +47,11 @@ Rectangle{
             selectByMouse: true
             inputMethodHints: Qt.ImhDigitsOnly
 
-            validator: IntValidator{
-                bottom: _root.valueFrom
-                top: _root.valueTo
-            }
+
+//            validator: IntValidator{
+//                bottom: _root.valueFrom
+//                top: _root.valueTo
+//            }
 
             background: Rectangle {
                      implicitWidth: _textField1.font.pointSize * 10

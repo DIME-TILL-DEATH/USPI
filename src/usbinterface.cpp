@@ -140,6 +140,12 @@ const USBDevice& USBInterface::activeDevice() const
     return m_activeDevice;
 }
 
+void USBInterface::refreshUSBDevices()
+{
+    closeDevice(m_activeDevice);
+    initUSB();
+}
+
 
 bool USBInterface::initUSB()
 {
@@ -164,13 +170,13 @@ bool USBInterface::initUSB()
 
     if(m_activeDevice.handle == nullptr)
     {
-        qWarning() << "Can't open device";
+        qWarning() << "Can't open USB device";
         return false;
     }
 
     if(!initDevice(m_activeDevice))
     {
-        qWarning() << "Device initialization failed";
+        qWarning() << "USB device initialization failed";
         return false;
     }
 

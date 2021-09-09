@@ -17,7 +17,7 @@ Rectangle{
     radius: height/5
 
     FieldTip{
-        tipText: (adapter !== undefined) ? adapter.description : "описание"
+        tipText: (adapter !== undefined) ? adapter.name + ":\n\n" + adapter.description : "описание"
     }
 
     Row{
@@ -26,8 +26,8 @@ Rectangle{
 
         spacing: width / 50
 
-        FieldProperties{
-            id: _fieldProperties
+        FieldHeader{
+            id: _fieldHeader
             adapter: _root.adapter
         }
 
@@ -35,7 +35,7 @@ Rectangle{
             id: _comboBox
 
             height: parent.height*0.75
-            width: (parent.width - _fieldProperties.width)*0.9
+            width: (parent.width - _fieldHeader.width)*0.9
 
             anchors.verticalCenter: parent.verticalCenter
 
