@@ -16,8 +16,6 @@ USBInterface::USBInterface()
     else
     {
         libusb_set_option(m_USBSession, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_WARNING);
-
-        initUSB();
     }
 }
 
@@ -180,7 +178,7 @@ bool USBInterface::initUSB()
         return false;
     }
 
-    qInfo() << m_activeDevice.deviceName;
+//    qInfo() << m_activeDevice.deviceName;
 
     isActive = true;
     return true;
@@ -230,7 +228,10 @@ void USBInterface::closeDevice(USBDevice& device)
     {
         libusb_release_interface(device.handle, device.interfaceNumber);
         libusb_close(device.handle);
+
         device.handle = nullptr;
+        device.deviceInfo.clear();
+        device.deviceName.clear();
     }
 }
 
