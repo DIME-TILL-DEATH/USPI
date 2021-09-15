@@ -14,6 +14,8 @@ namespace USB
 #define ORDER 5
 #define TRIGGER 4
 
+#define HEADER_SIZE 4
+
 static QString interfaceNameString = "USB";
 
 struct USBDevice{
@@ -23,6 +25,8 @@ struct USBDevice{
 
     int interfaceNumber{0};
     unsigned char endpointAddress{4};
+
+    quint16 deviceBufferSize{256};
 
     QString deviceName;
     QStringList deviceInfo;
@@ -59,7 +63,9 @@ private:
     int m_VID{0x03EB}; //0x03EB - Atmel //0x04D8 - microchip
     int m_PID{0x204F}; //0x2FF0 - ATMega32U2 DFU
 
-    int m_timeout{1000};
+    int m_timeout{30000};
+
+    char* m_rawData{nullptr};
 
 
     bool initUSB();
@@ -71,7 +77,7 @@ private:
     QString epTypeString(const libusb_endpoint_descriptor& epDescriptor);
     QString deviceSpeedString(libusb_device *dev);
 
-    QByteArray formHeader(const std::vector<Register*> &wrSequence);
+    QByteArray formHeader(const std::vector<Register*> &wrSequence, quint8 packetSize);
 };
 }
 

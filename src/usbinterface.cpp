@@ -16,6 +16,7 @@ USBInterface::USBInterface()
     else
     {
         libusb_set_option(m_USBSession, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_WARNING);
+        m_rawData = static_cast<char*>(std::malloc(m_activeDevice.deviceBufferSize));
     }
 }
 
@@ -25,6 +26,7 @@ USBInterface::~USBInterface()
     {
         closeDevice(m_activeDevice);
         libusb_exit(m_USBSession);
+       // std::free(m_rawData);
     }
 }
 
@@ -68,25 +70,14 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
     int actualWrittenBytes = 0;
     int rtnValue = 0;
 
-    QByteArray header = formHeader(wrSequence);
 
-    rtnValue = libusb_bulk_transfer(m_activeDevice.handle,
-                                    m_activeDevice.endpointAddress | LIBUSB_ENDPOINT_OUT,
-                                    (unsigned char*)header.data(),
-                                    header.size(),
-                                    &actualWrittenBytes,
-                                    m_timeout);
-    if(rtnValue < 0)
-    {
-        qWarning() << "Failed send to USB device:" << libusb_strerror(rtnValue);
-        return false;
-    }
+
+    QByteArray sequenceData;
+    quint16 bytesInPacket = 0;
 
     for(auto it = wrSequence.begin(); it != wrSequence.end(); ++it)
     {
-        QByteArray regData;
-
-        regData = (*it)->rawData();
+        QByteArray regData = (*it)->rawData();
 
         if(m_deviceHeader.isMSB)
         {
@@ -103,26 +94,35 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
         regData.prepend((uchar)0x00); //reserved byte
         regData.prepend((*it)->bitSize());
 
-        char* rawData = regData.data();
-        int dataSize = regData.size();
+        bytesInPacket += regData.size();
 
-        rtnValue = libusb_bulk_transfer(m_activeDevice.handle,
-                                        m_activeDevice.endpointAddress | LIBUSB_ENDPOINT_OUT,
-                                        (unsigned char*)rawData,
-                                        dataSize,
-                                        &actualWrittenBytes,
-                                        m_timeout);
+        sequenceData.append(regData);
+    }
 
-        if(rtnValue < 0)
-        {
-            qWarning() << "Failed send to USB device:" << libusb_strerror(rtnValue);
-            return false;
-        }
-        if(dataSize > actualWrittenBytes)
-        {
-            qWarning() << "Sended: " << actualWrittenBytes << ", while data size is: " << dataSize;
-            return false;
-        }
+    QByteArray header = formHeader(wrSequence, bytesInPacket);
+    sequenceData.prepend(header);
+
+    int dataSize = sequenceData.size();
+
+    m_rawData = sequenceData.data();
+
+    rtnValue = libusb_bulk_transfer(m_activeDevice.handle,
+                                    m_activeDevice.endpointAddress | LIBUSB_ENDPOINT_OUT,
+                                    (unsigned char*)m_rawData,
+                                    dataSize,
+                                    &actualWrittenBytes,
+                                    m_timeout);
+
+
+    if(rtnValue < 0)
+    {
+        qWarning() << "Failed send to USB device:" << libusb_strerror(rtnValue);
+        return false;
+    }
+    if(dataSize > actualWrittenBytes)
+    {
+        qWarning() << "Sended: " << actualWrittenBytes << ", while data size is: " << dataSize;
+        return false;
     }
 
     return true;
@@ -317,14 +317,14 @@ QString USBInterface::deviceSpeedString(libusb_device *dev)
     }
 }
 
-QByteArray USBInterface::formHeader(const std::vector<Register *> &wrSequence)
+QByteArray USBInterface::formHeader(const std::vector<Register *> &wrSequence, quint8 packetSize)
 {
     uchar reservedByte = 0x00;
 
     QByteArray result;
     result.append((1 << SPI)|(0<<PARALLEL)|(m_deviceHeader.isMSB<<ORDER)|(0<<TRIGGER));
     result.append(wrSequence.size());
-    result.append(m_deviceHeader.registerSize);
+    result.append(packetSize + HEADER_SIZE);
     result.append(reservedByte); //reserved byte
 
     return result;
