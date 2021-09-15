@@ -50,6 +50,12 @@ private:
         {"variant_lists",   &FileParser::readVariantListField},
         {"fixed",           &FileParser::readFixedField}
     };
+
+    static bool parseIntObject(const QJsonObject& jsonObject, const QString& valueName, quint64& destValue,
+                        const QString& fieldName = "unknown", quint64 defaultValue = 0, bool mandatory = false,  ParseError* error = nullptr);
+
+    static bool parseStringObject(const QJsonObject& jsonObject, const QString& valueName, QString& destValue,
+                        const QString& fieldName = "unknown", bool mandatory = false,  ParseError* error = nullptr);
 };
 
 #endif // FILEPARSER_H

@@ -33,7 +33,11 @@ int main(int argc, char *argv[])
     QHash <QString, AbstractInterface* > avaliableInterfaces;
     InterfacesSettingsAdapter interfacesSettings(&avaliableInterfaces);
 
+
     UserInterface ui(&avaliableInterfaces);
+
+    QObject::connect(&ui, &UserInterface::avaliableInterfacesUpdated, &interfacesSettings, &InterfacesSettingsAdapter::usbInterfaceSettingsChanged);
+    QObject::connect(&ui, &UserInterface::avaliableInterfacesUpdated, &interfacesSettings, &InterfacesSettingsAdapter::fileInterfaceSettings);
 
     Logger log;
     log.setAsMessageHandlerForApp();

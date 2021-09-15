@@ -7,7 +7,11 @@ import Elements 1.0
 import Fields 1.0
 import Views 1.0
 
+import "../CreateFunctions.js" as Scripts
+
 Rectangle{
+    id: _root
+
     property var registerMapView
     property var registerSequenceView
 
@@ -40,6 +44,7 @@ Rectangle{
                 else index = 0
 
                 RegisterSequenceModel.addItem(RegisterMapModel.getItem(registerMapView.currentIndex), index)
+                registerSequenceView.currentIndex += 1
             }
         }
         Button{
@@ -66,9 +71,26 @@ Rectangle{
             anchors.horizontalCenter: parent.horizontalCenter
 
             text: "<"
-            enabled: (registerSequenceView.count>0) ? true : false
+            enabled: (registerSequenceView.currentIndex>-1) ? true : false
             onPressed: {
                 RegisterSequenceModel.removeItem(registerSequenceView.currentIndex)
+
+                // топорное решение, придумать что-то получше
+                // может быть сделать fieldsView моделью и передавать ему регистр
+                // но главный вопрос, как универсальнее понять нужный индекс?
+                if(registerSequenceView.currentIndex < registerSequenceView.count)
+                {
+                    Scripts.createRegisterFields(RegisterSequenceModel.getItem(registerSequenceView.currentIndex), _root.parent.parent)
+                }
+                else if(registerSequenceView.currentIndex === 0)
+                {
+                    Scripts.clearRegisterFields(_root.parent.parent)
+                }
+                else if(registerSequenceView.currentIndex === registerSequenceView.count && registerSequenceView.currentIndex !== 0)
+                {
+                    Scripts.createRegisterFields(RegisterSequenceModel.getItem(registerSequenceView.currentIndex-1), _root.parent.parent)
+                }
+
             }
         }
         Button{
@@ -82,6 +104,11 @@ Rectangle{
                 for(var i=registerSequenceView.count-1; i >= 0; i--)
                 {
                     RegisterSequenceModel.removeItem(i)
+                }
+
+                if(registerSequenceView.currentIndex > -1)
+                {
+                    Scripts.clearRegisterFields(_root.parent.parent)
                 }
             }
         }

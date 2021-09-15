@@ -20,7 +20,8 @@ FileDialog {
     onAccepted: {
         if(Backend.loadDevice(_fileDialog.fileUrl))
         {
-            Scripts.createRegisterFields(RegisterMapModel.getItem(0), registerMapView)
+            Scripts.clearRegisterFields(registerMapView)
+            registerMapView.registerView.currentIndex = -1
         }
     }
     Component.onCompleted: visible = false

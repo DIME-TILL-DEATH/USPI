@@ -50,7 +50,11 @@ ApplicationWindow {
 
                 onAccepted: {
                     var result = Backend.loadSession(fileUrl)
-                    Scripts.createRegisterFields(RegisterMapModel.getItem(0), _registerMapView)
+
+                    Scripts.clearRegisterFields(_registerMapView)
+
+                    _registerMapView.registerView.currentIndex = -1
+                    _registerMapView.registerSequenceView.currentIndex = -1
                 }
                 Component.onCompleted: visible = false
             }

@@ -16,6 +16,7 @@ Item {
     property alias fieldsView: _fieldsView
     property alias resultView: _text
     property alias registerView: _registerMapView
+    property alias registerSequenceView: _registerSequenceView
 
     property bool autoWrite : _sequenceControlPanel.rbAuto.checked
 
@@ -32,6 +33,7 @@ Item {
         {
             Scripts.createRegisterFields(registerAdapter, _root)
             _flickable.contentY = 0
+           // _registerSequenceView.currentIndex = -1
         }
 
         Component.onCompleted: {
@@ -113,8 +115,8 @@ Item {
                             else
                             {
                                 _registerSequenceView.currentIndex = index
-                                Scripts.createRegisterFields(register, _root)
-
+                               // _registerMapView.currentIndex = -1
+                                Scripts.createRegisterFields(register, _root)             
                             }
                         }
 

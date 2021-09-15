@@ -31,12 +31,17 @@ function createField(fieldAdapter, container)
     }
 }
 
-function createRegisterFields(registerAdapter, registerMapView)
+function clearRegisterFields(registerMapView)
 {
     for(var childIndex=0; childIndex < registerMapView.fieldsView.children.length; childIndex++)
     {
         registerMapView.fieldsView.children[childIndex].destroy()
     }
+}
+
+function createRegisterFields(registerAdapter, registerMapView)
+{
+    clearRegisterFields(registerMapView);
 
     registerMapView.fieldsView.registerAdapter = registerAdapter
 

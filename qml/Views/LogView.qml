@@ -1,5 +1,5 @@
-import QtQuick 2.12
-import QtQuick.Window 2.12
+import QtQuick 2.15
+import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
 import StyleSettings 1.0
@@ -39,6 +39,11 @@ Rectangle{
 
         model: Log
 
+        // без буффера при быстрой прокрутке ListView подвисает
+        // проследить чтобы на портативных системах не вызывало подвисания
+        cacheBuffer: 100000
+        //reuseItems: true
+
         ScrollBar.vertical: ScrollBar{
             policy: ScrollBar.AlwaysOn
         }
@@ -58,7 +63,11 @@ Rectangle{
             Component.onCompleted: {
                 _loggerWindow.positionViewAtEnd()
             }
-        }
 
+//            ListView.onAdd:
+//            {
+//                _loggerWindow.positionViewAtEnd()
+//            }
+        }
     }
 }

@@ -124,13 +124,10 @@ bool FileParser::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
 
 bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceRegister, ParseError *error)
 {
-    if(jsonObject.contains("name") && jsonObject["name"].isString())
-    {
-        deviceRegister->m_name = jsonObject["name"].toString();
-    }
-    else
+    if(!parseStringObject(jsonObject, "name", deviceRegister->m_name, "", true))
     {
         if(error != nullptr) error->setErrorType(ParseError::ErrorType::RegisterHeaderError, "'name' field not found");
+        return false;
     }
 
     if(jsonObject.contains("size") && jsonObject["size"].isDouble())
@@ -161,7 +158,6 @@ bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceReg
 
                 if(!it->second(jsonObject, deviceRegister, error))
                     return false;
-
             }
         }
     }
@@ -173,35 +169,14 @@ bool FileParser::readAbstractField(const QJsonObject &jsonObject, AbstractField 
 {
     if(field)
     {
-        if(jsonObject.contains("name") && jsonObject["name"].isString())
-        {
-            field->m_name = jsonObject["name"].toString();
-        }
-        else
-        {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, "'name' of field not found.");
-            return false;
-        }
+        if(!parseStringObject(jsonObject, "name", field->m_name, "???", true, error)) return false;
 
-        if(jsonObject.contains("description") && jsonObject["description"].isString())
-        {
-            field->m_description = jsonObject["description"].toString();
-        }
+        parseStringObject(jsonObject, "description", field->m_description);
+        parseStringObject(jsonObject, "comment", field->m_comment);
 
-        if(jsonObject.contains("comment") && jsonObject["comment"].isString())
-        {
-            field->m_comment = jsonObject["comment"].toString();
-        }
-
-        if(jsonObject.contains("position") && jsonObject["position"].isDouble())
-        {
-            field->m_position = jsonObject["position"].toDouble();
-        }
-        else
-        {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, "'position' of field not found.");
-            return false;
-        }
+        quint64 size64;
+        if(!parseIntObject(jsonObject, "position", size64, field->m_name, 0, true, error)) return false;
+        field->m_position = size64;
     }
     return true;
 }
@@ -214,7 +189,6 @@ bool FileParser::readBitField(const QJsonObject &jsonObject, Register* deviceReg
 
     if(!readAbstractField(jsonObject, field, error))
         return false;
-
 
     BitField* bitField = dynamic_cast<BitField*>(field);
 
@@ -250,36 +224,13 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
     {
         integerField->m_type = AbstractField::FieldType::IntegerField;
 
-        if(jsonObject.contains("size") && jsonObject["size"].isDouble())
-        {
-            integerField->m_size = jsonObject["size"].toDouble();
-        }
+        quint64 size64;
+        if(!parseIntObject(jsonObject, "size", size64, field->m_name, 0, true, error)) return false;
+        integerField->m_size = size64;
 
-        if(jsonObject.contains("valueFrom") && jsonObject["valueFrom"].isDouble())
-        {
-            integerField->m_valueFrom = jsonObject["valueFrom"].toDouble();
-            integerField->m_data = integerField->m_valueFrom;
-        }
-        else
-        {
-            integerField->m_valueFrom = 0;
-            integerField->m_data = 0;
-        }
-
-        if(jsonObject.contains("valueTo") && jsonObject["valueTo"].isDouble())
-        {
-            integerField->m_valueTo = jsonObject["valueTo"].toDouble();
-        }
-        else
-        {
-            integerField->m_valueTo = pow(2, integerField->m_size)-1;
-        }
-
-        if(jsonObject.contains("default_value") && jsonObject["default_value"].isDouble())
-        {
-           integerField->m_data = jsonObject["default_value"].toDouble();
-        }
-        return true;
+        parseIntObject(jsonObject, "valueFrom", integerField->m_valueFrom, field->name(), 0);
+        parseIntObject(jsonObject, "valueTo", integerField->m_valueTo, field->name(), pow(2, integerField->m_size)-1);
+        parseIntObject(jsonObject, "default_value", integerField->m_data, field->name(), integerField->m_valueFrom);
 
         if(jsonObject.contains("scale") && jsonObject["scale"].isObject())
         {
@@ -294,10 +245,7 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
                 integerField->m_scaleOffset = scaleObject["offset"].toDouble();
             }
 
-            if(scaleObject.contains("units") && scaleObject["units"].isString())
-            {
-                integerField->m_scaleUnits = scaleObject["units"].toString();
-            }
+            parseStringObject(jsonObject, "units", integerField->m_scaleUnits);
         }
         return true;
     }
@@ -322,10 +270,10 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
     if(variantListField)
     {
         variantListField->m_type = AbstractField::FieldType::VariantListField;
-        if(jsonObject.contains("size") && jsonObject["size"].isDouble())
-        {
-            variantListField->m_size = jsonObject["size"].toDouble();
-        }
+
+        quint64 size64;
+        if(!parseIntObject(jsonObject, "size", size64, field->m_name, 0, true, error)) return false;
+        variantListField->m_size = size64;
 
         if(jsonObject.contains("variants") && jsonObject["variants"].isArray())
         {
@@ -349,23 +297,30 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
                 }
                 else
                 {
-                    if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, "variant field error.");
+                    if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, "Variant list field error.");
                     return false;
                 }
             }
 
-            if(jsonObject.contains("default_value") && jsonObject["default_value"].isString())
+            if(jsonObject.contains("default_value") && jsonObject["default_value"].isDouble())
             {
-               QString defaultString = jsonObject["default_value"].toString();
+               quint64 defaultValue = jsonObject["default_value"].toInt();
 
-               //TODO: сделать проверку наличия строки по-умолчаниюв  перечне вариантов
-               //std::find_if(variantListField->m_data.begin(), variantListField->m_data.end(), defaultString);
-               variantListField->m_selected = defaultString;
+               if(variantListField->m_data.contains(defaultValue))
+               {
+                    QString defaultString = variantListField->m_data.value(defaultValue);
+                    variantListField->m_selected = defaultString;
+               }
+               else
+               {
+                   error->setErrorType(ParseError::ErrorType::FieldContentError, "Variant list field '" + field->name() +"' error. No such default value in list.");
+                   return false;
+               }
             }
         }
         else
         {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, "there is no variants in variant list");
+            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, "Variant list field '" + field->name() +"': there is no variants in variant list");
             return false;
         }
         return true;
@@ -392,19 +347,11 @@ bool FileParser::readFixedField(const QJsonObject &jsonObject, Register* deviceR
     {
         fixedField->m_type = AbstractField::FieldType::FixedField;
 
-        if(jsonObject.contains("size") && jsonObject["size"].isDouble())
-        {
-            fixedField->m_size = jsonObject["size"].toDouble();
-        }
+        quint64 size64;
+        if(!parseIntObject(jsonObject, "size", size64, field->m_name, 0, true, error)) return false;
+        fixedField->m_size = size64;
 
-        if(jsonObject.contains("value") && jsonObject["value"].isDouble())
-        {
-            fixedField->m_data = jsonObject["value"].toDouble();
-        }
-        else
-        {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, "'value' of fixed field not found");
-        }
+        if(!parseIntObject(jsonObject, "value", fixedField->m_data, fixedField->m_name, 0, true, error)) return false;
         return true;
     }
     else
@@ -412,4 +359,58 @@ bool FileParser::readFixedField(const QJsonObject &jsonObject, Register* deviceR
         if(error != nullptr) error->setErrorType(ParseError::ErrorType::PointerError, "casting AbstractField to FixedField is unsucceccfull!");
         return false;
     }
+}
+
+bool FileParser::parseIntObject(const QJsonObject &jsonObject, const QString& valueName, quint64& destValue,
+                                const QString &fieldName, quint64 defaultValue, bool mandatory, ParseError *error)
+{
+    if(jsonObject.contains(valueName) && jsonObject[valueName].isDouble())
+    {
+        destValue = jsonObject[valueName].toDouble();
+    }
+    else if(jsonObject.contains(valueName) && jsonObject[valueName].isString())
+    {
+        QString str = jsonObject[valueName].toString();
+        bool conversionResult;
+        destValue = str.toLongLong(&conversionResult, 0);
+        if(!conversionResult)
+        {
+            qWarning() << "Field '" << fieldName << "' error. Cannot convert 'valueTo' from string to int. Using default value: " << defaultValue;
+            destValue = defaultValue;
+        }
+    }
+    else
+    {
+        if(mandatory)
+        {
+            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, valueName + " of field '" + fieldName + "' not found.");
+            return false;
+        }
+        else
+        {
+            destValue = defaultValue;
+        }
+    }
+    return true;
+}
+
+bool FileParser::parseStringObject(const QJsonObject &jsonObject, const QString &valueName, QString &destValue, const QString &fieldName, bool mandatory, ParseError *error)
+{
+    if(jsonObject.contains(valueName) && jsonObject[valueName].isString())
+    {
+        destValue = jsonObject[valueName].toString();
+    }
+    else
+    {
+        if(mandatory)
+        {
+            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, valueName + " of field '" + fieldName + "' not found.");
+            return false;
+        }
+        else
+        {
+            destValue = "";
+        }
+    }
+    return true;
 }

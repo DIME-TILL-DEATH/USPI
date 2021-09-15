@@ -74,8 +74,12 @@ void FieldAdapter::setValue(const QVariant &newValue)
             dynamic_cast<BitField*>(m_field)->setBit(newValue.toBool());
             break;
         case AbstractField::FieldType::IntegerField:
-            dynamic_cast<IntegerField*>(m_field)->setData(newValue.toLongLong());
+        {
+            QString tempValue =  newValue.toString();
+            bool result;
+            dynamic_cast<IntegerField*>(m_field)->setData(tempValue.toLong(&result, 0));
             break;
+        }
         case AbstractField::FieldType::VariantListField:
             dynamic_cast<VariantListField*>(m_field)->setSelected(newValue.toString());
         default: break;
