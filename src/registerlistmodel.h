@@ -3,6 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QObject>
+#include <QDebug>
 
 #include "dutdevice.h"
 #include "registeradapter.h"
@@ -29,6 +30,8 @@ public:
     Q_INVOKABLE void addItem(RegisterAdapter item, qint16 index);
     Q_INVOKABLE void changeItem(RegisterAdapter item, qint16 index);
     Q_INVOKABLE void removeItem(qint16 index);
+    Q_INVOKABLE bool moveItem(qint16 sourceIndex, qint16 destIndex);
+
     Q_INVOKABLE RegisterAdapter getItem(qint16 index);
 
     std::vector<RegisterAdapter>& registerAdaptersList();

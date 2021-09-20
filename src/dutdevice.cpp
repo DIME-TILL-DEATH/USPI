@@ -7,7 +7,7 @@ bool DUTDevice::loadFromFile(const QString &fileName, ParseError *error)
 
     if(!jsonFile.loadFile(fileName, error)) return false;
     if(!jsonFile.readHeader(&m_deviceHeader, error)) return false;
-    if(!jsonFile.readRegisterArray(&m_deviceRegisterMap, error)) return false;
+    if(!jsonFile.readRegisterArray(&m_deviceRegisterMap, &m_deviceHeader, error)) return false;
 
     for(auto it=m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)
     {

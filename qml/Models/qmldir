@@ -1,0 +1,4 @@
+module Models
+
+DelegateModelRegList 1.0 DelegateModelRegList.qml
+DelegateModelRegSequence 1.0 DelegateModelRegSequence.qml

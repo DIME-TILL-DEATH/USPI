@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
+    QHash <QString, AbstractInterface* > avaliableInterfaces;
+    InterfacesSettingsAdapter interfacesSettings(&avaliableInterfaces);
+
+    Logger log;
 
     QGuiApplication app(argc, argv);
 
@@ -30,16 +34,11 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("vniirt.ru");
     app.setApplicationName("USPI");
 
-    QHash <QString, AbstractInterface* > avaliableInterfaces;
-    InterfacesSettingsAdapter interfacesSettings(&avaliableInterfaces);
-
-
     UserInterface ui(&avaliableInterfaces);
 
     QObject::connect(&ui, &UserInterface::avaliableInterfacesUpdated, &interfacesSettings, &InterfacesSettingsAdapter::usbInterfaceSettingsChanged);
     QObject::connect(&ui, &UserInterface::avaliableInterfacesUpdated, &interfacesSettings, &InterfacesSettingsAdapter::fileInterfaceSettings);
 
-    Logger log;
     log.setAsMessageHandlerForApp();
 
     engine.rootContext()->setContextProperty("Backend", &ui);
@@ -51,6 +50,7 @@ int main(int argc, char *argv[])
     RegisterAdapter::registerTypes();
     FieldAdapter::registerTypes();
     InterfacesSettingsAdapter::registerTypes();
+    UserInterface::registerTypes();
     //---------------------------------------------------------------
 
     engine.addImportPath(":/qml");

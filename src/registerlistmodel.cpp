@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <vector>
+
 #include "registerlistmodel.h"
 
 RegisterListModel::RegisterListModel(std::vector<std::shared_ptr<Register> > &registerList, QObject *parent)
@@ -70,7 +73,6 @@ bool RegisterListModel::removeRows(int row, int count, const QModelIndex &parent
     beginRemoveRows(parent, row, row + count - 1);
     m_data.erase(m_data.begin()+row, m_data.begin()+row+count);
     endRemoveRows();
-
     return true;
 }
 
@@ -110,8 +112,27 @@ void RegisterListModel::changeItem(RegisterAdapter item, qint16 index)
 void RegisterListModel::removeItem(qint16 index)
 {
     removeRows(index, 1);
-
     emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
+}
+
+bool RegisterListModel::moveItem(qint16 sourceIndex, qint16 destIndex)
+{
+    if(sourceIndex < 0 || sourceIndex > static_cast<qint16>(m_data.size())) return false;
+    if(destIndex < 0 || destIndex > static_cast<qint16>(m_data.size())) return false;
+    if(destIndex == sourceIndex) return false;
+
+    if(destIndex > sourceIndex)
+     {
+        beginMoveRows(QModelIndex(), sourceIndex, sourceIndex, QModelIndex(), destIndex+1);
+        std::rotate(m_data.begin()+sourceIndex, m_data.begin()+sourceIndex+1, m_data.begin()+destIndex+1);
+     }
+     else if(destIndex < sourceIndex)
+     {
+        beginMoveRows(QModelIndex(), sourceIndex, sourceIndex, QModelIndex(), destIndex);
+        std::rotate(m_data.rbegin()+(m_data.size()-sourceIndex), m_data.rbegin()+(m_data.size()-sourceIndex-1), m_data.rbegin()+(m_data.size()-destIndex-1));
+     }
+    endMoveRows();
+    return true;
 }
 
 RegisterAdapter RegisterListModel::getItem(qint16 index)

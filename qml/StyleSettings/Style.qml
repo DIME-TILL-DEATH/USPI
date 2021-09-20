@@ -7,7 +7,7 @@ QtObject {
     readonly property color borderColorPassive:   "gray"
 
     readonly property color regHeaderActiveGlobal  : "skyblue"
-    readonly property color regHeaderPassiveGlobal : "transparent"
+    readonly property color regHeaderPassiveGlobal : "white"
     readonly property color regHeaderActiveLocal : "lightgreen"
     readonly property color regHeaderPassiveLocal : "lightgray"
 

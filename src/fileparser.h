@@ -29,7 +29,7 @@ public:
     bool loadFile(const QString& name, ParseError* error = nullptr);
 
     bool readHeader(DUTDevice::Header *header, ParseError* error = nullptr);
-    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, ParseError* error = nullptr);
+    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header *header, ParseError* error = nullptr);
 
 private:
     QJsonObject m_deviceGlobalObject;
@@ -51,10 +51,10 @@ private:
         {"fixed",           &FileParser::readFixedField}
     };
 
-    static bool parseIntObject(const QJsonObject& jsonObject, const QString& valueName, quint64& destValue,
+    static bool parseFieldIntObject(const QJsonObject& jsonObject, const QString& valueName, quint64& destValue,
                         const QString& fieldName = "unknown", quint64 defaultValue = 0, bool mandatory = false,  ParseError* error = nullptr);
 
-    static bool parseStringObject(const QJsonObject& jsonObject, const QString& valueName, QString& destValue,
+    static bool parseFieldStringObject(const QJsonObject& jsonObject, const QString& valueName, QString& destValue,
                         const QString& fieldName = "unknown", bool mandatory = false,  ParseError* error = nullptr);
 };
 

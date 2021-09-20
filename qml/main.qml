@@ -15,15 +15,25 @@ import "CreateFunctions.js" as Scripts
 ApplicationWindow {
     id: _appWindow
 
-    // Либо вынести в настройки, либо пересчитывать из размера шрифта
-    width: Screen.width*0.55
-    height: Screen.height*0.65
+
+    width:  (Backend === null) ? Screen.width*0.55
+             : ((Backend.userSettings.windowWidth !==0) ? Backend.userSettings.windowWidth
+                                                     : Screen.width*0.55)
+    height: (Backend === null) ? Screen.height*0.65
+            : ((Backend.userSettings.windowHeight !==0) ? Backend.userSettings.windowHeight
+                                                     : Screen.height*0.65)
 
     minimumWidth: 640
     minimumHeight: 480
 
     visible: true
     title: qsTr("USPI")
+
+    onClosing:
+    {
+        Backend.userSettings.windowWidth = width
+        Backend.userSettings.windowHeight = height
+    }
 
     menuBar: MenuBar {
         Menu {

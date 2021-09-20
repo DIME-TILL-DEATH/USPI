@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QUrl>
 #include <QStringListModel>
+#include <QSettings>
+
 #include <memory>
 
 #include "logger.h"
@@ -16,6 +18,18 @@
 #include "fileinterface.h"
 #include "usbinterface.h"
 
+struct UserSettings
+{
+    Q_GADGET
+public:
+    quint16 m_windowWidth;
+    quint16 m_windowHeight;
+
+    Q_PROPERTY(quint16 windowWidth MEMBER m_windowWidth)
+    Q_PROPERTY(quint16 windowHeight MEMBER m_windowHeight)
+};
+Q_DECLARE_METATYPE(UserSettings)
+
 class UserInterface : public QObject
 {
     Q_OBJECT
@@ -23,9 +37,13 @@ class UserInterface : public QObject
     Q_PROPERTY(QString dutDeviceName READ dutDeviceName NOTIFY dutDeviceUpdated)
     Q_PROPERTY(QString currentInterface READ currentInterface WRITE setCurrentInterface NOTIFY interfaceUpdated)
     Q_PROPERTY(QStringList avaliableInterfaces READ avaliableInterfaces NOTIFY avaliableInterfacesUpdated)
+
+    Q_PROPERTY(UserSettings userSettings READ userSettings WRITE setUserSettings NOTIFY userSettingsUpdated)
 public:
     explicit UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent = nullptr);
     ~UserInterface();
+
+    static void registerTypes();
 
     const QString& dutDeviceName() const;
     const QString& currentInterface() const;
@@ -46,6 +64,9 @@ public:
 
     // нейминг не очень
     Q_INVOKABLE void changeWriteItemLocal(quint16 index);
+
+    const UserSettings &userSettings() const;
+    void setUserSettings(const UserSettings &newSettings);
 
 private:
     DUTDevice m_device;
@@ -68,10 +89,13 @@ private:
 
     QSettings m_applicationSettings;
 
+    UserSettings m_userSettings;
+
 signals:
     void dutDeviceUpdated();
     void interfaceUpdated();
     void avaliableInterfacesUpdated();
+    void userSettingsUpdated();
 };
 
 #endif // USERINTERFACE_H

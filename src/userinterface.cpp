@@ -21,15 +21,29 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
 
     QFont font = QGuiApplication::font();
 
-    // TODO: QSettings. Настройки отображения приложения
+    m_applicationSettings.beginGroup("UserSettings");
+
+    m_userSettings.m_windowWidth = m_applicationSettings.value("windowWidth", 0).toInt();
+    m_userSettings.m_windowHeight = m_applicationSettings.value("windowHeight", 0).toInt();
+
 //    font.setFamily("Times new roman");
 //    font.setPointSize(9);
+
+    m_applicationSettings.endGroup();
+
     font.setStyleStrategy(QFont::NoSubpixelAntialias);
     QGuiApplication::setFont(font);
 }
 
 UserInterface::~UserInterface()
 {
+    m_applicationSettings.beginGroup("UserSettings");
+
+    m_applicationSettings.setValue("windowWidth", m_userSettings.m_windowWidth);
+    m_applicationSettings.setValue("windowHeight", m_userSettings.m_windowHeight);
+
+    m_applicationSettings.endGroup();
+
     delete m_abstractInterface;
     delete m_fileInterface;
     delete m_usbInterface;
@@ -188,6 +202,21 @@ void UserInterface::changeWriteItemLocal(quint16 index)
         adapter.setIsLocal(false);
         m_registerSequenceModel.changeItem(adapter, index);
     }
+}
+
+const UserSettings &UserInterface::userSettings() const
+{
+    return m_userSettings;
+}
+
+void UserInterface::setUserSettings(const UserSettings &newSettings)
+{
+    m_userSettings = newSettings;
+}
+
+void UserInterface::registerTypes()
+{
+    qRegisterMetaType<UserSettings>("UserSettings");
 }
 
 RegisterListModel* UserInterface::registerMapModel()

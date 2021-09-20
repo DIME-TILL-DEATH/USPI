@@ -7,6 +7,7 @@ import StyleSettings 1.0
 import Elements 1.0
 import Fields 1.0
 import Views 1.0
+import Models 1.0
 
 import "../CreateFunctions.js" as Scripts
 
@@ -37,7 +38,7 @@ Item {
         }
 
         Component.onCompleted: {
-            _registerMapView.delegateClicked.connect(selectRegisterMap)
+            _registerListModel.delegateClicked.connect(selectRegisterMap)
         }
 
 
@@ -45,7 +46,9 @@ Item {
             id: _registerMapView
 
             headerText: qsTr("Карта регистров:")
-            model: RegisterMapModel
+            model: DelegateModelRegList{
+                id: _registerListModel
+            }
 
             width: parent.width * 0.15
         }
@@ -93,49 +96,10 @@ Item {
                 id: _registerSequenceView
 
                 headerText: qsTr("Порядок записи:")
-                model: RegisterSequenceModel
+
+                model: DelegateModelRegSequence{}
 
                 height: parent.height-_btnWrite.height-parent.padding*4
-
-                delegate: RegisterHeader{
-
-                    color: isLocal ?
-                               (ListView.isCurrentItem ? Style.regHeaderActiveLocal : Style.regHeaderPassiveLocal) :
-                               (ListView.isCurrentItem ? Style.regHeaderActiveGlobal : Style.regHeaderPassiveGlobal)
-
-                    MouseArea{
-                        id: _ma
-                        anchors.fill: parent
-                        acceptedButtons: Qt.AllButtons
-                        onClicked: {
-                            if(mouse.button & Qt.RightButton)
-                            {
-                                _sequenceOptionsMenu.popup()
-                            }
-                            else
-                            {
-                                _registerSequenceView.currentIndex = index
-                               // _registerMapView.currentIndex = -1
-                                Scripts.createRegisterFields(register, _root)             
-                            }
-                        }
-
-                        Menu{
-                            id: _sequenceOptionsMenu
-                            MenuItem{
-                                text: "индивидуально"
-                                checkable: true
-                                onTriggered: {
-                                    Backend.changeWriteItemLocal(index)
-                                }
-                            }
-            //                MenuSeparator{}
-            //                MenuItem{
-            //                    text: "пауза"
-            //                }
-                        }
-                    }
-                }
             }
 
 

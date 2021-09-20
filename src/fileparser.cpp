@@ -92,7 +92,7 @@ bool FileParser::readHeader(DUTDevice::Header* header, ParseError *error)
     }
 }
 
-bool FileParser::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, ParseError *error)
+bool FileParser::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header* header, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("registers") && m_deviceGlobalObject["registers"].isArray())
     {
@@ -106,8 +106,13 @@ bool FileParser::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
             QJsonObject registerObject = registerArray[registerIndex].toObject();
             Register* deviceRegister = new Register;
 
+            deviceRegister->m_bitSize = header->registerSize;
+
             if(!readRegister(registerObject, deviceRegister, error))
+            {
+                delete deviceRegister;
                 return false;
+            }
 
             deviceRegister->m_uniqueId = registerIndex + 0xAA; // просто смещение, чтобы unqiqueId не мог быть 0
 
@@ -124,7 +129,7 @@ bool FileParser::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
 
 bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceRegister, ParseError *error)
 {
-    if(!parseStringObject(jsonObject, "name", deviceRegister->m_name, "", true))
+    if(!parseFieldStringObject(jsonObject, "name", deviceRegister->m_name, "", true))
     {
         if(error != nullptr) error->setErrorType(ParseError::ErrorType::RegisterHeaderError, "'name' field not found");
         return false;
@@ -133,11 +138,6 @@ bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceReg
     if(jsonObject.contains("size") && jsonObject["size"].isDouble())
     {
         deviceRegister->m_bitSize = jsonObject["size"].toDouble();
-    }
-    else
-    {
-        //TODO: default value from header:
-        //deviceRegister->m_bitSize =
     }
 
     // clear previous pointers
@@ -169,13 +169,13 @@ bool FileParser::readAbstractField(const QJsonObject &jsonObject, AbstractField 
 {
     if(field)
     {
-        if(!parseStringObject(jsonObject, "name", field->m_name, "???", true, error)) return false;
+        if(!parseFieldStringObject(jsonObject, "name", field->m_name, "???", true, error)) return false;
 
-        parseStringObject(jsonObject, "description", field->m_description);
-        parseStringObject(jsonObject, "comment", field->m_comment);
+        parseFieldStringObject(jsonObject, "description", field->m_description);
+        parseFieldStringObject(jsonObject, "comment", field->m_comment);
 
         quint64 size64;
-        if(!parseIntObject(jsonObject, "position", size64, field->m_name, 0, true, error)) return false;
+        if(!parseFieldIntObject(jsonObject, "position", size64, field->m_name, 0, true, error)) return false;
         field->m_position = size64;
     }
     return true;
@@ -225,12 +225,12 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
         integerField->m_type = AbstractField::FieldType::IntegerField;
 
         quint64 size64;
-        if(!parseIntObject(jsonObject, "size", size64, field->m_name, 0, true, error)) return false;
+        if(!parseFieldIntObject(jsonObject, "size", size64, field->m_name, 0, true, error)) return false;
         integerField->m_size = size64;
 
-        parseIntObject(jsonObject, "valueFrom", integerField->m_valueFrom, field->name(), 0);
-        parseIntObject(jsonObject, "valueTo", integerField->m_valueTo, field->name(), pow(2, integerField->m_size)-1);
-        parseIntObject(jsonObject, "default_value", integerField->m_data, field->name(), integerField->m_valueFrom);
+        parseFieldIntObject(jsonObject, "valueFrom", integerField->m_valueFrom, field->name(), 0);
+        parseFieldIntObject(jsonObject, "valueTo", integerField->m_valueTo, field->name(), pow(2, integerField->m_size)-1);
+        parseFieldIntObject(jsonObject, "default_value", integerField->m_data, field->name(), integerField->m_valueFrom);
 
         if(jsonObject.contains("scale") && jsonObject["scale"].isObject())
         {
@@ -245,7 +245,7 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
                 integerField->m_scaleOffset = scaleObject["offset"].toDouble();
             }
 
-            parseStringObject(jsonObject, "units", integerField->m_scaleUnits);
+            parseFieldStringObject(jsonObject, "units", integerField->m_scaleUnits);
         }
         return true;
     }
@@ -272,7 +272,7 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
         variantListField->m_type = AbstractField::FieldType::VariantListField;
 
         quint64 size64;
-        if(!parseIntObject(jsonObject, "size", size64, field->m_name, 0, true, error)) return false;
+        if(!parseFieldIntObject(jsonObject, "size", size64, field->m_name, 0, true, error)) return false;
         variantListField->m_size = size64;
 
         if(jsonObject.contains("variants") && jsonObject["variants"].isArray())
@@ -348,10 +348,10 @@ bool FileParser::readFixedField(const QJsonObject &jsonObject, Register* deviceR
         fixedField->m_type = AbstractField::FieldType::FixedField;
 
         quint64 size64;
-        if(!parseIntObject(jsonObject, "size", size64, field->m_name, 0, true, error)) return false;
+        if(!parseFieldIntObject(jsonObject, "size", size64, field->m_name, 0, true, error)) return false;
         fixedField->m_size = size64;
 
-        if(!parseIntObject(jsonObject, "value", fixedField->m_data, fixedField->m_name, 0, true, error)) return false;
+        if(!parseFieldIntObject(jsonObject, "value", fixedField->m_data, fixedField->m_name, 0, true, error)) return false;
         return true;
     }
     else
@@ -361,7 +361,7 @@ bool FileParser::readFixedField(const QJsonObject &jsonObject, Register* deviceR
     }
 }
 
-bool FileParser::parseIntObject(const QJsonObject &jsonObject, const QString& valueName, quint64& destValue,
+bool FileParser::parseFieldIntObject(const QJsonObject &jsonObject, const QString& valueName, quint64& destValue,
                                 const QString &fieldName, quint64 defaultValue, bool mandatory, ParseError *error)
 {
     if(jsonObject.contains(valueName) && jsonObject[valueName].isDouble())
@@ -394,7 +394,7 @@ bool FileParser::parseIntObject(const QJsonObject &jsonObject, const QString& va
     return true;
 }
 
-bool FileParser::parseStringObject(const QJsonObject &jsonObject, const QString &valueName, QString &destValue, const QString &fieldName, bool mandatory, ParseError *error)
+bool FileParser::parseFieldStringObject(const QJsonObject &jsonObject, const QString &valueName, QString &destValue, const QString &fieldName, bool mandatory, ParseError *error)
 {
     if(jsonObject.contains(valueName) && jsonObject[valueName].isString())
     {

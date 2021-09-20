@@ -16,7 +16,7 @@ Item{
 
     property string headerText : ""
 
-    signal delegateClicked(registerAdapter : var)
+//    signal delegateClicked(registerAdapter : var)
 
     width: parent.width
     height: parent.height
@@ -44,17 +44,14 @@ Item{
 
         spacing: height/200
 
-        delegate: RegisterHeader{
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    _rootList.currentIndex = index
-                    delegateClicked(register)
-                }
-            }
-        }
+//        delegate: RegisterHeader{
+//                onClicked: {
+//                    _rootList.currentIndex = index
+//                    delegateClicked(register)
+//                }
+//        }
 
-        //==========================================================
+        //[transitions]
         remove: Transition {
                 NumberAnimation { property: "opacity"; to: 0; duration: 500  }
 
@@ -68,6 +65,10 @@ Item{
         addDisplaced: Transition {
                  NumberAnimation { properties: "y"; duration: 250 }
                  NumberAnimation { properties: "opacity"; to: 1; duration: 500}
+        }
+
+        moveDisplaced: Transition {
+                 NumberAnimation { properties: "y"; duration: 150 }
         }
     }
 }
