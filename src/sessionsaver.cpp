@@ -37,6 +37,35 @@ bool SessionSaver::saveSession(const QString &filePath)
             }
         }
 
+        // added to v.0.2 Saving field adapters. Added view options
+        for(auto reg_it = m_registerMapModel->registerAdaptersList().begin();
+                 reg_it != m_registerMapModel->registerAdaptersList().end();
+                 ++reg_it)
+        {
+            for(auto field_it = (*reg_it).m_bufferedFieldAdapters.begin();
+                     field_it != (*reg_it).m_bufferedFieldAdapters.end();
+                     ++field_it)
+            {
+                // view mode of field (bin, dec, hex)
+                outFile << field_it.key();
+                outFile << (*field_it).viewOptions();
+            }
+        }
+
+        for(auto reg_it = m_registerWriteSequenceModel->registerAdaptersList().begin();
+                 reg_it != m_registerWriteSequenceModel->registerAdaptersList().end();
+                 ++reg_it)
+        {
+            for(auto field_it = (*reg_it).m_bufferedFieldAdapters.begin();
+                     field_it != (*reg_it).m_bufferedFieldAdapters.end();
+                     ++field_it)
+            {
+                // view mode of field (bin, dec, hex)
+                outFile << field_it.key();
+                outFile << (*field_it).viewOptions();
+            }
+        }
+
         qInfo() << "Сессия" << filePath << "сохранена";
         file.close();
         return true;
@@ -56,7 +85,14 @@ bool SessionSaver::loadSession(const QString &filePath)
     {
         QDataStream inFile(&file);
 
-        inFile >> m_sessionSaverVersion;
+        QString saverVersion;
+        inFile >> saverVersion;
+
+        saverVersion.remove(0, 2);
+        saverVersion = saverVersion.left(3);
+        m_compareVersion = saverVersion.toDouble();
+
+
         inFile >> *m_device;
 
         m_registerMapModel->resetModel(m_device->deviceRegisterMap());
@@ -94,8 +130,51 @@ bool SessionSaver::loadSession(const QString &filePath)
 
             if(reg_ptr != nullptr) m_registerWriteSequenceModel->addItem(regAdapter, i);
         }
+
+        // view options
+        if(m_compareVersion > 0.1)
+        {
+            for(auto reg_it = m_registerMapModel->registerAdaptersList().begin();
+                     reg_it != m_registerMapModel->registerAdaptersList().end();
+                     ++reg_it)
+            {
+                for(auto field_it = (*reg_it).m_bufferedFieldAdapters.begin();
+                         field_it != (*reg_it).m_bufferedFieldAdapters.end();
+                         ++field_it)
+                {
+                    // view mode of field (bin, dec, hex)
+                    quint16 index;
+                    quint16 viewBase;
+
+                    inFile >> index;
+                    inFile >> viewBase;
+
+                    (*reg_it).m_bufferedFieldAdapters[index].setViewOptions(viewBase);
+                }
+            }
+
+            for(auto reg_it = m_registerWriteSequenceModel->registerAdaptersList().begin();
+                     reg_it != m_registerWriteSequenceModel->registerAdaptersList().end();
+                     ++reg_it)
+            {
+                for(auto field_it = (*reg_it).m_bufferedFieldAdapters.begin();
+                         field_it != (*reg_it).m_bufferedFieldAdapters.end();
+                         ++field_it)
+                {
+                    // view mode of field (bin, dec, hex)
+                    quint16 index;
+                    quint16 viewBase;
+
+                    inFile >> index;
+                    inFile >> viewBase;
+
+                    (*reg_it).m_bufferedFieldAdapters[index].setViewOptions(viewBase);
+                }
+            }
+        }
+
         file.close();
-        qInfo() << "Сессия" << filePath << "загружена";
+        qInfo() << "Сессия" << filePath << "загружена. Версия формата: " << m_compareVersion;
         return true;
     }
     else

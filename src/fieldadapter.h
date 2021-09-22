@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <QVariant>
+#include <QDebug>
+
+#include <memory>
 
 #include "abstractfield.h"
 #include "fixedfield.h"
@@ -10,7 +13,8 @@
 #include "bitfield.h"
 #include "variantlistfield.h"
 
-struct FieldScale{
+struct FieldScale
+{
     Q_GADGET
 public:
     qreal coefficient;
@@ -44,9 +48,13 @@ class FieldAdapter
 
     Q_PROPERTY(FieldScale fieldScale READ fieldScale)
 
+    Q_PROPERTY(bool isValidValue READ isValidValue)
+
+    Q_PROPERTY(quint16 viewOptions READ viewOptions WRITE setViewOptions)
 public:
     FieldAdapter() {};
-    FieldAdapter(AbstractField* field) : m_field{field} {};
+    FieldAdapter(AbstractField* field);
+    ~FieldAdapter() = default;
 
     static void registerTypes();
 
@@ -69,11 +77,17 @@ public:
 
     FieldScale fieldScale() const;
 
+    bool isValidValue();
+
+    quint16 viewOptions() const;
+    void setViewOptions(quint16 newOptions);
+
 private:
-    // при такой логике надо везде проверять что m_field != nullptr
-    // shared или unique ptr?
+    // надо везде проверять что m_field != nullptr
+    // переделать на shared ptr?
     AbstractField* m_field;
 
+    std::shared_ptr<quint16> m_viewOptions{nullptr};
 };
 Q_DECLARE_METATYPE(FieldAdapter)
 

@@ -8,15 +8,18 @@
 #include "fieldadapter.h"
 #include "register.h"
 
+class SessionSaver;
+
 class RegisterAdapter
 {
     Q_GADGET
     Q_PROPERTY(QString name READ name)
     Q_PROPERTY(quint16 fieldsCount READ fieldsCount)
 public:
+    friend class SessionSaver;
+
     RegisterAdapter() {};
-//    RegisterAdapter(Register* reg) : m_register{reg} {};
-    RegisterAdapter(std::shared_ptr<Register> reg) : m_register{reg} {};
+    RegisterAdapter(std::shared_ptr<Register> reg);
 
     static void registerTypes();
 
@@ -34,6 +37,8 @@ public:
 
 private:
     std::shared_ptr<Register> m_register;
+
+    QMap<quint16, FieldAdapter> m_bufferedFieldAdapters;
 
     bool m_isLocal{false};
 };

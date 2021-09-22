@@ -1,5 +1,13 @@
+#include <QtQml>
+
 #include "fieldadapter.h"
 
+
+FieldAdapter::FieldAdapter(AbstractField *field)
+    : m_field{field}
+{
+    m_viewOptions = std::make_shared<quint16>(quint16(10));
+}
 
 void FieldAdapter::registerTypes()
 {
@@ -55,8 +63,17 @@ QVariant FieldAdapter::value() const
             return dynamic_cast<BitField*>(m_field)->getBit();
 
         case AbstractField::FieldType::IntegerField:
-            return dynamic_cast<IntegerField*>(m_field)->data();
+        {
+            QString result;
+            result.setNum(dynamic_cast<IntegerField*>(m_field)->data(), *m_viewOptions);
 
+            switch (*m_viewOptions)
+            {
+                case 2: result.prepend("0b"); break;
+                case 16: result.prepend("0x"); break;
+            }
+            return result;
+        }
         case AbstractField::FieldType::VariantListField:
             return dynamic_cast<VariantListField*>(m_field)->selected();
         return  "variant_list";
@@ -67,7 +84,6 @@ QVariant FieldAdapter::value() const
 
 void FieldAdapter::setValue(const QVariant &newValue)
 {
-
     switch(m_field->type())
     {
         case AbstractField::FieldType::BitField:
@@ -75,9 +91,20 @@ void FieldAdapter::setValue(const QVariant &newValue)
             break;
         case AbstractField::FieldType::IntegerField:
         {
-            QString tempValue =  newValue.toString();
             bool result;
-            dynamic_cast<IntegerField*>(m_field)->setData(tempValue.toLong(&result, 0));
+            quint64 value;
+
+            if(newValue.toString().startsWith("0b"))
+            {
+                QString convString = newValue.toString().remove(0, 2);
+                value = convString.toULongLong(&result, 2);
+            }
+            else
+            {
+                value = newValue.toString().toULongLong(&result, 0);
+            }
+
+            if(result) dynamic_cast<IntegerField*>(m_field)->setData(value);
             break;
         }
         case AbstractField::FieldType::VariantListField:
@@ -146,5 +173,28 @@ FieldScale FieldAdapter::fieldScale() const
         answer.units = field_ptr->scaleUnits();
     }
     return answer;
+}
+
+bool FieldAdapter::isValidValue()
+{
+    switch(m_field->type())
+    {
+        case AbstractField::FieldType::IntegerField:
+        {
+            return dynamic_cast<IntegerField*>(m_field)->isValidValue();
+            break;
+        }
+        default: return true;;
+    }
+}
+
+quint16 FieldAdapter::viewOptions() const
+{
+    return *m_viewOptions;
+}
+
+void FieldAdapter::setViewOptions(quint16 newOptions)
+{
+    *m_viewOptions = newOptions;
 }
 

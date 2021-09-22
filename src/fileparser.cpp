@@ -242,7 +242,7 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
 
             if(scaleObject.contains("offset") && scaleObject["offset"].isDouble())
             {
-                integerField->m_scaleOffset = scaleObject["offset"].toDouble();
+                integerField->m_scaleOffset1 = scaleObject["offset"].toDouble();
             }
 
             parseFieldStringObject(jsonObject, "units", integerField->m_scaleUnits);
@@ -287,10 +287,29 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
                 quint32 variantValue;
 
                 if(variantObject.contains("name") && variantObject.contains("value")
-                        && variantObject["name"].isString() && variantObject["value"].isDouble())
+                        && variantObject["name"].isString()) // && variantObject["value"].isDouble())
                 {
                     variantName = variantObject["name"].toString();
-                    variantValue = variantObject["value"].toDouble();
+                    if(variantObject["value"].isDouble())
+                    {
+                        variantValue = variantObject["value"].toDouble();
+                    }
+                    else if(variantObject["value"].isString())
+                    {
+                        QString str = variantObject["value"].toString();
+                        bool conversionResult;
+                        variantValue = str.toLongLong(&conversionResult, 0);
+                        if(!conversionResult)
+                        {
+                            qWarning() << "Field '" << field->m_name << "' error. Cannot convert variant from string to int.";
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, "Variant list field error.");
+                        return false;
+                    }
 
                     variantListField->m_data.insert(variantValue, variantName);
                     variantListField->m_selected = variantName;

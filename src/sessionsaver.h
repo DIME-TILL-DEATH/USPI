@@ -21,7 +21,8 @@ public:
     bool loadSession(const QString& filePath);
 
 private:
-    QString m_sessionSaverVersion{"v.0.1 alfa"};
+    QString m_sessionSaverVersion{"v.0.2"};
+    qreal m_compareVersion;
 
     DUTDevice* m_device;
     std::vector<std::shared_ptr<Register> >* m_localRegisterMap;

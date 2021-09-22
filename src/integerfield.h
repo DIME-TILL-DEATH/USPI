@@ -29,6 +29,9 @@ public:
     qreal scaleOffset() const;
     const QString &scaleUnits() const;
 
+    bool isValidValue() const;
+    bool isValidValue(quint64 value);
+
 private:
     quint64 m_data;
 
@@ -36,7 +39,11 @@ private:
     quint64 m_valueTo;
 
     qreal m_scaleCoefficient{1};
-    qreal m_scaleOffset{0};
+    qreal m_scaleExponent{1};
+    qreal m_scaleOffset1{0};
+    qreal m_scaleOffset2{0};
+
+
     QString m_scaleUnits;
 };
 

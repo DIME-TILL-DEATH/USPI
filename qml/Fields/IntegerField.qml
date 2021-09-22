@@ -1,6 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
+import Qt.labs.platform 1.1
+
 import StyleSettings 1.0
 import Elements 1.0
 
@@ -10,7 +12,7 @@ Rectangle{
     property var adapter
 
     // property не обновляется само при изменении в адаптере
-    property int value: (adapter !== undefined) ? adapter.value : 0
+    property var value: (adapter !== undefined) ? adapter.value : 0
     property int valueFrom : (adapter !== undefined) ? adapter.valueFrom : 0
     property int valueTo: (adapter !== undefined) ? adapter.valueTo : 255
 
@@ -47,37 +49,33 @@ Rectangle{
             selectByMouse: true
             inputMethodHints: Qt.ImhDigitsOnly
 
-
-//            validator: IntValidator{
-//                bottom: _root.valueFrom
-//                top: _root.valueTo
-//            }
-
             background: Rectangle {
+                     id: _backgroundRectangle
+
                      implicitWidth: _textField1.font.pointSize * 10
                      implicitHeight: _textField1.font.pointSize
 
-                     color: (parseInt(_textField1.text) < _root.valueFrom) |
-                            (parseInt(_textField1.text) > _root.valueTo) ?
-                                "red" : "transparent"
+                     color: "transparent"
 
                      border.color: _textField1.activeFocus ? Style.borderColorActive : Style.borderColorPassive
                  }
 
 
             onEditingFinished: {
-                //adapter.value = parseInt(text)
-
-                adapter.value = text
-
                 _textField1.focus = false
-                fieldChanged(adapter.name, parseInt(text))
+                _textField1.text = adapter.value
 
                 _textField2.text = (adapter.value * adapter.fieldScale.coefficient + adapter.fieldScale.offset).toFixed(2)
             }
 
             onTextEdited: {
-                _textField2.text = (parseFloat(_textField1.text) * adapter.fieldScale.coefficient + adapter.fieldScale.offset).toFixed(2)
+                adapter.value = text
+
+                _backgroundRectangle.color = (_root.adapter.isValidValue) ? "transparent" : "red"
+
+                fieldChanged(adapter.name, parseInt(text))
+
+                _textField2.text = (adapter.value * adapter.fieldScale.coefficient + adapter.fieldScale.offset).toFixed(2)
             }
         }
 
@@ -105,4 +103,62 @@ Rectangle{
             visible: (adapter !== undefined) ? (adapter.fieldScale.coefficient !== 1) : false
         }
     }
+
+    //[for menu]
+    MouseArea{
+        id: _ma
+
+        z: - 10
+
+        anchors.fill: parent
+
+        acceptedButtons: Qt.AllButtons
+
+        onClicked: {
+            if(mouse.button & Qt.RightButton)
+            {
+                _viewOptionsMenu.open()
+            }
+        }
+    }
+
+    Menu{
+        id: _viewOptionsMenu
+
+        MenuItemGroup
+        {
+            id: _itemGrop
+        }
+
+        MenuItem{
+            text: "BIN"
+            checkable: true
+            group: _itemGrop
+            onTriggered: {
+                adapter.viewOptions = 2
+                _textField1.text = adapter.value
+            }
+        }
+        MenuItem{
+            text: "DEC"
+            checkable: true
+            checked: true
+            group: _itemGrop
+            onTriggered: {
+                adapter.viewOptions = 10
+                _textField1.text = adapter.value
+            }
+        }
+
+        MenuItem{
+            text: "HEX"
+            checkable: true
+            group: _itemGrop
+            onTriggered: {
+                adapter.viewOptions = 16
+                _textField1.text = adapter.value
+            }
+        }
+    }
+
 }

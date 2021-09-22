@@ -18,6 +18,7 @@ class Register
 {
 public:
     friend class FileParser;
+
     Register();
     ~Register();
 
