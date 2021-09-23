@@ -54,6 +54,9 @@ private:
     static bool parseFieldIntObject(const QJsonObject& jsonObject, const QString& valueName, quint64& destValue,
                         const QString& fieldName = "unknown", quint64 defaultValue = 0, bool mandatory = false,  ParseError* error = nullptr);
 
+    static bool parseFieldDoubleObject(const QJsonObject& jsonObject, const QString& valueName, qreal& destValue,
+                        const QString& fieldName = "unknown", qreal defaultValue = 0, bool mandatory = false,  ParseError* error = nullptr);
+
     static bool parseFieldStringObject(const QJsonObject& jsonObject, const QString& valueName, QString& destValue,
                         const QString& fieldName = "unknown", bool mandatory = false,  ParseError* error = nullptr);
 };

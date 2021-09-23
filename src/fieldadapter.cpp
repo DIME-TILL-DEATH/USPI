@@ -1,5 +1,7 @@
 #include <QtQml>
 
+#include <cmath>
+
 #include "fieldadapter.h"
 
 
@@ -12,7 +14,7 @@ FieldAdapter::FieldAdapter(AbstractField *field)
 void FieldAdapter::registerTypes()
 {
     qRegisterMetaType<FieldAdapter>("FieldAdapter");
-    qRegisterMetaType<FieldScale>("IntegerFieldScaler");
+//    qRegisterMetaType<FieldScale>("IntegerFieldScaler");
 }
 
 QString FieldAdapter::name() const
@@ -157,22 +159,84 @@ QVariant FieldAdapter::variantList() const
     }
 }
 
-FieldScale FieldAdapter::fieldScale() const
+//FieldScale FieldAdapter::fieldScale() const
+//{
+//    FieldScale answer;
+
+//    answer.coefficient=1;
+//    answer.offset=0;
+
+//    if(m_field->type() == AbstractField::FieldType::IntegerField)
+//    {
+//        IntegerField* field_ptr = dynamic_cast<IntegerField*>(m_field);
+
+//        answer.coefficient = field_ptr->scaleCoefficient();
+//        answer.offset = field_ptr->scaleOffset1();
+//        answer.units = field_ptr->scaleUnits();
+//    }
+//    return answer;
+//}
+
+QVariant FieldAdapter::scaledValue()
 {
-    FieldScale answer;
-
-    answer.coefficient=1;
-    answer.offset=0;
-
     if(m_field->type() == AbstractField::FieldType::IntegerField)
     {
         IntegerField* field_ptr = dynamic_cast<IntegerField*>(m_field);
 
-        answer.coefficient = field_ptr->scaleCoefficient();
-        answer.offset = field_ptr->scaleOffset();
-        answer.units = field_ptr->scaleUnits();
+        qreal K = field_ptr->scaleCoefficient();
+        qreal exp = field_ptr->scaleExponent();
+        qreal off1 = field_ptr->scaleOffset1();
+        qreal off2 = field_ptr->scaleOffset2();
+
+        if(K==1 && exp==1 && off1==0 && off2==0) return "none";
+
+        qreal val = field_ptr->data();
+        qreal resultValue = K*pow(val+off1, exp)+off2;
+
+        QString resultString;
+        resultString.setNum(resultValue);
+        resultString.append(" " + field_ptr->scaleUnits());
+
+        return resultString;
     }
-    return answer;
+    else
+    {
+        return value();
+    }
+}
+
+void FieldAdapter::setScaledValue(const QVariant &newScaledValue)
+{
+    if(m_field->type() == AbstractField::FieldType::IntegerField)
+    {
+        IntegerField* field_ptr = dynamic_cast<IntegerField*>(m_field);
+
+        qreal K = field_ptr->scaleCoefficient();
+        qreal exp = field_ptr->scaleExponent();
+        qreal off1 = field_ptr->scaleOffset1();
+        qreal off2 = field_ptr->scaleOffset2();
+
+        if(K==1 && exp==1 && off1==0 && off2==0)
+        {
+
+        }
+        else
+        {
+            QString expression = newScaledValue.toString();
+
+            QRegularExpression regExp("[0-9]*[.,]?[0-9]*");
+            QRegularExpressionMatch match = regExp.match(expression);
+
+            if(match.hasMatch())
+            {
+                QString word = match.captured(0);
+
+                qreal val = word.toDouble();
+                qreal resultValue = pow((val-off2)/K, 1/exp)-off1;
+                field_ptr->setData(std::round(resultValue));
+            }
+        }
+    }
 }
 
 bool FieldAdapter::isValidValue()

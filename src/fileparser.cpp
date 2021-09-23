@@ -161,7 +161,6 @@ bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceReg
             }
         }
     }
-
     return true;
 }
 
@@ -235,17 +234,14 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
         if(jsonObject.contains("scale") && jsonObject["scale"].isObject())
         {
             QJsonObject scaleObject = jsonObject["scale"].toObject();
-            if(scaleObject.contains("coefficient") && scaleObject["coefficient"].isDouble())
-            {
-                integerField->m_scaleCoefficient = scaleObject["coefficient"].toDouble();
-            }
 
-            if(scaleObject.contains("offset") && scaleObject["offset"].isDouble())
-            {
-                integerField->m_scaleOffset1 = scaleObject["offset"].toDouble();
-            }
+            parseFieldDoubleObject(scaleObject, "coefficient", integerField->m_scaleCoefficient, integerField->m_name, 1);
+            parseFieldDoubleObject(scaleObject, "exponent", integerField->m_scaleExponent, integerField->m_name, 1);
+            parseFieldDoubleObject(scaleObject, "offset", integerField->m_scaleOffset2, integerField->m_name, 0);
+            parseFieldDoubleObject(scaleObject, "offset1", integerField->m_scaleOffset1, integerField->m_name, 0);
+            parseFieldDoubleObject(scaleObject, "offset2", integerField->m_scaleOffset2, integerField->m_name, integerField->m_scaleOffset2);
 
-            parseFieldStringObject(jsonObject, "units", integerField->m_scaleUnits);
+            parseFieldStringObject(scaleObject, "units", integerField->m_scaleUnits);
         }
         return true;
     }
@@ -397,6 +393,27 @@ bool FileParser::parseFieldIntObject(const QJsonObject &jsonObject, const QStrin
             qWarning() << "Field '" << fieldName << "' error. Cannot convert 'valueTo' from string to int. Using default value: " << defaultValue;
             destValue = defaultValue;
         }
+    }
+    else
+    {
+        if(mandatory)
+        {
+            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, valueName + " of field '" + fieldName + "' not found.");
+            return false;
+        }
+        else
+        {
+            destValue = defaultValue;
+        }
+    }
+    return true;
+}
+
+bool FileParser::parseFieldDoubleObject(const QJsonObject &jsonObject, const QString &valueName, qreal &destValue, const QString &fieldName, qreal defaultValue, bool mandatory, ParseError *error)
+{
+    if(jsonObject.contains(valueName) && jsonObject[valueName].isDouble())
+    {
+        destValue = jsonObject[valueName].toDouble();
     }
     else
     {

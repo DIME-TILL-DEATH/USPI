@@ -39,7 +39,7 @@ qreal IntegerField::scaleCoefficient() const
     return m_scaleCoefficient;
 }
 
-qreal IntegerField::scaleOffset() const
+qreal IntegerField::scaleOffset1() const
 {
     return m_scaleOffset1;
 }
@@ -59,6 +59,16 @@ bool IntegerField::isValidValue(quint64 value)
 {
     if(value < m_valueFrom || value > m_valueTo) return false;
     else return true;
+}
+
+qreal IntegerField::scaleExponent() const
+{
+    return m_scaleExponent;
+}
+
+qreal IntegerField::scaleOffset2() const
+{
+    return m_scaleOffset2;
 }
 
 QDataStream& operator<<(QDataStream& stream, const IntegerField& field)

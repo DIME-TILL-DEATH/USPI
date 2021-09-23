@@ -52,7 +52,7 @@ Rectangle{
             background: Rectangle {
                      id: _backgroundRectangle
 
-                     implicitWidth: _textField1.font.pointSize * 10
+                     implicitWidth: _textField1.font.pointSize * 15
                      implicitHeight: _textField1.font.pointSize
 
                      color: "transparent"
@@ -64,18 +64,16 @@ Rectangle{
             onEditingFinished: {
                 _textField1.focus = false
                 _textField1.text = adapter.value
-
-                _textField2.text = (adapter.value * adapter.fieldScale.coefficient + adapter.fieldScale.offset).toFixed(2)
+                _textField2.text = adapter.scaledValue
             }
 
             onTextEdited: {
                 adapter.value = text
 
                 _backgroundRectangle.color = (_root.adapter.isValidValue) ? "transparent" : "red"
-
                 fieldChanged(adapter.name, parseInt(text))
 
-                _textField2.text = (adapter.value * adapter.fieldScale.coefficient + adapter.fieldScale.offset).toFixed(2)
+                _textField2.text = adapter.scaledValue
             }
         }
 
@@ -84,23 +82,52 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter
 
             text: "="
-            visible: (adapter !== undefined) ? (adapter.fieldScale.coefficient !== 1) : false
+            visible: (adapter !== undefined) ? (adapter.scaledValue !== "none") : false
         }
 
-        Text{
+        TextField{
             id: _textField2
 
+            height: parent.height*0.75
             anchors.verticalCenter: parent.verticalCenter
 
-            text: (adapter !== undefined) ? (adapter.value * adapter.fieldScale.coefficient + adapter.fieldScale.offset).toFixed(2) : 0
-            visible: (adapter !== undefined) ? (adapter.fieldScale.coefficient !== 1) : false
+            selectByMouse: true
+            inputMethodHints: Qt.ImhDigitsOnly
+
+            background: Rectangle {
+                     implicitWidth: _textField2.font.pointSize * 15
+                     implicitHeight: _textField2.font.pointSize
+
+                     color: "transparent"
+
+                     border.color: _textField2.activeFocus ? Style.borderColorActive : Style.borderColorPassive
+            }
+
+            text: (adapter !== undefined) ? adapter.scaledValue : 0
+            visible: (adapter !== undefined) ? (adapter.scaledValue !== "none") : false
+
+            onEditingFinished: {
+                adapter.scaledValue = text
+
+                _textField2.focus = false
+
+                _textField1.text = adapter.value
+                _textField2.text = adapter.scaledValue
+            }
+
+            onTextEdited: {
+                adapter.scaledValue = text
+
+                _backgroundRectangle.color = (_root.adapter.isValidValue) ? "transparent" : "red"
+                fieldChanged(adapter.name, parseInt(text))
+            }
         }
 
         Text{
             anchors.verticalCenter: parent.verticalCenter
 
-            text: (adapter !== undefined) ? adapter.fieldScale.units : ""
-            visible: (adapter !== undefined) ? (adapter.fieldScale.coefficient !== 1) : false
+            text: (adapter !== undefined) ? "" : ""
+            visible: (adapter !== undefined) ? (adapter.scaledValue !== "none") : false
         }
     }
 
