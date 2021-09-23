@@ -59,15 +59,13 @@ Rectangle{
 
             elide: Text.ElideRight
             wrapMode: Text.WordWrap
+        }
 
-            Component.onCompleted: {
-                _loggerWindow.positionViewAtEnd()
-            }
-
-//            ListView.onAdd:
-//            {
-//                _loggerWindow.positionViewAtEnd()
-//            }
+        onCountChanged:
+        {
+            var newIndex = count - 1
+            _loggerWindow.positionViewAtEnd()
+            currentIndex = newIndex
         }
     }
 }

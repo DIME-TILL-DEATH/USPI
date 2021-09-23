@@ -6,12 +6,12 @@
 
 #include <functional>
 
-#include "src/logger.h"
-#include "src/dutdevice.h"
-#include "src/interfacessettingsadapter.h"
+#include "logger.h"
+#include "dutdevice.h"
+#include "interfacessettingsadapter.h"
 
-#include "src/fieldadapter.h"
-#include "src/userinterface.h"
+#include "fieldadapter.h"
+#include "userinterface.h"
 
 Logger* Logger::currentHandler = nullptr;
 

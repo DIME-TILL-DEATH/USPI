@@ -11,15 +11,19 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        src/abstractfield.cpp \
-        src/abstractinterface.cpp \
-        src/bitfield.cpp \
+    src/ControllerDevice/controllerdevice.cpp \
+    src/ControllerDevice/devicepin.cpp \
+        src/Fields/abstractfield.cpp \
+        src/Fields/bitfield.cpp \
+        src/Fields/fieldadapter.cpp \
+        src/Fields/fixedfield.cpp \
+        src/Fields/integerfield.cpp \
+        src/Fields/variantlistfield.cpp \
+        src/Interfaces/abstractinterface.cpp \
+        src/Interfaces/fileinterface.cpp \
+        src/Interfaces/usbinterface.cpp \
         src/dutdevice.cpp \
-        src/fieldadapter.cpp \
-        src/fileinterface.cpp \
         src/fileparser.cpp \
-        src/fixedfield.cpp \
-        src/integerfield.cpp \
         src/interfacessettingsadapter.cpp \
         src/logger.cpp \
         src/parseerror.cpp \
@@ -27,9 +31,8 @@ SOURCES += \
         src/registeradapter.cpp \
         src/registerlistmodel.cpp \
         src/sessionsaver.cpp \
-        src/usbinterface.cpp \
         src/userinterface.cpp \
-        src/variantlistfield.cpp
+
 
 RESOURCES += qml.qrc
 
@@ -46,15 +49,19 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    src/abstractfield.h \
-    src/abstractinterface.h \
-    src/bitfield.h \
+    src/ControllerDevice/controllerdevice.h \
+    src/ControllerDevice/devicepin.h \
+    src/Fields/abstractfield.h \
+    src/Fields/bitfield.h \
+    src/Fields/fieldadapter.h \
+    src/Fields/fixedfield.h \
+    src/Fields/integerfield.h \
+    src/Fields/variantlistfield.h \
+    src/Interfaces/abstractinterface.h \
+    src/Interfaces/fileinterface.h \
+    src/Interfaces/usbinterface.h \
     src/dutdevice.h \
-    src/fieldadapter.h \
-    src/fileinterface.h \
     src/fileparser.h \
-    src/fixedfield.h \
-    src/integerfield.h \
     src/interfacessettingsadapter.h \
     src/logger.h \
     src/parseerror.h \
@@ -62,10 +69,11 @@ HEADERS += \
     src/registeradapter.h \
     src/registerlistmodel.h \
     src/sessionsaver.h \
-    src/usbinterface.h \
     src/userinterface.h \
-    src/variantlistfield.h
+
+INCLUDEPATH += src/
+INCLUDEPATH += src/Fields/
+INCLUDEPATH += src/Interfaces/
 
 INCLUDEPATH += $$PWD/libusb/include
 LIBS += -L$$PWD/libusb/static -lusb-1.0
-#LIBS += -lusb-1.0
