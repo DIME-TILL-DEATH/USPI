@@ -78,7 +78,9 @@ QDataStream& operator<<(QDataStream& stream, const IntegerField& field)
     stream << field.m_valueTo;
 
     stream << field.m_scaleCoefficient;
+    stream << field.m_scaleExponent;
     stream << field.m_scaleOffset1;
+    stream << field.m_scaleOffset2;
     stream << field.m_scaleUnits;
     return stream;
 }
@@ -90,7 +92,9 @@ QDataStream& operator>>(QDataStream& stream, IntegerField& field)
     stream >> field.m_valueTo;
 
     stream >> field.m_scaleCoefficient;
+    stream >> field.m_scaleExponent;
     stream >> field.m_scaleOffset1;
+    stream >> field.m_scaleOffset2;
     stream >> field.m_scaleUnits;
     return stream;
 }
