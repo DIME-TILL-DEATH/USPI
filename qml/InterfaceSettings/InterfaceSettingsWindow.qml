@@ -57,7 +57,8 @@ ApplicationWindow {
        text: qsTr("Обновить")
 
        onPressed: {
-          Backend.updateAvaliableInterfaces()
+           Backend.updateAvaliableInterfaces()
+           showSettings(_comboInterfaces.currentIndex)
        }
     }
 

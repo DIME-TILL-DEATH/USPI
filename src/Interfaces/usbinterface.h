@@ -3,34 +3,25 @@
 
 #include <QDebug>
 
-#include "abstractinterface.h"
 #include "libusb.h"
 
-namespace USB
+#include "abstractinterface.h"
+#include "interfacenames.h"
+
+#include "usbcontroller.h"
+
+namespace USBBitPosition
 {
+    const quint8 SPI{7};
+    const quint8 PARALLEL{6};
+    const quint8 ORDER{5};
+    const quint8 TRIGGER{4};
+}
 
-#define SPI 7
-#define PARALLEL 6
-#define ORDER 5
-#define TRIGGER 4
-
-#define HEADER_SIZE 4
-
-static QString interfaceNameString = "USB";
-
-struct USBDevice{
-    libusb_device* device_ptr{nullptr};
-    libusb_device_handle* handle{nullptr};
-    libusb_device_descriptor deviceDescriptor;
-
-    int interfaceNumber{0};
-    unsigned char endpointAddress{4};
-
-    quint16 deviceBufferSize{256};
-
-    QString deviceName;
-    QStringList deviceInfo;
-};
+namespace USBFieldSize
+{
+    const quint8 HEADER{4};
+}
 
 class USBInterface : public AbstractInterface
 {
@@ -44,7 +35,8 @@ public:
 
     const QString &interfaceName() const override;
 
-    const USBDevice &activeDevice() const;
+    std::vector<std::shared_ptr<AbstractController> >& connectedControllers() override;
+    const USBController &activeController() const;
 
     void refreshUSBDevices();
 
@@ -53,13 +45,16 @@ private:
 
     libusb_context* m_USBSession {nullptr};
 
-    USBDevice m_activeDevice;
     // TODO:
     // пока так, только один тип устройств
     // потом добавить функцию проверки соответствует ли устройство в списке полученных устройств USB
     // поддерживаемому типу, если да, открывать и сохранять указатели в list/vector и далее
     // позволять пользователю выбирать активное устройство (shared_ptr!). Отправлять через него.
     // в closeDevice закрывать все
+    USBController m_activeController;
+
+    // TODO:
+    // перенести в usbcontroller
     int m_VID{0x03EB}; //0x03EB - Atmel //0x04D8 - microchip
     int m_PID{0x204F}; //0x2FF0 - ATMega32U2 DFU
 
@@ -69,16 +64,16 @@ private:
 
 
     bool initUSB();
-    bool initDevice(USBDevice& device);
-    void closeDevice(USBDevice& device);
+    bool initDevice(USBController &device);
+    void closeDevice(USBController &device);
 
 
     QStringList deviceInfo(libusb_device *dev);
     QString epTypeString(const libusb_endpoint_descriptor& epDescriptor);
     QString deviceSpeedString(libusb_device *dev);
 
-    QByteArray formHeader(const std::vector<Register*> &wrSequence, quint8 packetSize);
+    QByteArray formHeader(quint16 regCount, quint16 packetSize);
 };
-}
+
 
 #endif // USBINTERFACE_H

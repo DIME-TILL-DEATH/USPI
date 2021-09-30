@@ -1,22 +1,23 @@
 #include "usbinterface.h"
 
-namespace USB {
+
 
 USBInterface::USBInterface()
-    :m_interfaceName{interfaceNameString}
+    :m_interfaceName{InterfaceNames::USB},
+     m_activeController{this, "null", {}}
 {
     int rtnValue;
     rtnValue = libusb_init(&m_USBSession);
-    isActive = false;
 
     if(rtnValue < 0)
     {
         qWarning() << "Failed to init libusb: " << libusb_error_name(rtnValue);
+        m_isAvaliable = false;
     }
     else
     {
         libusb_set_option(m_USBSession, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_WARNING);
-        m_rawData = static_cast<char*>(std::malloc(m_activeDevice.deviceBufferSize));
+        m_rawData = static_cast<char*>(std::malloc(m_activeController.deviceBufferSize));
     }
 }
 
@@ -24,7 +25,7 @@ USBInterface::~USBInterface()
 {
     if(m_USBSession != nullptr)
     {
-        closeDevice(m_activeDevice);
+        closeDevice(m_activeController);
         libusb_exit(m_USBSession);
        // std::free(m_rawData);
     }
@@ -33,35 +34,35 @@ USBInterface::~USBInterface()
 bool USBInterface::writeRegister(Register *wrReg)
 {
     // Warn! Method doesn't tested!!!
-    QByteArray regData = wrReg->rawData();
+//    QByteArray regData = wrReg->rawData();
 
-    char* rawData = regData.data();
-    int dataSize = regData.size();
+//    char* rawData = regData.data();
+//    int dataSize = regData.size();
 
-    int actualWrittenBytes;
-    int rtnValue = libusb_bulk_transfer(m_activeDevice.handle,
-                                    m_activeDevice.endpointAddress | LIBUSB_ENDPOINT_OUT,
-                                    (unsigned char*)rawData,
-                                    dataSize,
-                                    &actualWrittenBytes,
-                                    m_timeout);
+//    int actualWrittenBytes;
+//    int rtnValue = libusb_bulk_transfer(m_activeController.handle,
+//                                    m_activeController.endpointAddress | LIBUSB_ENDPOINT_OUT,
+//                                    (unsigned char*)rawData,
+//                                    dataSize,
+//                                    &actualWrittenBytes,
+//                                    m_timeout);
 
-    if(rtnValue < 0)
-    {
-        qWarning() << "Failed send to USB device:" << libusb_error_name(rtnValue);
-        return false;
-    }
-    if(dataSize > actualWrittenBytes)
-    {
-        qWarning() << "Sended: " << actualWrittenBytes << ", while data size is: " << dataSize;
-        return false;
-    }
+//    if(rtnValue < 0)
+//    {
+//        qWarning() << "Failed send to USB device:" << libusb_error_name(rtnValue);
+//        return false;
+//    }
+//    if(dataSize > actualWrittenBytes)
+//    {
+//        qWarning() << "Sended: " << actualWrittenBytes << ", while data size is: " << dataSize;
+//        return false;
+//    }
     return true;
 }
 
 bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
 {
-    if(m_activeDevice.handle == nullptr)
+    if(m_activeController.handle == nullptr)
     {
         qWarning() << "USB device not ready";
         return false;
@@ -70,44 +71,58 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
     int actualWrittenBytes = 0;
     int rtnValue = 0;
 
-
-
     QByteArray sequenceData;
     quint16 bytesInPacket = 0;
+    quint16 regInPacket = 0;
 
-    for(auto it = wrSequence.begin(); it != wrSequence.end(); ++it)
+    for(auto itSeq = wrSequence.begin(); itSeq != wrSequence.end(); ++itSeq)
     {
-        QByteArray regData = (*it)->rawData();
+        //QByteArray regData = (*itSeq)->rawData();
+
+        QList<QByteArray> rawDataList = (*itSeq)->rawData();
 
         if(m_deviceHeader.isMSB)
         {
-            std::reverse(regData.begin(), regData.end());
+            std::reverse(rawDataList.begin(), rawDataList.end());
         }
-        else
+
+        for(auto itReg = rawDataList.begin(); itReg != rawDataList.end(); ++itReg)
         {
-            for(QByteArray::iterator it=regData.begin();it!=regData.end();++it)
+            QByteArray regData = (*itReg);
+            quint16 bitSize = regData.size()*8;
+
+            if(m_deviceHeader.isMSB)
             {
-                reverseByte(*it);
+                std::reverse(regData.begin(), regData.end());
             }
+            else
+            {
+                for(QByteArray::iterator it=regData.begin();it!=regData.end();++it)
+                {
+                    reverseByte(*it);
+                }
+            }
+
+            regData.prepend((uchar)0x00); //reserved byte
+//            regData.prepend((*itSeq)->bitSize());
+            regData.prepend(bitSize);
+
+            bytesInPacket += regData.size();
+            regInPacket++;
+
+            sequenceData.append(regData);
         }
-
-        regData.prepend((uchar)0x00); //reserved byte
-        regData.prepend((*it)->bitSize());
-
-        bytesInPacket += regData.size();
-
-        sequenceData.append(regData);
     }
 
-    QByteArray header = formHeader(wrSequence, bytesInPacket);
+    QByteArray header = formHeader(regInPacket, bytesInPacket);
     sequenceData.prepend(header);
 
     int dataSize = sequenceData.size();
 
     m_rawData = sequenceData.data();
 
-    rtnValue = libusb_bulk_transfer(m_activeDevice.handle,
-                                    m_activeDevice.endpointAddress | LIBUSB_ENDPOINT_OUT,
+    rtnValue = libusb_bulk_transfer(m_activeController.handle,
+                                    m_activeController.endpointAddress | LIBUSB_ENDPOINT_OUT,
                                     (unsigned char*)m_rawData,
                                     dataSize,
                                     &actualWrittenBytes,
@@ -133,14 +148,19 @@ const QString &USBInterface::interfaceName() const
     return m_interfaceName;
 }
 
-const USBDevice& USBInterface::activeDevice() const
+std::vector<std::shared_ptr<AbstractController> > &USBInterface::connectedControllers()
 {
-    return m_activeDevice;
+
+}
+
+const USBController &USBInterface::activeController() const
+{
+    return m_activeController;
 }
 
 void USBInterface::refreshUSBDevices()
 {
-    closeDevice(m_activeDevice);
+    closeDevice(m_activeController);
     initUSB();
 }
 
@@ -161,18 +181,18 @@ bool USBInterface::initUSB()
 //        qWarning() << "libusb get device list error";
 //        return false;
 //    }
-
-    m_activeDevice.handle = libusb_open_device_with_vid_pid(m_USBSession, m_VID, m_PID);
+    m_isAvaliable = false;
+    m_activeController.handle = libusb_open_device_with_vid_pid(m_USBSession, m_VID, m_PID);
 
 //    libusb_free_device_list(devices_list_ptr, 1);
 
-    if(m_activeDevice.handle == nullptr)
+    if(m_activeController.handle == nullptr)
     {
         qWarning() << "Can't open USB device";
         return false;
     }
 
-    if(!initDevice(m_activeDevice))
+    if(!initDevice(m_activeController))
     {
         qWarning() << "USB device initialization failed";
         return false;
@@ -180,11 +200,11 @@ bool USBInterface::initUSB()
 
 //    qInfo() << m_activeDevice.deviceName;
 
-    isActive = true;
+    m_isAvaliable = true;
     return true;
 }
 
-bool USBInterface::initDevice(USBDevice& device)
+bool USBInterface::initDevice(USBController& device)
 {
         libusb_set_auto_detach_kernel_driver(device.handle, 1);
 
@@ -209,6 +229,8 @@ bool USBInterface::initDevice(USBDevice& device)
         unsigned char manufacturer[200];
         unsigned char product[200];
 
+        // TODO: use USBController methods to get info about device
+
         libusb_get_string_descriptor_ascii(device.handle, device.deviceDescriptor.iProduct, product, 200);
         libusb_get_string_descriptor_ascii(device.handle, device.deviceDescriptor.iManufacturer, manufacturer, 200);
 
@@ -222,7 +244,7 @@ bool USBInterface::initDevice(USBDevice& device)
         return true;
 }
 
-void USBInterface::closeDevice(USBDevice& device)
+void USBInterface::closeDevice(USBController& device)
 {
     if(device.handle != nullptr)
     {
@@ -230,8 +252,8 @@ void USBInterface::closeDevice(USBDevice& device)
         libusb_close(device.handle);
 
         device.handle = nullptr;
-        device.deviceInfo.clear();
-        device.deviceName.clear();
+//        device.deviceInfo.clear();
+//        device.deviceName.clear();
     }
 }
 
@@ -317,17 +339,17 @@ QString USBInterface::deviceSpeedString(libusb_device *dev)
     }
 }
 
-QByteArray USBInterface::formHeader(const std::vector<Register *> &wrSequence, quint8 packetSize)
+QByteArray USBInterface::formHeader(quint16 regCount, quint16 packetSize)
 {
     uchar reservedByte = 0x00;
 
     QByteArray result;
-    result.append((1 << SPI)|(0<<PARALLEL)|(m_deviceHeader.isMSB<<ORDER)|(0<<TRIGGER));
-    result.append(wrSequence.size());
-    result.append(packetSize + HEADER_SIZE);
+    result.append((1 << USBBitPosition::SPI)|(0<<USBBitPosition::PARALLEL)|
+                  (m_deviceHeader.isMSB<<USBBitPosition::ORDER)|(0<<USBBitPosition::TRIGGER));
+    result.append(regCount);
+    result.append(packetSize + USBFieldSize::HEADER);
     result.append(reservedByte); //reserved byte
 
     return result;
 }
 
-}

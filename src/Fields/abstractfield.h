@@ -23,7 +23,8 @@ public:
         FixedField,
         BitField,
         IntegerField,
-        VariantListField
+        VariantListField,
+        SeparationField
     };
 
     const QString &name() const;

@@ -32,7 +32,7 @@ public:
 
     AbstractField &field(quint16 fieldIndex);
 
-    QByteArray rawData();
+    QList<QByteArray> rawData();
 
     friend QDataStream& operator<<(QDataStream& stream, const Register& reg);
     friend QDataStream& operator>>(QDataStream& stream, Register& reg);

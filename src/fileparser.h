@@ -20,6 +20,7 @@
 #include "integerfield.h"
 #include "variantlistfield.h"
 #include "fixedfield.h"
+#include "separationfield.h"
 
 class FileParser
 {
@@ -42,13 +43,15 @@ private:
     static bool readIntegerField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);
     static bool readVariantListField(const QJsonObject &jsonObject, Register* deviceRegister,  ParseError* error = nullptr);
     static bool readFixedField(const QJsonObject& jsonObject, Register* deviceRegister, ParseError* error = nullptr);
+    static bool readSeparationField(const QJsonObject& jsonObject, Register* deviceRegister, ParseError* error = nullptr);
 
     std::map<QString, std::function<bool(const QJsonObject&, Register*, ParseError*)> > readMethodList
     {
         {"bits",            &FileParser::readBitField},
         {"integers",        &FileParser::readIntegerField},
         {"variant_lists",   &FileParser::readVariantListField},
-        {"fixed",           &FileParser::readFixedField}
+        {"fixed",           &FileParser::readFixedField},
+        {"separators",      &FileParser::readSeparationField}
     };
 
     static bool parseFieldIntObject(const QJsonObject& jsonObject, const QString& valueName, quint64& destValue,

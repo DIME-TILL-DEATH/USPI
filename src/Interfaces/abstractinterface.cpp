@@ -32,6 +32,16 @@ void AbstractInterface::setDeviceHeader(const DUTDevice::Header &newDeviceHeader
     m_deviceHeader = newDeviceHeader;
 }
 
+std::vector<std::shared_ptr<AbstractController> > &AbstractInterface::connectedControllers()
+{
+    return m_connectedControllers;
+}
+
+bool AbstractInterface::isAvaliable() const
+{
+    return m_isAvaliable;
+}
+
 void AbstractInterface::reverseByte(char &byte)
 {
     byte = ((byte & 0x55) <<  1) | ((byte & 0xAA) >>  1);

@@ -9,8 +9,8 @@ class FileParser;
 class FixedField : public AbstractField
 {
 public:
-    FixedField() {};
-    FixedField(AbstractField field) : AbstractField{field} {};
+    FixedField() {m_type = AbstractField::FieldType::FixedField;};
+    FixedField(AbstractField field) : AbstractField{field} {m_type = AbstractField::FieldType::FixedField;};
 
     QByteArray rawData(quint16 targetRegisterByteSize);
 

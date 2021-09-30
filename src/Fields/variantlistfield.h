@@ -12,8 +12,8 @@ class VariantListField : public AbstractField
 public:
     friend class FileParser;
 
-    VariantListField() {};
-    VariantListField(AbstractField field) : AbstractField{field} {};
+    VariantListField() {m_type = AbstractField::FieldType::VariantListField;};
+    VariantListField(AbstractField field) : AbstractField{field} {m_type = AbstractField::FieldType::VariantListField;};
 
     QByteArray rawData(quint16 targetRegisterByteSize);
 

@@ -14,7 +14,11 @@ function createField(fieldAdapter, container)
         case "variant_list":
             fieldTypeName = "Fields/VariantListField.qml";
             break;
+        case "separator":
+            fieldTypeName = "Fields/SeparationField.qml";
+            break;
         default:
+            console.log("Неизвестный тип поля")
             Log.message("Неизвестный тип поля")
             break;
     }

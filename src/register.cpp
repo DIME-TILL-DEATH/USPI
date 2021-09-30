@@ -80,17 +80,26 @@ AbstractField& Register::field(quint16 fieldIndex)
     return *m_fields.at(fieldIndex);
 }
 
-QByteArray Register::rawData()
+QList<QByteArray> Register::rawData()
 {
     const quint16 arraySize = m_bitSize/8;
 
     char resultDataChar[arraySize];
     char* regData = nullptr;
 
+
     memset(resultDataChar, 0, sizeof(resultDataChar));
+
+    QList<quint16> separationPositions;
 
     for(auto it=m_fields.begin(); it!=m_fields.end(); ++it)
     {
+        if((*it)->type() == AbstractField::FieldType::SeparationField)
+        {
+            separationPositions.push_back((*it)->position());
+            continue;
+        }
+
         QByteArray result((*it)->rawData(arraySize));
 
         regData = result.data();
@@ -101,7 +110,20 @@ QByteArray Register::rawData()
         }
     }
 
-    return QByteArray(resultDataChar, arraySize);
+    separationPositions.push_back(m_bitSize-1);
+
+    QByteArray sumResult(resultDataChar, arraySize);
+    QList<QByteArray> result;
+
+    // chopping for complex registers:
+    for(auto it=separationPositions.begin(); it!=separationPositions.end(); ++it)
+    {
+        // Работает правильно только для кратных 8 битам!
+          result << sumResult.left(((*it)+1)/8);
+          sumResult = sumResult.right(arraySize-((*it)+1)/8);
+    }
+
+    return result;
 }
 
 quint16 Register::uniqueId() const
@@ -210,17 +232,20 @@ bool Register::validateBounds(ParseError *error)
 
         for(auto it_verify = it_checker+1; it_verify != m_fields.end(); ++it_verify )
         {
-            quint16 startVerify = (*it_verify)->position();
-            quint16 stopVerify = (*it_verify)->position() + (*it_verify)->size() - 1;
-            if((startChecker > stopVerify) || (stopChecker < startVerify) )
+            if((*it_verify)->size() != 0) // skip separators
             {
-             //ok
-            }
-            else
-            {
-                if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldsOverLaps, "'" + (*it_checker)->name() +
-                                                                                                "' and '" + (*it_verify)->name()+"'");
-                return false;
+                quint16 startVerify = (*it_verify)->position();
+                quint16 stopVerify = (*it_verify)->position() + (*it_verify)->size() - 1;
+                if((startChecker > stopVerify) || (stopChecker < startVerify) )
+                {
+                    //ok
+                }
+                else
+                {
+                    if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldsOverLaps, "'" + (*it_checker)->name() +
+                                                             "' and '" + (*it_verify)->name()+"'");
+                    return false;
+                }
             }
         }
     }

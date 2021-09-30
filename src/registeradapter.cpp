@@ -38,11 +38,21 @@ FieldAdapter RegisterAdapter::field(quint16 fieldIndex)
 
 QString RegisterAdapter::value()
 {
-    QByteArray registerData = m_register->rawData();
+    //QByteArray registerData = m_register->rawData();
+    QString result;
+    QList<QByteArray> rawDataList = m_register->rawData();
 
-    // MSB. Надо как-то добавить чтобы проверял как выводить для данного устроцства. MSB или LSB
-    std::reverse(registerData.begin(), registerData.end());
-    QString result = registerData.toHex('-');
+    for(auto itReg = rawDataList.begin(); itReg != rawDataList.end(); ++itReg)
+    {
+        QByteArray registerData = (*itReg);
+
+        // MSB. Надо как-то добавить чтобы проверял как выводить для данного устроцства. MSB или LSB
+        std::reverse(registerData.begin(), registerData.end());
+
+        result += registerData.toHex('-');
+        result += " ";
+    }
+
     return result;
 }
 

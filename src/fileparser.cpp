@@ -376,6 +376,29 @@ bool FileParser::readFixedField(const QJsonObject &jsonObject, Register* deviceR
     }
 }
 
+bool FileParser::readSeparationField(const QJsonObject &jsonObject, Register *deviceRegister, ParseError *error)
+{
+    deviceRegister->m_fields.push_back(new SeparationField);
+
+    AbstractField* field = *(deviceRegister->m_fields.end()-1);
+
+    if(!readAbstractField(jsonObject, field, error))
+        return false;
+
+    SeparationField* separationField = dynamic_cast<SeparationField*>(field);
+
+    if(separationField)
+    {
+        separationField->m_type = AbstractField::FieldType::SeparationField;
+        return true;
+    }
+    else
+    {
+        if(error != nullptr) error->setErrorType(ParseError::ErrorType::PointerError, "casting AbstractField to SeparationField is unsucceccfull!");
+        return false;
+    }
+}
+
 bool FileParser::parseFieldIntObject(const QJsonObject &jsonObject, const QString& valueName, quint64& destValue,
                                 const QString &fieldName, quint64 defaultValue, bool mandatory, ParseError *error)
 {

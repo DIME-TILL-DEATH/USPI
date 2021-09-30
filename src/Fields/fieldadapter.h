@@ -13,20 +13,6 @@
 #include "bitfield.h"
 #include "variantlistfield.h"
 
-//struct FieldScale
-//{
-//    Q_GADGET
-//public:
-//    qreal coefficient;
-//    qreal offset;
-//    QString units;
-
-//    Q_PROPERTY(qreal coefficient MEMBER coefficient)
-//    Q_PROPERTY(qreal offset MEMBER offset)
-//    Q_PROPERTY(QString units MEMBER units)
-//};
-//Q_DECLARE_METATYPE(FieldScale)
-
 class FieldAdapter
 {
     Q_GADGET
@@ -46,7 +32,6 @@ class FieldAdapter
 
     Q_PROPERTY(QVariant variantList READ variantList)
 
-//    Q_PROPERTY(FieldScale fieldScale READ fieldScale)
     Q_PROPERTY(QVariant scaledValue READ scaledValue WRITE setScaledValue)
 
     Q_PROPERTY(bool isValidValue READ isValidValue)
@@ -76,7 +61,6 @@ public:
 
     QVariant variantList() const;
 
-//    FieldScale fieldScale() const;
     QVariant scaledValue();
     void setScaledValue(const QVariant& newScaledValue);
 

@@ -11,6 +11,8 @@ QtObject {
     readonly property color regHeaderActiveLocal : "lightgreen"
     readonly property color regHeaderPassiveLocal : "lightgray"
 
+    readonly property color separationField  : "azure"
+
     readonly property color logHeader  : "azure"
 
     readonly property color headerButtonBorderColor: "blue"

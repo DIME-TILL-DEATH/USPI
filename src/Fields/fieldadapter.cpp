@@ -40,6 +40,7 @@ QString FieldAdapter::type() const
         case AbstractField::FieldType::BitField: return "bit";
         case AbstractField::FieldType::IntegerField: return "integer";
         case AbstractField::FieldType::VariantListField: return "variant_list";
+        case AbstractField::FieldType::SeparationField: return "separator";
         default: return "unknown";
     }
 }

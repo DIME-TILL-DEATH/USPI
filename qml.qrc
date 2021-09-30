@@ -28,5 +28,6 @@
         <file>qml/Models/qmldir</file>
         <file>qml/Models/DelegateModelRegSequence.qml</file>
         <file>qml/Models/DelegateModelRegList.qml</file>
+        <file>qml/Fields/SeparationField.qml</file>
     </qresource>
 </RCC>

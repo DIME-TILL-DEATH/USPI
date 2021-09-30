@@ -4,3 +4,4 @@ FixedField          1.0 FixedField.qml
 BitField            1.0 BitField.qml
 IntegerField        1.0 IntegerField.qml
 VariantListField    1.0 VariantListField.qml
+SeparationField     1.0 SeparationField.qml
