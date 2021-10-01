@@ -317,12 +317,15 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
                 }
             }
 
-            if(jsonObject.contains("default_value") && jsonObject["default_value"].isDouble())
+            if(jsonObject.contains("default_value"))
             {
-               quint64 defaultValue = jsonObject["default_value"].toInt();
+               quint64 defaultValue = 0;
+
+               parseFieldIntObject(jsonObject, "default_value", defaultValue, variantListField->name(), 0);
 
                if(variantListField->m_data.contains(defaultValue))
                {
+
                     QString defaultString = variantListField->m_data.value(defaultValue);
                     variantListField->m_selected = defaultString;
                }

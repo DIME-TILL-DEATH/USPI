@@ -115,12 +115,17 @@ QList<QByteArray> Register::rawData()
     QByteArray sumResult(resultDataChar, arraySize);
     QList<QByteArray> result;
 
+    quint16 chopPosition = 0;
+    quint16 prevChopPosition = 0;
+
     // chopping for complex registers:
     for(auto it=separationPositions.begin(); it!=separationPositions.end(); ++it)
     {
+          chopPosition = ((*it)+1)/8;
         // Работает правильно только для кратных 8 битам!
-          result << sumResult.left(((*it)+1)/8);
-          sumResult = sumResult.right(arraySize-((*it)+1)/8);
+          result << sumResult.mid(prevChopPosition, chopPosition-prevChopPosition);
+//          sumResult = sumResult.right(arraySize-chopPosition);
+          prevChopPosition = chopPosition;
     }
 
     return result;

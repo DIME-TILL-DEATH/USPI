@@ -42,6 +42,9 @@ QString RegisterAdapter::value()
     QString result;
     QList<QByteArray> rawDataList = m_register->rawData();
 
+    // MSB. Надо как-то добавить чтобы проверял как выводить для данного устроцства. MSB или LSB
+    std::reverse(rawDataList.begin(), rawDataList.end());
+
     for(auto itReg = rawDataList.begin(); itReg != rawDataList.end(); ++itReg)
     {
         QByteArray registerData = (*itReg);

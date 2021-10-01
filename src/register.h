@@ -23,7 +23,7 @@ public:
     ~Register();
 
     Register(const Register& src_reg); // copy
-//    Register(Register&& src_reg) noexcept;
+//    Register(Register&& src_reg) noexcept; //move
 
     QString name() const;
     quint16 fieldsCount();
