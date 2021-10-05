@@ -71,7 +71,8 @@ bool Register::sortAndValidateFields(ParseError *error)
 
     if(!validateSize(error)) return false;
 
-    sort();
+//    sort();
+    std::sort(m_fields.begin(), m_fields.end(), [](AbstractField* a, AbstractField* b) {return a->position() < b->position();});
     return true;
 }
 
@@ -122,9 +123,9 @@ QList<QByteArray> Register::rawData()
     for(auto it=separationPositions.begin(); it!=separationPositions.end(); ++it)
     {
           chopPosition = ((*it)+1)/8;
+
         // Работает правильно только для кратных 8 битам!
           result << sumResult.mid(prevChopPosition, chopPosition-prevChopPosition);
-//          sumResult = sumResult.right(arraySize-chopPosition);
           prevChopPosition = chopPosition;
     }
 
@@ -257,22 +258,25 @@ bool Register::validateBounds(ParseError *error)
     return true;
 }
 
-void Register::sort()
-{
-    AbstractField* temp;
-    for(quint16 i=0; i < m_fields.size()-1; i++)
-    {
-        for(quint16 j=0; j< m_fields.size()-i-1; j++)
-        {
-            if(m_fields.at(j)->position() > m_fields.at(j+1)->position())
-            {
-                temp = m_fields.at(j);
-                m_fields.at(j) = m_fields.at(j+1);
-                m_fields.at(j+1) = temp;
-            }
-        }
-    }
-}
+//void Register::sort()
+//{
+////    AbstractField* temp;
+////    for(quint16 i=0; i < m_fields.size()-1; i++)
+////    {
+////        for(quint16 j=0; j< m_fields.size()-i-1; j++)
+////        {
+////            if(m_fields.at(j)->position() > m_fields.at(j+1)->position())
+////            {
+////                temp = m_fields.at(j);
+////                m_fields.at(j) = m_fields.at(j+1);
+////                m_fields.at(j+1) = temp;
+////            }
+////        }
+////    }
+
+//    // std library:
+//    std::sort(m_fields.begin(), m_fields.end(), [](AbstractField* a, AbstractField* b) {return a->position() < b->position();});
+//}
 
 QString Register::name() const
 {

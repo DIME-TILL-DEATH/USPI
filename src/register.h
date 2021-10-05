@@ -52,7 +52,7 @@ private:
 
     bool validateSize(ParseError* error);
     bool validateBounds(ParseError* error);
-    void sort();
+//    void sort();
 };
 
 bool operator==(const Register& lr, const Register& rr);
