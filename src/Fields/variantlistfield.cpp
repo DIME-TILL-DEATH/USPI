@@ -24,6 +24,12 @@ void VariantListField::setSelected(const QString &newSelected)
     m_selected = newSelected;
 }
 
+bool VariantListField::containsVariant(QString &variant)
+{
+    QList<QString> variants = m_data.values();
+    return variants.contains(variant);
+}
+
 const QMap<quint64, QString> &VariantListField::data() const
 {
     return m_data;

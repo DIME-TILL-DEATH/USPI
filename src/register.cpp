@@ -7,10 +7,7 @@ Register::Register()
 
 Register::~Register()
 {
-    for(auto it = m_fields.begin(); it != m_fields.end(); ++it)
-    {
-        delete *it;
-    }
+    qDeleteAll(m_fields);
 }
 
 Register::Register(const Register &src_reg)
@@ -18,8 +15,6 @@ Register::Register(const Register &src_reg)
        m_name{src_reg.m_name},
        m_bitSize{src_reg.m_bitSize}
 {
-    // Создаём свои объекты AbstractField и ссылки на них помещаем в вектор m_fields
-    // объекты будут удалены в деструкторе
     for(auto it = src_reg.m_fields.begin(); it != src_reg.m_fields.end(); ++it)
     {
         switch ((*it)->type())
@@ -71,7 +66,6 @@ bool Register::sortAndValidateFields(ParseError *error)
 
     if(!validateSize(error)) return false;
 
-//    sort();
     std::sort(m_fields.begin(), m_fields.end(), [](AbstractField* a, AbstractField* b) {return a->position() < b->position();});
     return true;
 }
@@ -79,6 +73,18 @@ bool Register::sortAndValidateFields(ParseError *error)
 AbstractField& Register::field(quint16 fieldIndex)
 {
     return *m_fields.at(fieldIndex);
+}
+
+AbstractField *Register::field(QString fieldName)
+{
+    auto findedField = std::find_if(m_fields.begin(), m_fields.end(), [fieldName](AbstractField* field)
+                                                                            {return field->name() == fieldName;});
+    if(findedField == m_fields.end())
+    {
+        qWarning() << "Поле с именем " << fieldName << " не найдено";
+        return nullptr;
+    }
+    return (*findedField);
 }
 
 QList<QByteArray> Register::rawData()
@@ -257,26 +263,6 @@ bool Register::validateBounds(ParseError *error)
     }
     return true;
 }
-
-//void Register::sort()
-//{
-////    AbstractField* temp;
-////    for(quint16 i=0; i < m_fields.size()-1; i++)
-////    {
-////        for(quint16 j=0; j< m_fields.size()-i-1; j++)
-////        {
-////            if(m_fields.at(j)->position() > m_fields.at(j+1)->position())
-////            {
-////                temp = m_fields.at(j);
-////                m_fields.at(j) = m_fields.at(j+1);
-////                m_fields.at(j+1) = temp;
-////            }
-////        }
-////    }
-
-//    // std library:
-//    std::sort(m_fields.begin(), m_fields.end(), [](AbstractField* a, AbstractField* b) {return a->position() < b->position();});
-//}
 
 QString Register::name() const
 {

@@ -1,8 +1,10 @@
 #include "sessionsaver.h"
+#include "JsonWorker.h"
 
-SessionSaver::SessionSaver(DUTDevice *device, std::vector<std::shared_ptr<Register> >* localRegisterMap, RegisterListModel *registerMapModel, RegisterListModel *registerWriteSequenceModel)
+SessionSaver::SessionSaver(DUTDevice *device, ExtensionManager *extensionManager, std::vector<std::shared_ptr<Register> >* localRegisterMap, RegisterListModel *registerMapModel, RegisterListModel *registerWriteSequenceModel)
     :m_device{device},
-      m_localRegisterMap{localRegisterMap},
+     m_extensionManager{extensionManager},
+     m_localRegisterMap{localRegisterMap},
      m_registerMapModel{registerMapModel},
      m_registerWriteSequenceModel{registerWriteSequenceModel}
 {
@@ -12,67 +14,29 @@ SessionSaver::SessionSaver(DUTDevice *device, std::vector<std::shared_ptr<Regist
 bool SessionSaver::saveSession(const QString &filePath)
 {
     QFile file(filePath);
-    if(file.open(QIODevice::WriteOnly))
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        QDataStream outFile(&file);
+        JsonWorker saver;
 
-        outFile << m_sessionSaverVersion;
-        outFile << *m_device;
+        QJsonObject jsonGlobalObject;
 
-        size_t writeSequenceSize = m_registerWriteSequenceModel->registerAdaptersList().size();
-        outFile << writeSequenceSize;
+        saver.saveHeader(m_device->deviceHeader());
+        saver.saveRegisterArray(m_device->deviceRegisterMap());
 
-        for(auto it = m_registerWriteSequenceModel->registerAdaptersList().begin();
-                it != m_registerWriteSequenceModel->registerAdaptersList().end();
-                ++it)
-        {
-            outFile << (*it).getRegister()->uniqueId();
+        jsonGlobalObject["DUT"] = saver.deviceGlobalObject();
 
-            bool isLocalRegister = (*it).isLocal();
-            outFile << isLocalRegister;
+        jsonGlobalObject["project settings"] = saveProjectSettings();
+        jsonGlobalObject["plugins"] = savePlugInsSettings();
+        jsonGlobalObject["write sequence"] = saveWriteSequence();
 
-            if(isLocalRegister)
-            {
-                outFile << *((*it).getRegister());
-            }
-        }
-
-        // added to v.0.2 Saving field adapters. Added view options
-        for(auto reg_it = m_registerMapModel->registerAdaptersList().begin();
-                 reg_it != m_registerMapModel->registerAdaptersList().end();
-                 ++reg_it)
-        {
-            for(auto field_it = (*reg_it).m_bufferedFieldAdapters.begin();
-                     field_it != (*reg_it).m_bufferedFieldAdapters.end();
-                     ++field_it)
-            {
-                // view mode of field (bin, dec, hex)
-                outFile << field_it.key();
-                outFile << (*field_it).viewOptions();
-            }
-        }
-
-        for(auto reg_it = m_registerWriteSequenceModel->registerAdaptersList().begin();
-                 reg_it != m_registerWriteSequenceModel->registerAdaptersList().end();
-                 ++reg_it)
-        {
-            for(auto field_it = (*reg_it).m_bufferedFieldAdapters.begin();
-                     field_it != (*reg_it).m_bufferedFieldAdapters.end();
-                     ++field_it)
-            {
-                // view mode of field (bin, dec, hex)
-                outFile << field_it.key();
-                outFile << (*field_it).viewOptions();
-            }
-        }
+        file.write(QJsonDocument(jsonGlobalObject).toJson());
+        file.close();
 
         qInfo() << "Сессия" << filePath << "сохранена";
-        file.close();
         return true;
     }
     else
     {
-        // или всё-таки Logger вручную? Привести к единному варианту
         qInfo() << "Невозможно открыть файл " << filePath;
         return false;
     }
@@ -81,97 +45,25 @@ bool SessionSaver::saveSession(const QString &filePath)
 bool SessionSaver::loadSession(const QString &filePath)
 {
     QFile file(filePath);
-    if(file.open(QIODevice::ReadOnly))
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        QDataStream inFile(&file);
+        QByteArray fileData = file.readAll();
 
-        QString saverVersion;
-        inFile >> saverVersion;
+        QJsonParseError jsonError;
+        QJsonDocument jsonDoc(QJsonDocument::fromJson(fileData, &jsonError));
 
-        saverVersion.remove(0, 2);
-        saverVersion = saverVersion.left(3);
-        m_compareVersion = saverVersion.toDouble();
-
-
-        inFile >> *m_device;
-
-        m_registerMapModel->resetModel(m_device->deviceRegisterMap());
-
-        size_t writeSequenceSize;
-        inFile >> writeSequenceSize;
-
-        m_registerWriteSequenceModel->resetModel();
-
-        for(quint16 i=0; i<writeSequenceSize; ++i)
+        if(jsonDoc.isNull())
         {
-            quint16 registerUniqueId;
-            inFile >> registerUniqueId;
-
-            std::shared_ptr<Register> reg_ptr;
-
-
-            bool isLocal;
-            inFile >> isLocal;
-
-            if(isLocal)
-            {
-                Register* localRegister_ptr = new Register;
-                inFile >> *localRegister_ptr;
-                m_localRegisterMap->push_back(std::shared_ptr<Register>(localRegister_ptr));
-                reg_ptr = m_localRegisterMap->back();
-            }
-            else
-            {
-                reg_ptr = m_device->registerByUniqueId(registerUniqueId);
-            }
-            RegisterAdapter regAdapter(reg_ptr);
-
-            regAdapter.setIsLocal(isLocal);
-
-            if(reg_ptr != nullptr) m_registerWriteSequenceModel->addItem(regAdapter, i);
+            qWarning() << "Invalid json file: " + jsonError.errorString() +" at position " + QString::number(jsonError.offset, 10);
+            return false;
         }
 
-        // view options
-        if(m_compareVersion > 0.1)
-        {
-            for(auto reg_it = m_registerMapModel->registerAdaptersList().begin();
-                     reg_it != m_registerMapModel->registerAdaptersList().end();
-                     ++reg_it)
-            {
-                for(auto field_it = (*reg_it).m_bufferedFieldAdapters.begin();
-                         field_it != (*reg_it).m_bufferedFieldAdapters.end();
-                         ++field_it)
-                {
-                    // view mode of field (bin, dec, hex)
-                    quint16 index;
-                    quint16 viewBase;
+        QJsonObject globalObject = jsonDoc.object();
 
-                    inFile >> index;
-                    inFile >> viewBase;
-
-                    (*reg_it).m_bufferedFieldAdapters[index].setViewOptions(viewBase);
-                }
-            }
-
-            for(auto reg_it = m_registerWriteSequenceModel->registerAdaptersList().begin();
-                     reg_it != m_registerWriteSequenceModel->registerAdaptersList().end();
-                     ++reg_it)
-            {
-                for(auto field_it = (*reg_it).m_bufferedFieldAdapters.begin();
-                         field_it != (*reg_it).m_bufferedFieldAdapters.end();
-                         ++field_it)
-                {
-                    // view mode of field (bin, dec, hex)
-                    quint16 index;
-                    quint16 viewBase;
-
-                    inFile >> index;
-                    inFile >> viewBase;
-
-                    (*reg_it).m_bufferedFieldAdapters[index].setViewOptions(viewBase);
-                }
-            }
-        }
+        loadDUT(globalObject);
+        loadWriteSequence(globalObject);
+        loadProjectSettings(globalObject);
+        loadPlugInSettings(globalObject);
 
         file.close();
         qInfo() << "Сессия" << filePath << "загружена. Версия формата: " << m_compareVersion;
@@ -182,5 +74,132 @@ bool SessionSaver::loadSession(const QString &filePath)
         qWarning() << "Невозможно открыть файл " << filePath;
         return false;
     }
+}
+
+bool SessionSaver::loadDUT(QJsonObject globalObject)
+{
+    if(globalObject.contains("DUT") && globalObject["DUT"].isObject())
+    {
+        QJsonObject jsonDUTobject = globalObject["DUT"].toObject();
+
+        ParseError error;
+        if(!m_device->loadFromJsonObject(jsonDUTobject, &error))
+        {
+            qWarning() << error.errorString();
+            return false;
+        }
+        m_registerMapModel->resetModel(m_device->deviceRegisterMap());
+    }
+    return true;
+}
+
+QJsonArray SessionSaver::saveWriteSequence()
+{
+    QJsonArray jsonWriteSequenceArray;
+
+    int index =0;
+    foreach(RegisterAdapter currentAdapter, m_registerWriteSequenceModel->registerAdaptersList())
+    {
+        QJsonObject jsonItem;
+
+        jsonItem["order"] = index;
+        jsonItem["SourceUniqueID"] = currentAdapter.getRegister()->uniqueId();
+
+        if(currentAdapter.isLocal())
+        {
+            QJsonObject jsonLocalRegisterData;
+            JsonWorker::saveRegister(*currentAdapter.getRegister(), jsonLocalRegisterData);
+
+            jsonItem["local"] = jsonLocalRegisterData;
+        }
+
+        jsonWriteSequenceArray.append(jsonItem);
+        index++;
+    }
+    return jsonWriteSequenceArray;
+}
+
+bool SessionSaver::loadWriteSequence(QJsonObject globalObject)
+{
+    if(globalObject.contains("write sequence") && globalObject["write sequence"].isArray())
+    {
+        QJsonArray sequnceArray = globalObject["write sequence"].toArray();
+
+        for (int registerIndex = 0; registerIndex < sequnceArray.size(); ++registerIndex)
+        {
+            QJsonObject variantObject = sequnceArray[registerIndex].toObject();
+            if(variantObject.contains("SourceUniqueID"))
+            {
+                quint16 uniqueId= variantObject["SourceUniqueID"].toInt();
+                RegisterAdapter* adapter = m_registerMapModel->getRegisterAdapterByUniqueId(uniqueId);
+                m_registerWriteSequenceModel->addItem(*adapter, registerIndex);
+
+                if(variantObject.contains("local"))
+                {
+                    QJsonObject jsonLocalRegisterObject = variantObject["local"].toObject();
+
+                    Register* reg_ptr = new Register();
+
+                    JsonWorker::readRegister(jsonLocalRegisterObject, reg_ptr);
+                    m_localRegisterMap->push_back(std::shared_ptr<Register>(reg_ptr));
+
+                    RegisterAdapter adapter(m_localRegisterMap->back());
+                    adapter.setIsLocal(true);
+
+                    m_registerWriteSequenceModel->changeItem(adapter, registerIndex);
+                }
+            }
+        }
+        return true;
+    }
+    else return false;
+}
+
+QJsonObject SessionSaver::saveProjectSettings()
+{
+    QJsonObject settingsObject;
+
+    settingsObject["format version"] = m_sessionSaverVersion;
+
+    return settingsObject;
+}
+
+bool SessionSaver::loadProjectSettings(QJsonObject globalObject)
+{
+    if(globalObject.contains("project settings") && globalObject["project settings"].isObject())
+    {
+        QJsonObject jsonSettingsObject = globalObject["project settings"].toObject();
+
+        QString versionString;
+        if(jsonSettingsObject.contains("format version") && jsonSettingsObject["format version"].isString())
+        {
+            versionString = jsonSettingsObject["format version"].toString();
+            versionString.remove(0, 2);
+
+            m_compareVersion = versionString.toFloat();
+        }
+        return true;
+    }
+    else return false;
+}
+
+QJsonArray SessionSaver::savePlugInsSettings()
+{
+    QJsonArray plugInSettingsObject;
+
+    JsonWorker::savePlugInsArray(m_extensionManager->loadedPlugInsInfo(), plugInSettingsObject);
+
+    return plugInSettingsObject;
+}
+
+bool SessionSaver::loadPlugInSettings(QJsonObject globalObject)
+{
+    std::vector<PluginInfo> plugList;
+
+    if(!JsonWorker::readPluginsArray(globalObject ,&plugList)) return false;
+    m_extensionManager->unloadPlugins();
+    m_extensionManager->loadPlugins(plugList);
+
+    return true;
 }
 

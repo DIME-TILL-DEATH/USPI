@@ -2,16 +2,18 @@
 
 #include "userinterface.h"
 
+#include "JsonWorker.h"
 #include "parseerror.h"
 
 UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent)
     : QObject(parent),
-      m_saver{&m_device, &m_localRegisterMap, &m_registerMapModel, &m_registerSequenceModel},
+      extensionManager(&m_device),
+      m_saver{&m_device, &extensionManager, &m_localRegisterMap, &m_registerMapModel, &m_registerSequenceModel},
       m_avaliableInterfaces{avaliableInterfaces}
 {
     m_abstractInterface = new AbstractInterface();
     m_fileInterface = new FileInterface();
-    m_usbInterface = new USB::USBInterface();
+    m_usbInterface = new USBInterface();
 
     updateAvaliableInterfaces();
     if(m_interface_ptr == nullptr)
@@ -41,6 +43,7 @@ UserInterface::~UserInterface()
 
     m_applicationSettings.setValue("windowWidth", m_userSettings.m_windowWidth);
     m_applicationSettings.setValue("windowHeight", m_userSettings.m_windowHeight);
+    m_applicationSettings.setValue("interface", m_interface_ptr->interfaceName());
 
     m_applicationSettings.endGroup();
 
@@ -88,6 +91,23 @@ bool UserInterface::loadDevice(const QUrl &fileName)
     emit dutDeviceUpdated();
     m_registerSequenceModel.resetModel();
     m_registerMapModel.resetModel(m_device.deviceRegisterMap());
+
+    // load plugins for device
+    JsonWorker jsonFile;
+    if(!jsonFile.loadFile(fileName.toLocalFile(), &error))
+    {
+        qWarning() << error.errorString();
+        return false;
+    }
+
+    std::vector<PluginInfo> plugList;
+
+    jsonFile.readPluginsArray(jsonFile.deviceGlobalObject() ,&plugList);
+
+    extensionManager.unloadPlugins();
+
+    extensionManager.loadPlugins(plugList);
+    emit avaliablePluginsUpdated();
 
     qInfo() << "Карта регистров для устройства '" << m_device.name() << "' загружена";
     return true;
@@ -142,6 +162,7 @@ bool UserInterface::loadSession(const QUrl& fileName)
     if(m_saver.loadSession(fileName.toLocalFile()))
     {
         emit dutDeviceUpdated();
+        emit avaliablePluginsUpdated();
         return true;
     }
     else return false;
@@ -150,6 +171,11 @@ bool UserInterface::loadSession(const QUrl& fileName)
 bool UserInterface::saveSession(const QUrl& fileName)
 {
     return m_saver.saveSession(fileName.toLocalFile());
+}
+
+void UserInterface::runPlugin(QString pluginName)
+{
+    extensionManager.runPlugin(pluginName);
 }
 
 QStringList UserInterface::avaliableInterfaces()
@@ -162,9 +188,26 @@ QStringList UserInterface::avaliableInterfaces()
     return resultList;
 }
 
+QStringList UserInterface::avaliablePlugins()
+{
+    return extensionManager.avaliablePluginsNames();
+}
+
 void UserInterface::updateAvaliableInterfaces()
 {
-    QString prevSelectedInterface = m_avaliableInterfaces->key(m_interface_ptr);
+    QString prevSelectedInterface;
+    if(m_interface_ptr == nullptr)
+    {
+        m_applicationSettings.beginGroup("UserSettings");
+
+        prevSelectedInterface = m_applicationSettings.value("interface", "USB").toString();
+
+        m_applicationSettings.endGroup();
+    }
+    else
+    {
+        prevSelectedInterface = m_avaliableInterfaces->key(m_interface_ptr);
+    }
 
     m_avaliableInterfaces->clear();
 
@@ -172,9 +215,16 @@ void UserInterface::updateAvaliableInterfaces()
     m_avaliableInterfaces->insert(m_fileInterface->interfaceName(), m_fileInterface);
 
     m_usbInterface->refreshUSBDevices();
-    m_avaliableInterfaces->insert(m_usbInterface->interfaceName(), m_usbInterface);
+    if(m_usbInterface->isAvaliable()) m_avaliableInterfaces->insert(m_usbInterface->interfaceName(), m_usbInterface);
 
-    m_interface_ptr = m_avaliableInterfaces->value(prevSelectedInterface);
+    if(m_avaliableInterfaces->contains(prevSelectedInterface))
+    {
+        m_interface_ptr = m_avaliableInterfaces->value(prevSelectedInterface);
+    }
+    else
+    {
+        m_interface_ptr = m_avaliableInterfaces->value("File");
+    }
 
     emit avaliableInterfacesUpdated();
     emit interfaceUpdated();

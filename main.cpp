@@ -1,6 +1,9 @@
 #include <QGuiApplication>
+#include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QtQml>
+
+#include <QDir>
 
 #include <QDebug>
 
@@ -10,8 +13,9 @@
 #include "dutdevice.h"
 #include "interfacessettingsadapter.h"
 
-#include "fieldadapter.h"
+//#include "fieldadapter.h"
 #include "userinterface.h"
+#include "extensionmanager.h"
 
 Logger* Logger::currentHandler = nullptr;
 
@@ -26,7 +30,8 @@ int main(int argc, char *argv[])
 
     Logger log;
 
-    QGuiApplication app(argc, argv);
+//    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
     //---------------------------------------------------------------

@@ -60,7 +60,7 @@ Rectangle{
             Button{
                 id: _btnChooseInterface
 
-                width: parent.width/5
+                width: parent.width/10
                 height: _headerRect.height*0.8
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -76,6 +76,44 @@ Rectangle{
 
                 onPressed: {
                     _interfaceSettingsWindowLoader.active = true
+                }
+            }
+
+            ComboBox{
+                id: _pluginSelector
+
+                width: parent.width/4
+                height: _headerRect.height*0.8
+
+                anchors.verticalCenter: parent.verticalCenter
+                background: Rectangle {
+                         border.color: _pluginSelector.down ? Style.borderColorActive : Style.borderColorPassive
+                         border.width: _pluginSelector.visualFocus ? 2 : 1
+                         radius: 2
+                 }
+
+                model: Backend.avaliablePlugins
+            }
+
+            Button{
+                id: _btnRunPlugin
+
+                width: parent.width/10
+                height: _headerRect.height*0.8
+                anchors.verticalCenter: parent.verticalCenter
+
+                text: "Запуск"
+
+                background: Rectangle{
+                    border.width: 1
+                    border.color: Style.headerButtonBorderColor
+
+                    color: Style.headerButtonBackgroundColor
+                    opacity: _btnRunPlugin.pressed ? 0.5 : 1
+                }
+
+                onPressed: {
+                    Backend.runPlugin(_pluginSelector.currentText)
                 }
             }
 

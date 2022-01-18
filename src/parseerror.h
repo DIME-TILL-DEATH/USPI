@@ -4,7 +4,7 @@
 #include <QString>
 
 // Может всё-таки setErrorType сделать открытым?
-class FileParser;
+class JsonWorker;
 class Register;
 class DUTDevice;
 
@@ -40,7 +40,7 @@ public:
 
     QString errorString();
 
-    friend class FileParser;
+    friend class JsonWorker;
     friend class DUTDevice;
     friend class Register;
 private:

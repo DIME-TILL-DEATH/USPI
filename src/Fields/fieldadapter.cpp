@@ -77,6 +77,7 @@ QVariant FieldAdapter::value() const
             }
             return result;
         }
+
         case AbstractField::FieldType::VariantListField:
             return dynamic_cast<VariantListField*>(m_field)->selected();
         return  "variant_list";
@@ -159,24 +160,6 @@ QVariant FieldAdapter::variantList() const
         return value();
     }
 }
-
-//FieldScale FieldAdapter::fieldScale() const
-//{
-//    FieldScale answer;
-
-//    answer.coefficient=1;
-//    answer.offset=0;
-
-//    if(m_field->type() == AbstractField::FieldType::IntegerField)
-//    {
-//        IntegerField* field_ptr = dynamic_cast<IntegerField*>(m_field);
-
-//        answer.coefficient = field_ptr->scaleCoefficient();
-//        answer.offset = field_ptr->scaleOffset1();
-//        answer.units = field_ptr->scaleUnits();
-//    }
-//    return answer;
-//}
 
 QVariant FieldAdapter::scaledValue()
 {
@@ -262,4 +245,3 @@ void FieldAdapter::setViewOptions(quint16 newOptions)
 {
     *m_viewOptions = newOptions;
 }
-

@@ -5,11 +5,11 @@
 
 #include "abstractfield.h"
 
-class FileParser;
+class JsonWorker;
 class IntegerField : public AbstractField
 {
 public:
-    friend class FileParser;
+    friend class JsonWorker;
 
     IntegerField() {m_type = AbstractField::FieldType::IntegerField;};
     IntegerField(AbstractField field) : AbstractField{field} {m_type = AbstractField::FieldType::IntegerField;};

@@ -36,12 +36,12 @@ AbstractField::FieldType AbstractField::type() const
     return m_type;
 }
 
-quint8 AbstractField::position() const
+quint16 AbstractField::position() const
 {
     return m_position;
 }
 
-quint8 AbstractField::size() const
+quint16 AbstractField::size() const
 {
     return m_size;
 }

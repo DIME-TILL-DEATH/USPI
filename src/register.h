@@ -5,19 +5,26 @@
 #include <QString>
 #include <QHash>
 #include <QDataStream>
+#include <QDebug>
 
 #include "abstractfield.h"
 //#include "registeradapter.h"
 
-#include "fieldadapter.h"
+#include "bitfield.h"
+#include "fixedfield.h"
+#include "integerfield.h"
+#include "variantlistfield.h"
+#include "separationfield.h"
+
+//#include "fieldadapter.h"
 #include "parseerror.h"
 
-class FileParser;
+class JsonWorker;
 
 class Register
 {
 public:
-    friend class FileParser;
+    friend class JsonWorker;
 
     Register();
     ~Register();
@@ -30,7 +37,9 @@ public:
 
     bool sortAndValidateFields(ParseError* error = nullptr);
 
+    // наверное надо привести к общему виду
     AbstractField &field(quint16 fieldIndex);
+    AbstractField *field(QString fieldName);
 
     QList<QByteArray> rawData();
 
@@ -52,7 +61,6 @@ private:
 
     bool validateSize(ParseError* error);
     bool validateBounds(ParseError* error);
-//    void sort();
 };
 
 bool operator==(const Register& lr, const Register& rr);

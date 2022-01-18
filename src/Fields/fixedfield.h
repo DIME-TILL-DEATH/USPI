@@ -5,7 +5,7 @@
 
 #include "abstractfield.h"
 
-class FileParser;
+class JsonWorker;
 class FixedField : public AbstractField
 {
 public:
@@ -14,7 +14,7 @@ public:
 
     QByteArray rawData(quint16 targetRegisterByteSize);
 
-    friend class FileParser;
+    friend class JsonWorker;
     quint32 data() const;
 
     friend QDataStream& operator<<(QDataStream& stream, const FixedField& field);

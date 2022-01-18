@@ -140,6 +140,15 @@ RegisterAdapter RegisterListModel::getItem(qint16 index)
     return m_data.at(index);
 }
 
+RegisterAdapter *RegisterListModel::getRegisterAdapterByUniqueId(quint16 uniqueId)
+{
+    for(auto it = m_data.begin(); it != m_data.end(); ++it)
+    {
+        if((*it).getRegister()->uniqueId() == uniqueId) return &(*it);
+    }
+    return nullptr;
+}
+
 std::vector<RegisterAdapter> &RegisterListModel::registerAdaptersList()
 {
     return m_data;

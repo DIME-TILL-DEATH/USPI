@@ -6,20 +6,21 @@
 
 #include "abstractfield.h"
 
-class FileParser;
+class JsonWorker;
 class VariantListField : public AbstractField
 {
 public:
-    friend class FileParser;
+    friend class JsonWorker;
 
     VariantListField() {m_type = AbstractField::FieldType::VariantListField;};
     VariantListField(AbstractField field) : AbstractField{field} {m_type = AbstractField::FieldType::VariantListField;};
 
     QByteArray rawData(quint16 targetRegisterByteSize);
 
-
     const QString &selected() const;
     void setSelected(const QString &newSelected);
+
+    bool containsVariant(QString& variant);
 
     const QMap<quint64, QString> &data() const;
 

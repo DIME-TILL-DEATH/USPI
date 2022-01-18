@@ -1,13 +1,22 @@
 #include "dutdevice.h"
-#include "fileparser.h"
+#include "JsonWorker.h"
 
 bool DUTDevice::loadFromFile(const QString &fileName, ParseError *error)
 {
-    FileParser jsonFile;
+    JsonWorker jsonFile;
 
     if(!jsonFile.loadFile(fileName, error)) return false;
-    if(!jsonFile.readHeader(&m_deviceHeader, error)) return false;
-    if(!jsonFile.readRegisterArray(&m_deviceRegisterMap, &m_deviceHeader, error)) return false;
+
+    if(!loadFromJsonObject(jsonFile.deviceGlobalObject(), error)) return false;
+    return true;
+}
+
+bool DUTDevice::loadFromJsonObject(const QJsonObject &jsonObject, ParseError *error)
+{
+    JsonWorker worker(jsonObject);
+
+    if(!worker.readHeader(&m_deviceHeader, error)) return false;
+    if(!worker.readRegisterArray(&m_deviceRegisterMap, &m_deviceHeader, error)) return false;
 
     for(auto it=m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)
     {
@@ -46,6 +55,21 @@ std::shared_ptr<Register> DUTDevice::registerByUniqueId(quint16 uniqueId)
         if((*it)->uniqueId() == uniqueId) return (*it);
     }
     return nullptr;
+}
+
+AbstractField *DUTDevice::findField(QString registerName, QString fieldName)
+{
+    auto findedReg = std::find_if(m_deviceRegisterMap.begin(), m_deviceRegisterMap.end(), [registerName](std::shared_ptr<Register> reg)
+                                                                            {return reg->name() == registerName;});
+    if(findedReg == m_deviceRegisterMap.end())
+    {
+        qWarning() << "Регистр с именем " << registerName << " не найден в карте регистров устройства";
+        return nullptr;
+    }
+
+    AbstractField* findedField = (*findedReg)->field(fieldName);
+
+    return findedField;
 }
 
 QDataStream& operator<<(QDataStream& stream, const DUTDevice& device)

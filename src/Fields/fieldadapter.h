@@ -23,8 +23,8 @@ class FieldAdapter
 
     Q_PROPERTY(QString type READ type)
 
-    Q_PROPERTY(quint8 position READ position)
-    Q_PROPERTY(quint8 size READ size)
+    Q_PROPERTY(quint16 position READ position)
+    Q_PROPERTY(quint16 size READ size)
 
     Q_PROPERTY(QVariant value READ value WRITE setValue)
     Q_PROPERTY(QVariant valueFrom READ valueFrom)
@@ -32,6 +32,7 @@ class FieldAdapter
 
     Q_PROPERTY(QVariant variantList READ variantList)
 
+//    Q_PROPERTY(FieldScale fieldScale READ fieldScale)
     Q_PROPERTY(QVariant scaledValue READ scaledValue WRITE setScaledValue)
 
     Q_PROPERTY(bool isValidValue READ isValidValue)
@@ -61,6 +62,7 @@ public:
 
     QVariant variantList() const;
 
+//    FieldScale fieldScale() const;
     QVariant scaledValue();
     void setScaledValue(const QVariant& newScaledValue);
 

@@ -13,9 +13,12 @@ SOURCES += \
         src/Controllers/abstractcontroller.cpp \
         src/Controllers/devicepin.cpp \
         src/Controllers/usbcontroller.cpp \
+    src/Extensions/controlpanelinterface.cpp \
+    src/Extensions/extensionmanager.cpp \
+    src/Extensions/plugininfo.cpp \
         src/Fields/abstractfield.cpp \
         src/Fields/bitfield.cpp \
-        src/Fields/fieldadapter.cpp \
+    src/Fields/fieldadapter.cpp \
         src/Fields/fixedfield.cpp \
         src/Fields/integerfield.cpp \
         src/Fields/variantlistfield.cpp \
@@ -23,8 +26,8 @@ SOURCES += \
         src/Interfaces/abstractinterface.cpp \
         src/Interfaces/fileinterface.cpp \
         src/Interfaces/usbinterface.cpp \
+    src/JsonWorker.cpp \
         src/dutdevice.cpp \
-        src/fileparser.cpp \
         src/interfacessettingsadapter.cpp \
         src/logger.cpp \
         src/parseerror.cpp \
@@ -53,6 +56,9 @@ HEADERS += \
     src/Controllers/abstractcontroller.h \
     src/Controllers/devicepin.h \
     src/Controllers/usbcontroller.h \
+    src/Extensions/controlpanelinterface.h \
+    src/Extensions/extensionmanager.h \
+    src/Extensions/plugininfo.h \
     src/Fields/abstractfield.h \
     src/Fields/bitfield.h \
     src/Fields/fieldadapter.h \
@@ -64,8 +70,8 @@ HEADERS += \
     src/Interfaces/fileinterface.h \
     src/Interfaces/interfacenames.h \
     src/Interfaces/usbinterface.h \
+    src/JsonWorker.h \
     src/dutdevice.h \
-    src/fileparser.h \
     src/interfacessettingsadapter.h \
     src/logger.h \
     src/parseerror.h \
@@ -79,6 +85,7 @@ INCLUDEPATH += src/
 INCLUDEPATH += src/Fields/
 INCLUDEPATH += src/Interfaces/
 INCLUDEPATH += src/Controllers/
+INCLUDEPATH += src/Extensions/
 
 INCLUDEPATH += $$PWD/libusb/include
 LIBS += -L$$PWD/libusb/static -lusb-1.0

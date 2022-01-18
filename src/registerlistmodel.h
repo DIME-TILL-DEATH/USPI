@@ -34,12 +34,14 @@ public:
 
     Q_INVOKABLE RegisterAdapter getItem(qint16 index);
 
+    RegisterAdapter* getRegisterAdapterByUniqueId(quint16 uniqueID);
+
     std::vector<RegisterAdapter>& registerAdaptersList();
 private:
     std::vector<RegisterAdapter> m_data;
 
     enum ListRoles{
-        RegisterAdapterRole= Qt::UserRole + 1,
+        RegisterAdapterRole = Qt::UserRole + 1,
         isLocalRole
     };
 };

@@ -1,11 +1,24 @@
-#include "fileparser.h"
+#include "JsonWorker.h"
 
-FileParser::FileParser()
+JsonWorker::JsonWorker(const QJsonObject &globalObject)
+    :m_deviceGlobalObject{globalObject}
 {
 
 }
 
-bool FileParser::loadFile(const QString &name, ParseError* error)
+
+const QJsonObject &JsonWorker::deviceGlobalObject() const
+{
+    return m_deviceGlobalObject;
+}
+
+void JsonWorker::setDeviceGlobalObject(const QJsonObject &newDeviceGlobalObject)
+{
+    m_deviceGlobalObject = newDeviceGlobalObject;
+}
+
+
+bool JsonWorker::loadFile(const QString &name, ParseError* error)
 {
     QFile deviceFile(name);
     if(!deviceFile.open(QIODevice::ReadOnly))
@@ -37,7 +50,7 @@ bool FileParser::loadFile(const QString &name, ParseError* error)
     }
 }
 
-bool FileParser::readHeader(DUTDevice::Header* header, ParseError *error)
+bool JsonWorker::readHeader(DUTDevice::Header* header, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("header") && m_deviceGlobalObject["header"].isObject())
     {
@@ -92,7 +105,19 @@ bool FileParser::readHeader(DUTDevice::Header* header, ParseError *error)
     }
 }
 
-bool FileParser::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header* header, ParseError *error)
+void JsonWorker::saveHeader(const DUTDevice::Header& header)
+{
+    QJsonObject jsonDeviceHeaderObject;
+
+    jsonDeviceHeaderObject["name"] = header.deviceName;
+    jsonDeviceHeaderObject["version"] = header.version;
+    jsonDeviceHeaderObject["register_size"] = header.registerSize;
+    jsonDeviceHeaderObject["isMSB"] = header.isMSB;
+
+    m_deviceGlobalObject["header"] = jsonDeviceHeaderObject;
+}
+
+bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header* header, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("registers") && m_deviceGlobalObject["registers"].isArray())
     {
@@ -127,8 +152,80 @@ bool FileParser::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
     }
 }
 
-bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceRegister, ParseError *error)
+void JsonWorker::saveRegisterArray(const std::vector<std::shared_ptr<Register> > &registerMap)
 {
+    QJsonArray jsonRegisterArray;
+
+    foreach(std::shared_ptr<Register> currentRegister, registerMap)
+    {
+        QJsonObject jsonCurrentRegister;
+        saveRegister(*currentRegister, jsonCurrentRegister);
+
+        jsonRegisterArray.append(jsonCurrentRegister);
+    }
+
+    m_deviceGlobalObject["registers"] = jsonRegisterArray;
+}
+
+bool JsonWorker::readPluginsArray(QJsonObject globalObject, std::vector<PluginInfo>* pluginsList)
+{
+    if(globalObject.contains("plugins") && globalObject["plugins"].isArray())
+    {
+        QJsonArray jsonPlugInsData = globalObject["plugins"].toArray();
+
+        pluginsList->clear();
+        pluginsList->reserve(jsonPlugInsData.size());
+
+        for (int registerIndex = 0; registerIndex < jsonPlugInsData.size(); ++registerIndex)
+        {
+            QJsonObject pluginObject = jsonPlugInsData[registerIndex].toObject();
+
+            QString name, path, description;
+
+            if(!parseFieldStringObject(pluginObject, "name", name, "", true))
+            {
+                qWarning() << "Error parsing json file. Plugin name not found!";
+                return false;
+            }
+            if(!parseFieldStringObject(pluginObject, "path", path, "", true))
+            {
+                qWarning() << "Error parsing json file. Plugin path not found!";
+                return false;
+            }
+            parseFieldStringObject(pluginObject, "description", description);
+
+            pluginsList->push_back(PluginInfo(name, path, description));
+        }
+        return true;
+    }
+    else return false;
+}
+
+void JsonWorker::savePlugInsArray(const std::vector<PluginInfo>& pluginsList, QJsonArray& jsonPlugInsArray)
+{
+    foreach(PluginInfo currentPlugIn, pluginsList)
+    {
+        QJsonObject jsonCurrentPlugIn;
+
+        jsonCurrentPlugIn["name"] = currentPlugIn.name();
+        jsonCurrentPlugIn["description"] = currentPlugIn.description();
+        jsonCurrentPlugIn["path"] = currentPlugIn.path();
+
+        jsonPlugInsArray.append(jsonCurrentPlugIn);
+    }
+}
+
+bool JsonWorker::readRegister(const QJsonObject& jsonObject, Register *deviceRegister, ParseError *error)
+{
+    std::map<QString, std::function<bool(const QJsonObject&, Register*, ParseError*)> > readMethodList
+    {
+        {"bits",            &JsonWorker::readBitField},
+        {"integers",        &JsonWorker::readIntegerField},
+        {"variant_lists",   &JsonWorker::readVariantListField},
+        {"fixed",           &JsonWorker::readFixedField},
+        {"separators",      &JsonWorker::readSeparationField}
+    };
+
     if(!parseFieldStringObject(jsonObject, "name", deviceRegister->m_name, "", true))
     {
         if(error != nullptr) error->setErrorType(ParseError::ErrorType::RegisterHeaderError, "'name' field not found");
@@ -164,7 +261,56 @@ bool FileParser::readRegister(const QJsonObject& jsonObject, Register *deviceReg
     return true;
 }
 
-bool FileParser::readAbstractField(const QJsonObject &jsonObject, AbstractField *field, ParseError *error)
+void JsonWorker::saveRegister(const Register &deviceRegister, QJsonObject &jsonRegister)
+{
+    jsonRegister["name"] = deviceRegister.name();
+    jsonRegister["size"] = deviceRegister.bitSize();
+
+    QJsonArray jsonBitFieldArray;
+    QJsonArray jsonFixedFieldArray;
+    QJsonArray jsonIntegerFieldArray;
+    QJsonArray jsonVariantListFieldArray;
+    QJsonArray jsonSeparationFieldArray;
+
+    foreach(AbstractField* currentField, deviceRegister.m_fields)
+    {
+        QJsonObject jsonFieldObject;
+
+        saveAbstractField(currentField, jsonFieldObject);
+
+        switch (currentField->m_type)
+        {
+            case AbstractField::FieldType::BitField:
+                saveBitField(dynamic_cast<BitField*>(currentField), jsonFieldObject);
+                jsonBitFieldArray.append(jsonFieldObject);
+            break;
+            case AbstractField::FieldType::FixedField:
+                saveFixedField(dynamic_cast<FixedField*>(currentField), jsonFieldObject);
+                jsonFixedFieldArray.append(jsonFieldObject);
+            break;
+            case AbstractField::FieldType::IntegerField:
+                saveIntegerField(dynamic_cast<IntegerField*>(currentField), jsonFieldObject);
+                jsonIntegerFieldArray.append(jsonFieldObject);
+            break;
+            case AbstractField::FieldType::SeparationField:
+                jsonSeparationFieldArray.append(jsonFieldObject);
+            break;
+            case AbstractField::FieldType::VariantListField:
+                saveVariantListField(dynamic_cast<VariantListField*>(currentField), jsonFieldObject);
+                jsonVariantListFieldArray.append(jsonFieldObject);
+            break;
+            case AbstractField::FieldType::UnknownField: qWarning() << currentField->m_name << " неизвестный тип поля. Сохранение невозможно"; break;
+        }
+    }
+
+    if(jsonBitFieldArray.size() > 0) jsonRegister["bits"] = jsonBitFieldArray;
+    if(jsonIntegerFieldArray.size() > 0) jsonRegister["integers"] = jsonIntegerFieldArray;
+    if(jsonFixedFieldArray.size() > 0) jsonRegister["fixed"] = jsonFixedFieldArray;
+    if(jsonSeparationFieldArray.size() > 0) jsonRegister["separators"] = jsonSeparationFieldArray;
+    if(jsonVariantListFieldArray.size() > 0) jsonRegister["variant_lists"] = jsonVariantListFieldArray;
+}
+
+bool JsonWorker::readAbstractField(const QJsonObject &jsonObject, AbstractField *field, ParseError *error)
 {
     if(field)
     {
@@ -180,7 +326,15 @@ bool FileParser::readAbstractField(const QJsonObject &jsonObject, AbstractField 
     return true;
 }
 
-bool FileParser::readBitField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError *error)
+void JsonWorker::saveAbstractField(AbstractField *abstractField, QJsonObject &fieldObject)
+{
+    fieldObject["name"] = abstractField->m_name;
+    fieldObject["description"] = abstractField->m_description;
+    fieldObject["comment"] = abstractField->m_comment;
+    fieldObject["position"] = abstractField->m_position;
+}
+
+bool JsonWorker::readBitField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError *error)
 {
     deviceRegister->m_fields.push_back(new BitField);
 
@@ -208,7 +362,19 @@ bool FileParser::readBitField(const QJsonObject &jsonObject, Register* deviceReg
     }
 }
 
-bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError *error)
+void JsonWorker::saveBitField(BitField *bitField, QJsonObject& fieldObject)
+{
+    if(bitField)
+    {
+        fieldObject["default_value"] = bitField->m_bit;
+    }
+    else
+    {
+        qWarning() << "Нулевой указатель на битовое поле";
+    }
+}
+
+bool JsonWorker::readIntegerField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError *error)
 {
     deviceRegister->m_fields.push_back(new IntegerField);
 
@@ -252,7 +418,39 @@ bool FileParser::readIntegerField(const QJsonObject &jsonObject, Register* devic
     }
 }
 
-bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError *error)
+void JsonWorker::saveIntegerField(IntegerField *integerField, QJsonObject &fieldObject)
+{
+    if(integerField)
+    {
+        fieldObject["size"] = integerField->m_size;
+
+        QString value;
+        value.setNum(integerField->m_data, 16);
+        fieldObject["default_value"] = "0x" + value;
+
+        value.setNum(integerField->valueFrom(), 16);
+        fieldObject["valueFrom"] = "0x" + value;
+
+        value.setNum(integerField->valueTo(), 16);
+        fieldObject["valueTo"] = "0x" + value;
+
+        QJsonObject scale;
+
+        scale["coefficient"] = integerField->m_scaleCoefficient;
+        scale["exponent"] = integerField->m_scaleExponent;
+        scale["offset1"] = integerField->m_scaleOffset1;
+        scale["offset2"] = integerField->m_scaleOffset2;
+        scale["units"] = integerField->m_scaleUnits;
+
+        fieldObject["scale"] = scale;
+    }
+    else
+    {
+        qWarning() << "Нулевой указатель на целочисленное поле";
+    }
+}
+
+bool JsonWorker::readVariantListField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError *error)
 {
     deviceRegister->m_fields.push_back(new VariantListField);
 
@@ -350,7 +548,41 @@ bool FileParser::readVariantListField(const QJsonObject &jsonObject, Register* d
     }
 }
 
-bool FileParser::readFixedField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError *error)
+void JsonWorker::saveVariantListField(VariantListField *variantListField, QJsonObject &fieldObject)
+{
+    if(variantListField)
+    {
+        fieldObject["size"] = variantListField->m_size;
+
+        QString value;
+        value.setNum(variantListField->m_data.key(variantListField->m_selected), 16);
+        fieldObject["default_value"] = "0x" + value;
+
+        QJsonArray variants;
+
+        for(auto it = variantListField->m_data.begin();
+            it != variantListField->m_data.end();
+            ++it)
+        {
+            QJsonObject variantObject;
+
+            variantObject["name"] = it.value();
+
+            value.setNum(it.key(), 16);
+            variantObject["value"] = "0x" + value;
+
+            variants.append(variantObject);
+        }
+
+        fieldObject["variants"] = variants;
+    }
+    else
+    {
+        qWarning() << "Нулевой указатель на целочисленное поле";
+    }
+}
+
+bool JsonWorker::readFixedField(const QJsonObject &jsonObject, Register* deviceRegister, ParseError *error)
 {
     deviceRegister->m_fields.push_back(new FixedField);
 
@@ -379,7 +611,23 @@ bool FileParser::readFixedField(const QJsonObject &jsonObject, Register* deviceR
     }
 }
 
-bool FileParser::readSeparationField(const QJsonObject &jsonObject, Register *deviceRegister, ParseError *error)
+void JsonWorker::saveFixedField(FixedField *fixedField, QJsonObject &fieldObject)
+{
+    if(fixedField)
+    {
+        fieldObject["size"] = fixedField->m_size;
+
+        QString value;
+        value.setNum(fixedField->m_data, 16);
+        fieldObject["value"] = "0x" + value;
+    }
+    else
+    {
+        qWarning() << "Нулевой указатель на фиксированное поле";
+    }
+}
+
+bool JsonWorker::readSeparationField(const QJsonObject &jsonObject, Register *deviceRegister, ParseError *error)
 {
     deviceRegister->m_fields.push_back(new SeparationField);
 
@@ -402,7 +650,7 @@ bool FileParser::readSeparationField(const QJsonObject &jsonObject, Register *de
     }
 }
 
-bool FileParser::parseFieldIntObject(const QJsonObject &jsonObject, const QString& valueName, quint64& destValue,
+bool JsonWorker::parseFieldIntObject(const QJsonObject &jsonObject, const QString& valueName, quint64& destValue,
                                 const QString &fieldName, quint64 defaultValue, bool mandatory, ParseError *error)
 {
     if(jsonObject.contains(valueName) && jsonObject[valueName].isDouble())
@@ -435,7 +683,7 @@ bool FileParser::parseFieldIntObject(const QJsonObject &jsonObject, const QStrin
     return true;
 }
 
-bool FileParser::parseFieldDoubleObject(const QJsonObject &jsonObject, const QString &valueName, qreal &destValue, const QString &fieldName, qreal defaultValue, bool mandatory, ParseError *error)
+bool JsonWorker::parseFieldDoubleObject(const QJsonObject &jsonObject, const QString &valueName, qreal &destValue, const QString &fieldName, qreal defaultValue, bool mandatory, ParseError *error)
 {
     if(jsonObject.contains(valueName) && jsonObject[valueName].isDouble())
     {
@@ -456,7 +704,7 @@ bool FileParser::parseFieldDoubleObject(const QJsonObject &jsonObject, const QSt
     return true;
 }
 
-bool FileParser::parseFieldStringObject(const QJsonObject &jsonObject, const QString &valueName, QString &destValue, const QString &fieldName, bool mandatory, ParseError *error)
+bool JsonWorker::parseFieldStringObject(const QJsonObject &jsonObject, const QString &valueName, QString &destValue, const QString &fieldName, bool mandatory, ParseError *error)
 {
     if(jsonObject.contains(valueName) && jsonObject[valueName].isString())
     {

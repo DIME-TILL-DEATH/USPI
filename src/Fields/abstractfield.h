@@ -7,7 +7,7 @@
 
 #include <math.h>
 
-class FileParser;
+class JsonWorker;
 
 class AbstractField
 {
@@ -33,8 +33,8 @@ public:
 
     FieldType type() const;
 
-    quint8 position() const;
-    quint8 size() const;
+    quint16 position() const;
+    quint16 size() const;
 
     friend QDataStream& operator<<(QDataStream& stream, const AbstractField& field);
     friend QDataStream& operator>>(QDataStream& stream, AbstractField& field);
@@ -45,12 +45,12 @@ protected:
     QString m_comment;
     FieldType m_type;
 
-    quint8 m_position;
-    quint8 m_size{1};
+    quint16 m_position;
+    quint16 m_size{1};
 
     QByteArray shiftBitData(quint64 data);
 
-    friend class FileParser;
+    friend class JsonWorker;
 };
 
 #endif // ABSTRACTFIELD_H

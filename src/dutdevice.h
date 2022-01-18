@@ -17,6 +17,7 @@ class DUTDevice
 {
 public:
     bool loadFromFile(const QString& fileName, ParseError* error = nullptr);
+    bool loadFromJsonObject(const QJsonObject& jsonObject, ParseError* error = nullptr);
 
     struct Header{
         QString deviceName{"Выбрать"};
@@ -31,6 +32,8 @@ public:
     const Header &deviceHeader() const;
 
     std::shared_ptr<Register> registerByUniqueId(quint16 uniqueId);
+
+    AbstractField* findField(QString registerName, QString fieldName);
 
     friend QDataStream& operator<<(QDataStream& stream, const DUTDevice& device);
     friend QDataStream& operator>>(QDataStream& stream, DUTDevice& device);
