@@ -190,7 +190,7 @@ QStringList UserInterface::avaliableInterfaces()
 
 QStringList UserInterface::avaliablePlugins()
 {
-    return extensionManager.avaliablePluginsNames();
+    return extensionManager.avaliablePlugInsNames();
 }
 
 void UserInterface::updateAvaliableInterfaces()

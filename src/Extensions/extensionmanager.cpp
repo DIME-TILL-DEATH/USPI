@@ -37,7 +37,7 @@ QStringList ExtensionManager::getPlugins(QString path)
     return plugins;
 }
 
-QStringList ExtensionManager::avaliablePluginsNames()
+QStringList ExtensionManager::avaliablePlugInsNames()
 {
     return m_pluginsList.keys();
 }
@@ -53,6 +53,11 @@ void ExtensionManager::loadPlugins(std::vector<PluginInfo> pluginsList)
 
 std::vector<PluginInfo> ExtensionManager::loadedPlugInsInfo()
 {
+    for(auto info_it = m_loadedPlugInsInfo.begin(); info_it != m_loadedPlugInsInfo.end(); ++info_it)
+    {
+        (*info_it).setSettings(getPlugInSettings( (*info_it).name()));
+    }
+
     return m_loadedPlugInsInfo;
 }
 
@@ -66,6 +71,34 @@ void ExtensionManager::loadPlugin(PluginInfo pluginInfo)
     {
         qWarning() << "Не могу загрузить плагин: " << fileAddress << ", так как " << loader->errorString();
         return;
+    }   
+
+    ControlPanelInterface* plugin = qobject_cast<ControlPanelInterface*>(loader->instance());
+
+    if(plugin)
+    {
+        connect(dynamic_cast<QObject*>(plugin), SIGNAL(setFieldValue(QString,QString,QVariant)),
+                this, SLOT(setFieldValue(QString,QString,QVariant)));
+
+        connect(dynamic_cast<QObject*>(plugin), SIGNAL(getFieldValue(QString,QString,QVariant&)),
+                this, SLOT(getFieldValue(QString,QString,QVariant&)));
+
+        connect(dynamic_cast<QObject*>(plugin), SIGNAL(writeRegisterSequence(QStringList)),
+                this, SLOT(writeRegisterSequence(QStringList)));
+
+
+        connect(this, SIGNAL(saveRequest(QString,QMap<QString,QString>&)),
+                dynamic_cast<QObject*>(plugin), SLOT(saveRequest(QString,QMap<QString,QString>&)));
+
+        connect(this, SIGNAL(loadRequest(QString, const QMap<QString,QString>&)),
+                dynamic_cast<QObject*>(plugin), SLOT(loadRequest(QString, const QMap<QString,QString>&)));
+
+
+        emit loadRequest(pluginInfo.name(), pluginInfo.settings());
+    }
+    else
+    {
+        qWarning() << "Could not cast: " << pluginInfo.name() << " : " << loader->fileName();
     }
 
     m_pluginsList.insert(pluginInfo.name(), loader);
@@ -95,14 +128,6 @@ void ExtensionManager::runPlugin(QString pluginName)
 
     if(plugin)
     {
-        connect(dynamic_cast<QObject*>(plugin), SIGNAL(setFieldValue(QString,QString,QVariant)),
-                this, SLOT(setFieldValue(QString,QString,QVariant)));
-
-        connect(dynamic_cast<QObject*>(plugin), SIGNAL(getFieldValue(QString,QString,QVariant&)),
-                this, SLOT(getFieldValue(QString,QString,QVariant&)));
-
-        connect(dynamic_cast<QObject*>(plugin), SIGNAL(writeRegisterSequence(QStringList)),
-                this, SLOT(writeRegisterSequence(QStringList)));
 
         plugin->showPanel();
     }
@@ -125,6 +150,20 @@ void ExtensionManager::runPlugin(QString pluginName)
     //             if (iFilter)
     //                 addItems(pluginItem, "FilterInterface", iFilter->filters());
     //         }
+}
+
+QMap<QString, QString> ExtensionManager::getPlugInSettings(const QString &plugInName)
+{
+    QMap<QString, QString> plugInSettings;
+
+    emit saveRequest(plugInName, plugInSettings);
+
+    return plugInSettings;
+}
+
+void ExtensionManager::setPlugInSettings(const QString &plugInName, const QMap<QString, QString> &plugInSettings)
+{
+    emit loadRequest(plugInName, plugInSettings);
 }
 
 void ExtensionManager::setFieldValue(QString registerName, QString fieldName, QVariant value)

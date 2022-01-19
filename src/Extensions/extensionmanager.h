@@ -15,7 +15,7 @@ public:
     ~ExtensionManager();
 
     QStringList getPlugins(QString path);
-    QStringList avaliablePluginsNames();
+    QStringList avaliablePlugInsNames();
     void loadPlugins(std::vector<PluginInfo> pluginsList);
     std::vector<PluginInfo> loadedPlugInsInfo();
     void loadPlugin(PluginInfo pluginIngo);
@@ -23,11 +23,20 @@ public:
     void unloadPlugins();
 
     void runPlugin(QString pluginName);
+
+
 private:
     QMap<QString, QPluginLoader*> m_pluginsList;
     std::vector<PluginInfo> m_loadedPlugInsInfo;
 
+    QMap<QString, QString> getPlugInSettings(const QString& plugInName);
+    void setPlugInSettings(const QString& plugInName, const QMap<QString, QString>& plugInSettings);
+
     DUTDevice* m_controlledDevice;
+
+signals:
+    void saveRequest(QString plugInName, QMap<QString, QString>& dataToSave);
+    void loadRequest(QString plugInName, const QMap<QString, QString>& dataToLoad);
 
 public slots:
     void setFieldValue(QString registerName, QString fieldName, QVariant value);

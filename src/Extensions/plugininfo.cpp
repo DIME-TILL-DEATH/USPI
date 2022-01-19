@@ -1,9 +1,10 @@
 #include "plugininfo.h"
 
-PluginInfo::PluginInfo(QString name, QString path, QString description)
+PluginInfo::PluginInfo(QString name, QString path, QString description, QMap<QString, QString> settings)
     : m_name{name},
       m_path{path},
-      m_description{description}
+      m_description{description},
+      m_settings{settings}
 {
 
 }
@@ -21,4 +22,14 @@ const QString &PluginInfo::path() const
 const QString &PluginInfo::description() const
 {
     return m_description;
+}
+
+const QMap<QString, QString> &PluginInfo::settings() const
+{
+    return m_settings;
+}
+
+void PluginInfo::setSettings(const QMap<QString, QString> &newSettings)
+{
+    m_settings = newSettings;
 }

@@ -194,7 +194,21 @@ bool JsonWorker::readPluginsArray(QJsonObject globalObject, std::vector<PluginIn
             }
             parseFieldStringObject(pluginObject, "description", description);
 
-            pluginsList->push_back(PluginInfo(name, path, description));
+            QMap<QString,QString> settingsMap;
+
+            if(pluginObject.contains("settings") && pluginObject["settings"].isObject())
+            {
+                QJsonObject jsonSettingsObject = pluginObject["settings"].toObject();
+
+                QStringList keyList = jsonSettingsObject.keys();
+
+                foreach(QString currentKey, keyList)
+                {
+                    settingsMap.insert(currentKey, jsonSettingsObject[currentKey].toString());
+                }
+            }
+
+            pluginsList->push_back(PluginInfo(name, path, description, settingsMap));
         }
         return true;
     }
@@ -210,6 +224,17 @@ void JsonWorker::savePlugInsArray(const std::vector<PluginInfo>& pluginsList, QJ
         jsonCurrentPlugIn["name"] = currentPlugIn.name();
         jsonCurrentPlugIn["description"] = currentPlugIn.description();
         jsonCurrentPlugIn["path"] = currentPlugIn.path();
+
+        QJsonObject jsonPlugInSettingsObject;
+
+        QMap<QString,QString> plugInSettings = currentPlugIn.settings();
+
+        for(auto currentSetting = plugInSettings.begin(); currentSetting != plugInSettings.end(); ++currentSetting)
+        {
+            jsonPlugInSettingsObject[currentSetting.key()] = currentSetting.value();
+        }
+
+        jsonCurrentPlugIn["settings"] = jsonPlugInSettingsObject;
 
         jsonPlugInsArray.append(jsonCurrentPlugIn);
     }
