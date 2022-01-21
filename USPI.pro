@@ -13,12 +13,12 @@ SOURCES += \
         src/Controllers/abstractcontroller.cpp \
         src/Controllers/devicepin.cpp \
         src/Controllers/usbcontroller.cpp \
-    src/Extensions/controlpanelinterface.cpp \
-    src/Extensions/extensionmanager.cpp \
-    src/Extensions/plugininfo.cpp \
+        src/Extensions/controlpanelinterface.cpp \
+        src/Extensions/extensionmanager.cpp \
+        src/Extensions/plugininfo.cpp \
         src/Fields/abstractfield.cpp \
         src/Fields/bitfield.cpp \
-    src/Fields/fieldadapter.cpp \
+        src/Fields/fieldadapter.cpp \
         src/Fields/fixedfield.cpp \
         src/Fields/integerfield.cpp \
         src/Fields/variantlistfield.cpp \
@@ -26,7 +26,7 @@ SOURCES += \
         src/Interfaces/abstractinterface.cpp \
         src/Interfaces/fileinterface.cpp \
         src/Interfaces/usbinterface.cpp \
-    src/JsonWorker.cpp \
+        src/JsonWorker.cpp \
         src/dutdevice.cpp \
         src/interfacessettingsadapter.cpp \
         src/logger.cpp \

@@ -5,11 +5,11 @@
 
 #include "abstractfield.h"
 
-class FileParser;
+class JsonWorker;
 class BitField : public AbstractField
 {
 public:
-    friend class FileParser;
+    friend class JsonWorker;
 
     BitField() {};
     BitField(AbstractField field) : AbstractField{field} {};
