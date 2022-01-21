@@ -35,6 +35,8 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
 
     font.setStyleStrategy(QFont::NoSubpixelAntialias);
     QGuiApplication::setFont(font);
+
+    connect(&extensionManager, &ExtensionManager::writeRegisterSequenceRequest, this, &UserInterface::writeCustomSequence);
 }
 
 UserInterface::~UserInterface()
@@ -75,7 +77,7 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
             return true;
         }
     }
-    qWarning() << ("Error in setting interface: interface not found");
+    qWarning() << (tr("Ошибка выбора интерфейса отправки: интерфейс не найден"));
     return false;
 }
 
@@ -109,7 +111,7 @@ bool UserInterface::loadDevice(const QUrl &fileName)
     extensionManager.loadPlugins(plugList);
     emit avaliablePluginsUpdated();
 
-    qInfo() << "Карта регистров для устройства '" << m_device.name() << "' загружена";
+    qInfo() << tr("Карта регистров для устройства '") << m_device.name() << tr("' загружена");
     return true;
 }
 
@@ -119,7 +121,7 @@ bool UserInterface::writeSequence()
     {
         if(m_registerSequenceModel.registerAdaptersList().size()>0)
         {
-            QString resultMessage("Запись через '" + m_interface_ptr->interfaceName() + "' в регистры: ");
+            QString resultMessage(tr("Запись через '") + m_interface_ptr->interfaceName() + tr("' в регистры: "));
 
             std::vector<Register*> wrSequence;
             for(auto it = m_registerSequenceModel.registerAdaptersList().begin();
@@ -135,7 +137,7 @@ bool UserInterface::writeSequence()
 
             if(!m_interface_ptr->writeSequence(wrSequence))
             {
-                qWarning() << ("Error while writing sequnce to interface '" + m_interface_ptr->interfaceName()+ "'");
+                qWarning() << (tr("Ошибка записи последовательности через интерфейс '") + m_interface_ptr->interfaceName()+ "'");
                 return false;
             }
             else
@@ -146,13 +148,13 @@ bool UserInterface::writeSequence()
         }
         else
         {
-            qInfo() << "Очередь записи пуста";
+            qInfo() << tr("Очередь записи пуста");
             return true;
         }
     }
     else
     {
-        qWarning() << ("Null interface pointer");
+        qWarning() << (tr("Нулевой указатель на интерфейс"));
         return false;
     }
 }
@@ -262,6 +264,22 @@ const UserSettings &UserInterface::userSettings() const
 void UserInterface::setUserSettings(const UserSettings &newSettings)
 {
     m_userSettings = newSettings;
+}
+
+void UserInterface::writeCustomSequence(QStringList registerNames)
+{
+    std::vector<Register*> wrSequence;
+    foreach(QString name, registerNames)
+    {
+        wrSequence.push_back(m_device.registerByName(name).get());
+    }
+
+    m_interface_ptr->setDeviceHeader(m_device.deviceHeader());
+
+    if(!m_interface_ptr->writeSequence(wrSequence))
+    {
+        qWarning() << (tr("Ошибка записи последовательности через интерфейс '") + m_interface_ptr->interfaceName()+ "'");
+    }
 }
 
 void UserInterface::registerTypes()

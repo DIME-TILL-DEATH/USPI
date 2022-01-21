@@ -35,9 +35,9 @@ bool JsonWorker::loadFile(const QString &name, ParseError* error)
 
         if(jsonDoc.isNull())
         {
-            QString additionalErrorInfo{"Invalid json file: " +
+            QString additionalErrorInfo{QObject::tr("Ошибка файл json: ") +
                                         jsonError.errorString() +
-                                        " at position " +
+                                        QObject::tr(" в позиции ") +
                                         QString::number(jsonError.offset, 10)};
 
             if(error != nullptr) error->setErrorType(ParseError::ErrorType::GlobalObjectError, additionalErrorInfo);
@@ -184,12 +184,12 @@ bool JsonWorker::readPluginsArray(QJsonObject globalObject, std::vector<PluginIn
 
             if(!parseFieldStringObject(pluginObject, "name", name, "", true))
             {
-                qWarning() << "Error parsing json file. Plugin name not found!";
+                qWarning() << QObject::tr("Error parsing json file. Plugin name not found!");
                 return false;
             }
             if(!parseFieldStringObject(pluginObject, "path", path, "", true))
             {
-                qWarning() << "Error parsing json file. Plugin path not found!";
+                qWarning() << QObject::tr("Error parsing json file. Plugin path not found!");
                 return false;
             }
             parseFieldStringObject(pluginObject, "description", description);
@@ -395,7 +395,7 @@ void JsonWorker::saveBitField(BitField *bitField, QJsonObject& fieldObject)
     }
     else
     {
-        qWarning() << "Нулевой указатель на битовое поле";
+        qWarning() << QObject::tr("Нулевой указатель на битовое поле");
     }
 }
 
@@ -471,7 +471,7 @@ void JsonWorker::saveIntegerField(IntegerField *integerField, QJsonObject &field
     }
     else
     {
-        qWarning() << "Нулевой указатель на целочисленное поле";
+        qWarning() << QObject::tr("Нулевой указатель на целочисленное поле");
     }
 }
 
@@ -631,7 +631,7 @@ bool JsonWorker::readFixedField(const QJsonObject &jsonObject, Register* deviceR
     }
     else
     {
-        if(error != nullptr) error->setErrorType(ParseError::ErrorType::PointerError, "casting AbstractField to FixedField is unsucceccfull!");
+        if(error != nullptr) error->setErrorType(ParseError::ErrorType::PointerError, QObject::tr("не удалось преобразовать AbstractField в FixedField!"));
         return false;
     }
 }
@@ -648,7 +648,7 @@ void JsonWorker::saveFixedField(FixedField *fixedField, QJsonObject &fieldObject
     }
     else
     {
-        qWarning() << "Нулевой указатель на фиксированное поле";
+        qWarning() << QObject::tr("Нулевой указатель на фиксированное поле");
     }
 }
 
@@ -689,7 +689,7 @@ bool JsonWorker::parseFieldIntObject(const QJsonObject &jsonObject, const QStrin
         destValue = str.toLongLong(&conversionResult, 0);
         if(!conversionResult)
         {
-            qWarning() << "Field '" << fieldName << "' error. Cannot convert 'valueTo' from string to int. Using default value: " << defaultValue;
+            qWarning() << QObject::tr("Ошибка поля '") << fieldName << QObject::tr("'. Не удалось преобразовать значение 'valueTo' из типа string в int. Используется значение по умолчанию: ") << defaultValue;
             destValue = defaultValue;
         }
     }
@@ -697,7 +697,7 @@ bool JsonWorker::parseFieldIntObject(const QJsonObject &jsonObject, const QStrin
     {
         if(mandatory)
         {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, valueName + " of field '" + fieldName + "' not found.");
+            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, valueName + QObject::tr(" of field '") + fieldName + QObject::tr("' not found."));
             return false;
         }
         else
@@ -718,7 +718,7 @@ bool JsonWorker::parseFieldDoubleObject(const QJsonObject &jsonObject, const QSt
     {
         if(mandatory)
         {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, valueName + " of field '" + fieldName + "' not found.");
+            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, valueName + QObject::tr(" of field '") + fieldName + QObject::tr("' not found."));
             return false;
         }
         else
@@ -739,7 +739,7 @@ bool JsonWorker::parseFieldStringObject(const QJsonObject &jsonObject, const QSt
     {
         if(mandatory)
         {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, valueName + " of field '" + fieldName + "' not found.");
+            if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldContentError, valueName + QObject::tr(" of field '") + fieldName + QObject::tr("' not found."));
             return false;
         }
         else

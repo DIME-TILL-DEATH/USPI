@@ -105,6 +105,9 @@ signals:
     void avaliableInterfacesUpdated();
     void avaliablePluginsUpdated();
     void userSettingsUpdated();
+
+public slots:
+    void writeCustomSequence(QStringList registerNames);
 };
 
 #endif // USERINTERFACE_H

@@ -81,7 +81,7 @@ AbstractField *Register::field(QString fieldName)
                                                                             {return field->name() == fieldName;});
     if(findedField == m_fields.end())
     {
-        qWarning() << "Поле с именем " << fieldName << " не найдено";
+        qWarning() << QObject::tr("Поле с именем ") << fieldName << QObject::tr(" не найдено");
         return nullptr;
     }
     return (*findedField);
@@ -155,8 +155,8 @@ bool Register::validateSize(ParseError *error)
         if(((*it)->position() + (*it)->size()) > m_bitSize)
         {
             if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldSizeError,
-                                                     "'"+(*it)->name() + "' position '" + QString::number((*it)->position(), 10) +
-                                                     "' + size '" + QString::number((*it)->size(), 10) + "' is greater than size of target register '" +
+                                                     "'"+(*it)->name() + QObject::tr("' position '") + QString::number((*it)->position(), 10) +
+                                                     QObject::tr("' + size '") + QString::number((*it)->size(), 10) + QObject::tr("' is greater than size of target register '") +
                                                      QString::number(m_bitSize,10) +"')'");
             return false;
         }
@@ -169,8 +169,8 @@ bool Register::validateSize(ParseError *error)
                 if(field_ptr->data() > pow(2, field_ptr->size()))
                 {
                     if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldSizeError, "'"+field_ptr->name()+"'" +
-                                                             " fixed field size '" + QString::number(field_ptr->size(), 10) +
-                                                             "' is smaller than stored  value '" + QString::number(field_ptr->data(), 10)+"'");
+                                                             QObject::tr(" fixed field size '") + QString::number(field_ptr->size(), 10) +
+                                                             QObject::tr("' is smaller than stored  value '") + QString::number(field_ptr->data(), 10)+"'");
                             return false;
                 }
                 break;
@@ -182,8 +182,8 @@ bool Register::validateSize(ParseError *error)
                 if(field_ptr->data() > pow(2, field_ptr->size()))
                 {
                     if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldSizeError, "'"+field_ptr->name()+"'" +
-                                                             " integer field size '" + QString::number(field_ptr->size(), 10) +
-                                                             "' is smaller than stored  value '" + QString::number(field_ptr->data(), 10)+"'");
+                                                             QObject::tr(" integer field size '") + QString::number(field_ptr->size(), 10) +
+                                                             QObject::tr("' is smaller than stored  value '") + QString::number(field_ptr->data(), 10)+"'");
                             return false;
 
 
@@ -192,8 +192,8 @@ bool Register::validateSize(ParseError *error)
                 if(field_ptr->valueFrom() > pow(2, field_ptr->size()))
                 {
                     if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldSizeError, "'"+field_ptr->name()+"'" +
-                                                             " minimum value '" + QString::number(field_ptr->valueFrom(), 10) +
-                                                             "' is greater than avaliable field size '" + QString::number(field_ptr->size(), 10)+"'");
+                                                             QObject::tr(" minimum value '") + QString::number(field_ptr->valueFrom(), 10) +
+                                                             QObject::tr("' is greater than avaliable field size '") + QString::number(field_ptr->size(), 10)+"'");
                             return false;
 
 
@@ -202,8 +202,8 @@ bool Register::validateSize(ParseError *error)
                 if(field_ptr->valueTo() > pow(2, field_ptr->size()))
                 {
                     if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldSizeError, "'"+field_ptr->name()+"'" +
-                                                             " maximum value '" + QString::number(field_ptr->valueTo(), 10) +
-                                                             "' is greater than avaliable field size '" + QString::number(field_ptr->size(), 10)+"'");
+                                                             QObject::tr(" maximum value '") + QString::number(field_ptr->valueTo(), 10) +
+                                                             QObject::tr("' is greater than avaliable field size '") + QString::number(field_ptr->size(), 10)+"'");
                             return false;
 
 
@@ -219,8 +219,8 @@ bool Register::validateSize(ParseError *error)
                     if(it_map.key() > pow(2, field_ptr->size()))
                     {
                         if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldSizeError, "'"+field_ptr->name()+"'" +
-                                                                 " value '" + QString::number(it_map.key() , 10) +
-                                                                 "' is greater than avaliable field size '" + QString::number(field_ptr->size(), 10)+"'");
+                                                                 QObject::tr(" value '") + QString::number(it_map.key() , 10) +
+                                                                 QObject::tr("' is greater than avaliable field size '") + QString::number(field_ptr->size(), 10)+"'");
                                 return false;
                     }
                 }
@@ -255,7 +255,7 @@ bool Register::validateBounds(ParseError *error)
                 else
                 {
                     if(error != nullptr) error->setErrorType(ParseError::ErrorType::FieldsOverLaps, "'" + (*it_checker)->name() +
-                                                             "' and '" + (*it_verify)->name()+"'");
+                                                             QObject::tr("' and '") + (*it_verify)->name()+"'");
                     return false;
                 }
             }

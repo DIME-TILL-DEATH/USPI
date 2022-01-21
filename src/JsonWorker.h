@@ -69,15 +69,6 @@ private:
 
     static bool readSeparationField(const QJsonObject& jsonObject, Register* deviceRegister, ParseError* error = nullptr);
 
-//    std::map<QString, std::function<bool(const QJsonObject&, Register*, ParseError*)> > readMethodList
-//    {
-//        {"bits",            &JsonWorker::readBitField},
-//        {"integers",        &JsonWorker::readIntegerField},
-//        {"variant_lists",   &JsonWorker::readVariantListField},
-//        {"fixed",           &JsonWorker::readFixedField},
-//        {"separators",      &JsonWorker::readSeparationField}
-//    };
-
     static bool parseFieldIntObject(const QJsonObject& jsonObject, const QString& valueName, quint64& destValue,
                         const QString& fieldName = "unknown", quint64 defaultValue = 0, bool mandatory = false,  ParseError* error = nullptr);
 

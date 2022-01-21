@@ -11,7 +11,7 @@ USBInterface::USBInterface()
 
     if(rtnValue < 0)
     {
-        qWarning() << "Failed to init libusb: " << libusb_error_name(rtnValue);
+        qWarning() << QObject::tr("Не удалось инициализировать libusb: ") << libusb_error_name(rtnValue);
         m_isAvaliable = false;
     }
     else
@@ -64,7 +64,7 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
 {
     if(m_activeController.handle == nullptr)
     {
-        qWarning() << "USB device not ready";
+        qWarning() << QObject::tr("Устройство USB не готово");
         return false;
     }
 
@@ -131,12 +131,12 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
 
     if(rtnValue < 0)
     {
-        qWarning() << "Failed send to USB device:" << libusb_strerror(rtnValue);
+        qWarning() << QObject::tr("Ошибка отправки на USB устройство:") << libusb_strerror(rtnValue);
         return false;
     }
     if(dataSize > actualWrittenBytes)
     {
-        qWarning() << "Sended: " << actualWrittenBytes << ", while data size is: " << dataSize;
+        qWarning() << QObject::tr("Отправлено: ") << actualWrittenBytes << QObject::tr(", тогда как размер посылки: ") << dataSize;
         return false;
     }
 
@@ -188,13 +188,13 @@ bool USBInterface::initUSB()
 
     if(m_activeController.handle == nullptr)
     {
-        qWarning() << "Can't open USB device";
+        qWarning() << QObject::tr("Не удалось открыть USB устройство.");
         return false;
     }
 
     if(!initDevice(m_activeController))
     {
-        qWarning() << "USB device initialization failed";
+        qWarning() << QObject::tr("Не удалось инициализировать USB устройство.");
         return false;
     }
 
@@ -212,7 +212,7 @@ bool USBInterface::initDevice(USBController& device)
 
         if(rtnValue < 0)
         {
-            qWarning() << "Failed to claim interface: " << libusb_strerror(rtnValue);
+            qWarning() << QObject::tr("Failed to claim interface: ") << libusb_strerror(rtnValue);
             return false;
         }
 
@@ -223,7 +223,7 @@ bool USBInterface::initDevice(USBController& device)
 
         if (rtnValue < 0)
         {
-            qWarning() << "Failed to get device descriptor: " << libusb_strerror(rtnValue);
+            qWarning() << QObject::tr("Failed to get device descriptor: ") << libusb_strerror(rtnValue);
             return false;
         }
         unsigned char manufacturer[200];

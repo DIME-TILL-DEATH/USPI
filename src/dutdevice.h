@@ -20,7 +20,7 @@ public:
     bool loadFromJsonObject(const QJsonObject& jsonObject, ParseError* error = nullptr);
 
     struct Header{
-        QString deviceName{"Выбрать"};
+        QString deviceName{QObject::tr("Выбрать")};
         QString version{""};
         quint8 registerSize{32};
         bool isMSB{true};
@@ -32,6 +32,7 @@ public:
     const Header &deviceHeader() const;
 
     std::shared_ptr<Register> registerByUniqueId(quint16 uniqueId);
+    std::shared_ptr<Register> registerByName(QString registerName);
 
     AbstractField* findField(QString registerName, QString fieldName);
 

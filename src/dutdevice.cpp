@@ -54,6 +54,17 @@ std::shared_ptr<Register> DUTDevice::registerByUniqueId(quint16 uniqueId)
     {
         if((*it)->uniqueId() == uniqueId) return (*it);
     }
+    qWarning() << QObject::tr("Регистр с UniqueId ") << uniqueId << QObject::tr(" не найден!");
+    return nullptr;
+}
+
+std::shared_ptr<Register> DUTDevice::registerByName(QString registerName)
+{
+    for(auto it = m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)
+    {
+        if((*it)->name() == registerName) return (*it);
+    }
+    qWarning() << QObject::tr("Регистр ") << registerName << (" не найден!");
     return nullptr;
 }
 
@@ -63,7 +74,7 @@ AbstractField *DUTDevice::findField(QString registerName, QString fieldName)
                                                                             {return reg->name() == registerName;});
     if(findedReg == m_deviceRegisterMap.end())
     {
-        qWarning() << "Регистр с именем " << registerName << " не найден в карте регистров устройства";
+        qWarning() << QObject::tr("Регистр с именем ") << registerName << QObject::tr(" не найден в карте регистров устройства");
         return nullptr;
     }
 

@@ -32,12 +32,12 @@ bool SessionSaver::saveSession(const QString &filePath)
         file.write(QJsonDocument(jsonGlobalObject).toJson());
         file.close();
 
-        qInfo() << "Сессия" << filePath << "сохранена";
+        qInfo() << QObject::tr("Сессия") << filePath << QObject::tr("сохранена");
         return true;
     }
     else
     {
-        qInfo() << "Невозможно открыть файл " << filePath;
+        qInfo() << QObject::tr("Невозможно открыть файл ") << filePath;
         return false;
     }
 }
@@ -54,7 +54,7 @@ bool SessionSaver::loadSession(const QString &filePath)
 
         if(jsonDoc.isNull())
         {
-            qWarning() << "Invalid json file: " + jsonError.errorString() +" at position " + QString::number(jsonError.offset, 10);
+            qWarning() << QObject::tr("Ошибка в файле json: ") + jsonError.errorString() +QObject::tr(" в позиции ") + QString::number(jsonError.offset, 10);
             return false;
         }
 
@@ -66,12 +66,12 @@ bool SessionSaver::loadSession(const QString &filePath)
         loadPlugInSettings(globalObject);
 
         file.close();
-        qInfo() << "Сессия" << filePath << "загружена. Версия формата: " << m_compareVersion;
+        qInfo() << QObject::tr("Сессия") << filePath << QObject::tr("загружена. Версия формата: ") << m_compareVersion;
         return true;
     }
     else
     {
-        qWarning() << "Невозможно открыть файл " << filePath;
+        qWarning() << QObject::tr("Невозможно открыть файл ") << filePath;
         return false;
     }
 }

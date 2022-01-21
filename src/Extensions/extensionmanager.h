@@ -38,6 +38,8 @@ signals:
     void saveRequest(QString plugInName, QMap<QString, QString>& dataToSave);
     void loadRequest(QString plugInName, const QMap<QString, QString>& dataToLoad);
 
+    void writeRegisterSequenceRequest(QStringList registerNames);
+
 public slots:
     void setFieldValue(QString registerName, QString fieldName, QVariant value);
     void getFieldValue(QString registerName, QString fieldName, QVariant& value);

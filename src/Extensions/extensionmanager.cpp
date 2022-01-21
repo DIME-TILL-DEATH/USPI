@@ -25,7 +25,7 @@ QStringList ExtensionManager::getPlugins(QString path)
     filter  << "*.dll";
     QDir dir(path);
 
-    qInfo() << "Searching plugins in: " << path;
+    qInfo() << QObject::tr("Searching plugins in: ") << path;
 
     QFileInfoList list = dir.entryInfoList(filter);
 
@@ -69,7 +69,7 @@ void ExtensionManager::loadPlugin(PluginInfo pluginInfo)
 
     if(!loader->load())
     {
-        qWarning() << "Не могу загрузить плагин: " << fileAddress << ", так как " << loader->errorString();
+        qWarning() << tr("Не могу загрузить плагин: ") << fileAddress << tr(", так как ") << loader->errorString();
         return;
     }   
 
@@ -133,7 +133,7 @@ void ExtensionManager::runPlugin(QString pluginName)
     }
     else
     {
-        qWarning() << "Could not cast: " << pluginName << " : " << loader->fileName();
+        qWarning() << tr("Could not cast: ") << pluginName << " : " << loader->fileName();
     }
 
     // в примере определяют простым перебором вариантов:
@@ -180,7 +180,7 @@ void ExtensionManager::setFieldValue(QString registerName, QString fieldName, QV
             qulonglong setVal = value.toULongLong();
 
             if(intField) intField->setData(setVal);
-            else qWarning() << "Не удается преобразовать тип поля";
+            else qWarning() << tr("Не удается преобразовать тип поля");
 
             break;
         }
@@ -191,7 +191,7 @@ void ExtensionManager::setFieldValue(QString registerName, QString fieldName, QV
             bool setVal = value.toBool();
 
             if(bitField) bitField->setBit(setVal);
-            else qWarning() << "Не удается преобразовать тип поля";
+            else qWarning() << tr("Не удается преобразовать тип поля");
 
             break;
         }
@@ -201,18 +201,18 @@ void ExtensionManager::setFieldValue(QString registerName, QString fieldName, QV
             VariantListField* variantListField = dynamic_cast<VariantListField*>(field);
             QString setVal = value.toString();
 
-            if(!variantListField->containsVariant(setVal)) qWarning() << "Ошибка установки VariantListField. Нет такого варианта в списке";
+            if(!variantListField->containsVariant(setVal)) qWarning() << tr("Ошибка установки VariantListField. Нет такого варианта в списке");
 
             if(variantListField) variantListField->setSelected(setVal);
-            else qWarning() << "Не удается преобразовать тип поля";
+            else qWarning() << tr("Не удается преобразовать тип поля");
 
             break;
         }
 
         default:
         {
-            qWarning() << "ExtensionManager: ошибка записи в поле " << fieldName << " в регистре " << registerName;
-            qWarning() << "Запись значений в данный тип поля не поддерживается";
+            qWarning() << tr("ExtensionManager: ошибка записи в поле ") << fieldName << tr(" в регистре ") << registerName;
+            qWarning() << tr("Запись значений в данный тип поля не поддерживается");
         }
     }
 }
@@ -230,7 +230,7 @@ void ExtensionManager::getFieldValue(QString registerName, QString fieldName, QV
             IntegerField* intField = dynamic_cast<IntegerField*>(field);
 
             if(intField) value = intField->data();
-            else qWarning() << "Не удается преобразовать тип поля";
+            else qWarning() << tr("Не удается преобразовать тип поля");
 
             break;
         }
@@ -240,7 +240,7 @@ void ExtensionManager::getFieldValue(QString registerName, QString fieldName, QV
             BitField* bitField = dynamic_cast<BitField*>(field);
 
             if(bitField) value = bitField->getBit();
-            else qWarning() << "Не удается преобразовать тип поля";
+            else qWarning() << tr("Не удается преобразовать тип поля");
 
             break;
         }
@@ -250,7 +250,7 @@ void ExtensionManager::getFieldValue(QString registerName, QString fieldName, QV
             VariantListField* variantListField = dynamic_cast<VariantListField*>(field);
 
             if(variantListField) value = variantListField->selected();
-            else qWarning() << "Не удается преобразовать тип поля";
+            else qWarning() << tr("Не удается преобразовать тип поля");
 
             break;
         }
@@ -260,23 +260,20 @@ void ExtensionManager::getFieldValue(QString registerName, QString fieldName, QV
             FixedField* fixedField = dynamic_cast<FixedField*>(field);
 
             if(fixedField) value = fixedField->data();
-            else qWarning() << "Не удается преобразовать тип поля";
+            else qWarning() << tr("Не удается преобразовать тип поля");
 
             break;
         }
 
         default:
         {
-            qWarning() << "ExtensionManager: ошибка чтения поля " << fieldName << " в регистре " << registerName;
-            qWarning() << "Чтение данного типа поля не поддерживается";
+            qWarning() << tr("ExtensionManager: ошибка чтения поля ") << fieldName << tr(" в регистре ") << registerName;
+            qWarning() << tr("Чтение данного типа поля не поддерживается");
         }
     }
 }
 
 void ExtensionManager::writeRegisterSequence(QStringList registerNames)
 {
-    foreach(QString registerName, registerNames)
-    {
-
-    }
+    emit writeRegisterSequenceRequest(registerNames);
 }
