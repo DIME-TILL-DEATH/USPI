@@ -117,7 +117,7 @@ void JsonWorker::saveHeader(const DUTDevice::Header& header)
     m_deviceGlobalObject["header"] = jsonDeviceHeaderObject;
 }
 
-bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header* header, ParseError *error)
+bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header* header, RegisterType registerType, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("registers") && m_deviceGlobalObject["registers"].isArray())
     {
@@ -131,6 +131,7 @@ bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
             QJsonObject registerObject = registerArray[registerIndex].toObject();
             Register* deviceRegister = new Register;
 
+            deviceRegister->m_registerType = registerType;
             deviceRegister->m_bitSize = header->registerSize;
 
             if(!readRegister(registerObject, deviceRegister, error))

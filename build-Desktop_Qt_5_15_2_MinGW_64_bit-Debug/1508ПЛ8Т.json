@@ -9,7 +9,7 @@
 	"plugins" : [
 		{
 			"name" : "Контрольная панель 1508ПЛ8Т",
-			"path" : "D:/QTProjects/USPI_plugins/Plugin1508PL8T/build-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/debug/Plugin1508PL8T.dll"
+			"path" : "D:/QTProjects/USPI_plugins/Plugin1508PL8T/build-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/debug/Plugin1508PL8T.dll",
 			"settings": {
                 "Деление": "2",
                 "Канал 1 check": "\u0001",

@@ -55,7 +55,7 @@ Rectangle{
             text: ">>"
             enabled: (registerMapView.count>0) ? true : false
             onPressed: {
-                for(var i=_registerMapView.count-1; i >= 0; i--)
+                for(var i=registerMapView.count-1; i >= 0; i--)
                 {
                     var index
                     if(registerSequenceView.count>0) index = registerSequenceView.currentIndex+1

@@ -12,7 +12,7 @@ import "../CreateFunctions.js" as Scripts
 FileDialog {
     id: _fileDialog
 
-    property var registerMapView
+    property var mainView
 
     title: "Выберите файл"
     nameFilters: [ "Файлы карты регистров (*.json)", "All files (*)" ]
@@ -20,8 +20,8 @@ FileDialog {
     onAccepted: {
         if(Backend.loadDevice(_fileDialog.fileUrl))
         {
-            Scripts.clearRegisterFields(registerMapView)
-            registerMapView.registerView.currentIndex = -1
+            Scripts.clearRegisterFields(mainView)
+            mainView.registerView.registerView.currentIndex = -1
         }
     }
     Component.onCompleted: visible = false

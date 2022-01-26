@@ -11,6 +11,8 @@ MouseArea{
     width: _registerMapView.width*0.9
     height: _registerMapView.height/10
 
+
+
     property bool dragEnabled: false
     property bool held: false
 
@@ -61,9 +63,12 @@ MouseArea{
 
         radius: width/10
 
-        color: isLocal ?
-               (parent.ListView.isCurrentItem ? Style.regHeaderActiveLocal : Style.regHeaderPassiveLocal) :
-               (parent.ListView.isCurrentItem ? Style.regHeaderActiveGlobal : Style.regHeaderPassiveGlobal)
+        color: /*{switch(register.registerType){
+               case "DUT": return Style.regHeaderPassiveLocal
+               case "Controller": return Style.regHeaderPassiveGlobal
+               }}*/
+            isLocal ? (parent.ListView.isCurrentItem ? Style.regHeaderActiveLocal : Style.regHeaderPassiveLocal) :
+                      (parent.ListView.isCurrentItem ? Style.regHeaderActiveGlobal : Style.regHeaderPassiveGlobal)
 
 
         Drag.active: _rootMA.held

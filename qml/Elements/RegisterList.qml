@@ -44,13 +44,6 @@ Item{
 
         spacing: height/200
 
-//        delegate: RegisterHeader{
-//                onClicked: {
-//                    _rootList.currentIndex = index
-//                    delegateClicked(register)
-//                }
-//        }
-
         //[transitions]
         remove: Transition {
                 NumberAnimation { property: "opacity"; to: 0; duration: 500  }

@@ -15,6 +15,7 @@ class RegisterAdapter
     Q_GADGET
     Q_PROPERTY(QString name READ name)
     Q_PROPERTY(quint16 fieldsCount READ fieldsCount)
+    Q_PROPERTY(QString registerType READ registerType)
 public:
     friend class SessionSaver;
 
@@ -29,6 +30,8 @@ public:
     Q_INVOKABLE FieldAdapter field(quint16 fieldIndex);
 
     Q_INVOKABLE QString value();
+
+    QString registerType();
 
     Register *getRegister() const;
 
