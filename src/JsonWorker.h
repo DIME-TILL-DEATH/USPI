@@ -36,7 +36,7 @@ public:
     bool readHeader(DUTDevice::Header *header, ParseError* error = nullptr);
     void saveHeader(const DUTDevice::Header& header);
 
-    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header *header, ParseError* error = nullptr);
+    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header *header, RegisterType registerType, ParseError* error = nullptr);
     void saveRegisterArray(const std::vector<std::shared_ptr<Register> >& registerMap);
 
     static bool readRegister(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);

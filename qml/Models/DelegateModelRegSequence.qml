@@ -15,6 +15,10 @@ DelegateModel {
        delegate: RegisterHeader{
            id: _ma
 
+           width: _registerSequenceView.width*0.9
+           height: _registerSequenceView.height/10
+
+
            dragEnabled: true
            acceptedButtons: Qt.AllButtons
 

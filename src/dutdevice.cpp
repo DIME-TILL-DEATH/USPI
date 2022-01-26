@@ -16,7 +16,7 @@ bool DUTDevice::loadFromJsonObject(const QJsonObject &jsonObject, ParseError *er
     JsonWorker worker(jsonObject);
 
     if(!worker.readHeader(&m_deviceHeader, error)) return false;
-    if(!worker.readRegisterArray(&m_deviceRegisterMap, &m_deviceHeader, error)) return false;
+    if(!worker.readRegisterArray(&m_deviceRegisterMap, &m_deviceHeader, RegisterType::DUT, error)) return false;
 
     for(auto it=m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)
     {

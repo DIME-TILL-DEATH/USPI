@@ -13,7 +13,8 @@ Register::~Register()
 Register::Register(const Register &src_reg)
      : m_uniqueId{src_reg.m_uniqueId},
        m_name{src_reg.m_name},
-       m_bitSize{src_reg.m_bitSize}
+       m_bitSize{src_reg.m_bitSize},
+       m_registerType{src_reg.m_registerType}
 {
     for(auto it = src_reg.m_fields.begin(); it != src_reg.m_fields.end(); ++it)
     {
@@ -146,6 +147,11 @@ quint16 Register::uniqueId() const
 quint16 Register::bitSize() const
 {
     return m_bitSize;
+}
+
+RegisterType Register::registerType() const
+{
+    return m_registerType;
 }
 
 bool Register::validateSize(ParseError *error)

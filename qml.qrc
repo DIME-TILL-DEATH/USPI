@@ -13,7 +13,7 @@
         <file>qml/Views/LogView.qml</file>
         <file>qml/CreateFunctions.js</file>
         <file>qml/Elements/RegisterHeader.qml</file>
-        <file>qml/Views/RegisterMapView.qml</file>
+        <file>qml/Views/MainView.qml</file>
         <file>qml/Elements/OpenFileDeviceDialog.qml</file>
         <file>qml/Elements/MainAppHeader.qml</file>
         <file>qml/Elements/RegisterList.qml</file>
@@ -29,5 +29,6 @@
         <file>qml/Models/DelegateModelRegSequence.qml</file>
         <file>qml/Models/DelegateModelRegList.qml</file>
         <file>qml/Fields/SeparationField.qml</file>
+        <file>qml/Views/RegListView.qml</file>
     </qresource>
 </RCC>
