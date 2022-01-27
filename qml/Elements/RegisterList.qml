@@ -10,13 +10,11 @@ Item{
     id: _root
 
     property alias delegate: _rootList.delegate
-    property alias model: _rootList.model
+    property alias listModel: _rootList.model
     property alias currentIndex: _rootList.currentIndex
     property alias count: _rootList.count
 
     property string headerText : ""
-
-//    signal delegateClicked(registerAdapter : var)
 
     width: parent.width
     height: parent.height

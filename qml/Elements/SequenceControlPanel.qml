@@ -12,8 +12,13 @@ import "../CreateFunctions.js" as Scripts
 Rectangle{
     id: _root
 
-    property var registerMapView
+    //property var registerMapView
+
+    property int currentIndex : -1
+    property int regCount : 0
+
     property var registerSequenceView
+    property var currentRegList
 
     property int btnWidth : width*0.9
     property int btnHeight : height/10
@@ -37,13 +42,13 @@ Rectangle{
             anchors.horizontalCenter: parent.horizontalCenter
 
             text: ">"
-            enabled: (registerMapView.currentIndex >= 0) ? true : false
+            enabled: (currentIndex >= 0) ? true : false
             onPressed: {
                 var index
                 if(registerSequenceView.count>0) index = registerSequenceView.currentIndex+1
                 else index = 0
 
-                RegisterSequenceModel.addItem(RegisterMapModel.getItem(registerMapView.currentIndex), index)
+                RegisterSequenceModel.addItem(currentRegList.getItem(currentIndex), index)
                 registerSequenceView.currentIndex += 1
             }
         }
@@ -53,15 +58,17 @@ Rectangle{
             anchors.horizontalCenter: parent.horizontalCenter
 
             text: ">>"
-            enabled: (registerMapView.count>0) ? true : false
+            //enabled: (registerMapView.count>0) ? true : false
+            enabled: (regCount>0) ? true : false
             onPressed: {
-                for(var i=registerMapView.count-1; i >= 0; i--)
+                //for(var i=registerMapView.count-1; i >= 0; i--)
+                for(var i=regCount-1; i >= 0; i--)
                 {
                     var index
                     if(registerSequenceView.count>0) index = registerSequenceView.currentIndex+1
                     else index = 0
 
-                    RegisterSequenceModel.addItem(RegisterMapModel.getItem(i), index)
+                    RegisterSequenceModel.addItem(currentRegList.getItem(i), index)
                 }
             }
         }

@@ -61,10 +61,12 @@ ApplicationWindow {
                 onAccepted: {
                     var result = Backend.loadSession(fileUrl)
 
-                    Scripts.clearRegisterFields(_mainView.registerView)
+                    Scripts.clearRegisterFields(_mainView)
 
-                    _mainView.registerView.registerView.currentIndex = -1
-                    _mainView.registerView.registerSequenceView.currentIndex = -1
+                    _mainView.updateRegisterMap()
+                    //!!!!!!!
+                   // _mainView.registerView.registerView.currentIndex = -1
+                   // _mainView.registerView.registerSequenceView.currentIndex = -1
                 }
                 Component.onCompleted: visible = false
             }

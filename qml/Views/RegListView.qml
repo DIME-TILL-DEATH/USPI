@@ -14,6 +14,12 @@ import "../CreateFunctions.js" as Scripts
 Row {
     property alias registerView: _registerMapView
     property alias deviceRegisterListModel: _deviceRegisterListModel
+    property alias controllerRegisterListModel: _controllerRegisterListModel
+
+    property alias regMaps: _stack.children
+    property alias currentMapIndex: _stack.currentIndex
+
+    signal selectRegMap(selectedRegList : var)
 
     padding: width / 50
     spacing: width / 25
@@ -83,25 +89,50 @@ Row {
                          border.width: 1
                          radius: 4
                      }
-                     onClicked: {_tabSelectMap.currentIndex = index}
+                     onClicked: {
+                         _tabSelectMap.currentIndex = index
+                         selectRegMap(_stack.children[index])
+                     }
                 }
         }
     }
 
 
     StackLayout{
+        id: _stack
+
         width: parent.width * 0.8
         height: parent.height
         currentIndex: _tabSelectMap.currentIndex
-        Item{
-            RegisterList{
-                id: _registerMapView
 
-                headerText: qsTr("Регистры устройства:")
-                model: DelegateModelRegList{
-                    id: _deviceRegisterListModel
-                }
+        RegisterList{
+            id: _registerMapView
+
+            headerText: qsTr("Регистры устройства:")
+
+            listModel: DelegateModelRegList{
+                id: _deviceRegisterListModel
+
+                model: RegisterMapModel
+                modelView: _registerMapView
             }
         }
+
+        RegisterList{
+            id: _controllerRegisterList
+
+            headerText: qsTr("Управление контроллером:")
+
+            listModel: DelegateModelRegList{
+                id: _controllerRegisterListModel
+
+                model: RegisterSequenceModel
+                modelView: _controllerRegisterList
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        selectRegMap(_stack.children[0])
     }
 }

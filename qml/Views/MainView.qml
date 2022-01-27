@@ -21,6 +21,19 @@ Item {
 
     property bool autoWrite : _sequenceControlPanel.rbAuto.checked
 
+    function updateRegisterMap()
+    {
+        console.log(_regListView.regMaps[_regListView.currentMapIndex].count)
+
+        //_sequenceControlPanel.registerMapView = _regListView.regMaps[_regListView.currentMapIndex]
+        _sequenceControlPanel.regCount = _regListView.regMaps[_regListView.currentMapIndex].count
+        _sequenceControlPanel.currentRegList = _regListView.regMaps[_regListView.currentMapIndex].listModel.model
+        _sequenceControlPanel.currentIndex = -1
+
+        _registerSequenceView.currentIndex = -1
+        // при загрузке не обнуляется _registerSequenceView, поэтому подсчёт ведётся не верно и даёт сбой
+    }
+
     Row{
         id: _row
 
@@ -30,15 +43,31 @@ Item {
         padding: width / 200
         spacing: width / 200
 
-        function selectRegisterMap(registerAdapter)
+
+
+        function selectRegister(registerAdapter, currentIndex)
         {
             Scripts.createRegisterFields(registerAdapter, _root)
+            _sequenceControlPanel.currentIndex = currentIndex
             _flickable.contentY = 0
-           // _registerSequenceView.currentIndex = -1
+        }
+
+        function selectMap(selectedRegisterList)
+        {
+            // current index, count
+            //console.log(selectedRegisterList.currentIndex)
+
+            //_sequenceControlPanel.registerMapView = selectedRegisterList
+            _sequenceControlPanel.regCount = selectedRegisterList.count
+            _sequenceControlPanel.currentIndex = selectedRegisterList.currentIndex
+            _sequenceControlPanel.currentRegList = selectedRegisterList.listModel.model
         }
 
         Component.onCompleted: {
-            _regListView.deviceRegisterListModel.delegateClicked.connect(selectRegisterMap)
+            _regListView.deviceRegisterListModel.delegateClicked.connect(selectRegister)
+            _regListView.controllerRegisterListModel.delegateClicked.connect(selectRegister)
+
+            _regListView.selectRegMap.connect(selectMap)
         }
 
         RegListView{
@@ -48,92 +77,6 @@ Item {
             width: parent.width * 0.15
         }
 
-//        TabBar{
-//            id: _tabSelectMap
-
-//            height: parent.height
-//            width: parent.width * 0.02
-
-//            TabButton{
-//                id:  control
-//                text: qsTr("Устройство")
-
-//            }
-//            TabButton{
-//                text: qsTr("Контроллер")
-//            }
-
-//            contentItem: ListView {
-//                    id: _listView
-
-//                    model: ListModel{
-//                        ListElement{ tabText: "Устройство"}
-//                        ListElement{ tabText: "Контроллер"}
-//                    }
-
-//                    currentIndex: _tabSelectMap.currentIndex
-
-
-//                    spacing: height/200
-//                    orientation: ListView.Vertical   // <<-- VERTICAL
-
-//                    delegate:
-//                    Button{
-//                        id: _delegateButton
-//                        width: _listView.width
-//                        height: _listView.height / 6
-
-//                        Text {
-//                            id: _btnText
-
-//                             text: tabText
-
-
-//                            transform: Rotation {
-//                                origin.x: t_metrics.tightBoundingRect.width/2
-//                                origin.y: t_metrics.tightBoundingRect.height/2
-//                                angle: -90}
-
-//                            anchors.horizontalCenter:  _delegateButton.horizontalCenter
-//                            anchors.verticalCenter:  _delegateButton.verticalCenter
-
-//                            // opacity: enabled ? 1.0 : 0.3
-//                         }
-
-//                        TextMetrics {
-//                                id:     t_metrics
-//                                font:   _btnText.font
-//                                text:   _btnText.text
-//                            }
-
-//                         background: Rectangle {
-//                           //  opacity: enabled ? 1 : 0.3
-//                             color: (_tabSelectMap.currentIndex === index) ? "lightgreen" : "lightgray"
-//                             border.color: control.down ? "#17a81a" : "#21be2b"
-//                             border.width: 1
-//                             radius: 4
-//                         }
-//                         onClicked: {_tabSelectMap.currentIndex = index}
-//                    }
-//            }
-//        }
-
-
-//        StackLayout{
-//            width: parent.width * 0.15
-//            height: parent.height
-//            currentIndex: _tabSelectMap.currentIndex
-//            Item{
-//                RegisterList{
-//                    id: _registerMapView
-
-//                    headerText: qsTr("Регистры устройства:")
-//                    model: DelegateModelRegList{
-//                        id: _registerListModel
-//                    }
-//                }
-//            }
-//        }
 
         Flickable{
             id: _flickable
@@ -163,8 +106,11 @@ Item {
         SequenceControlPanel{
             id: _sequenceControlPanel
 
-            registerMapView: _regListView.registerView
+            //registerMapView: _regListView.registerView
+
+            //regCount: _regListView.
             registerSequenceView: _registerSequenceView
+            currentRegList: RegisterMapModel
         }
 
         Column{
@@ -179,7 +125,7 @@ Item {
 
                 headerText: qsTr("Порядок записи:")
 
-                model: DelegateModelRegSequence{}
+                listModel: DelegateModelRegSequence{}
 
                 height: parent.height-_btnWrite.height-parent.padding*4
             }

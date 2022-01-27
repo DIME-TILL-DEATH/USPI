@@ -11,8 +11,6 @@ MouseArea{
     width: _registerMapView.width*0.9
     height: _registerMapView.height/10
 
-
-
     property bool dragEnabled: false
     property bool held: false
 
