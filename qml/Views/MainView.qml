@@ -23,15 +23,11 @@ Item {
 
     function updateRegisterMap()
     {
-        console.log(_regListView.regMaps[_regListView.currentMapIndex].count)
-
-        //_sequenceControlPanel.registerMapView = _regListView.regMaps[_regListView.currentMapIndex]
         _sequenceControlPanel.regCount = _regListView.regMaps[_regListView.currentMapIndex].count
         _sequenceControlPanel.currentRegList = _regListView.regMaps[_regListView.currentMapIndex].listModel.model
         _sequenceControlPanel.currentIndex = -1
 
         _registerSequenceView.currentIndex = -1
-        // при загрузке не обнуляется _registerSequenceView, поэтому подсчёт ведётся не верно и даёт сбой
     }
 
     Row{
@@ -54,10 +50,6 @@ Item {
 
         function selectMap(selectedRegisterList)
         {
-            // current index, count
-            //console.log(selectedRegisterList.currentIndex)
-
-            //_sequenceControlPanel.registerMapView = selectedRegisterList
             _sequenceControlPanel.regCount = selectedRegisterList.count
             _sequenceControlPanel.currentIndex = selectedRegisterList.currentIndex
             _sequenceControlPanel.currentRegList = selectedRegisterList.listModel.model
@@ -106,9 +98,6 @@ Item {
         SequenceControlPanel{
             id: _sequenceControlPanel
 
-            //registerMapView: _regListView.registerView
-
-            //regCount: _regListView.
             registerSequenceView: _registerSequenceView
             currentRegList: RegisterMapModel
         }

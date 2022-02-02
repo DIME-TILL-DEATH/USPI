@@ -25,7 +25,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     void resetModel();
-    void resetModel(std::vector<std::shared_ptr<Register> > &registerList);
+    void resetModel(const std::vector<std::shared_ptr<Register> > &registerList);
 
     Q_INVOKABLE void addItem(RegisterAdapter item, qint16 index);
     Q_INVOKABLE void changeItem(RegisterAdapter item, qint16 index);

@@ -1,8 +1,7 @@
 #include "abstractcontroller.h"
 
-AbstractController::AbstractController(AbstractInterface *interface, const QString &name, const QMap<QString, DevicePin> &devicePins)
-    : m_interface{interface},
-      m_deviceName{name},
+AbstractController::AbstractController(const QString &name, const QMap<QString, DevicePin> &devicePins)
+    : m_deviceName{name},
       m_devicePins{devicePins}
 {
 
@@ -18,6 +17,16 @@ bool AbstractController::setPinFunction(const DevicePin &pin, DevicePin::Functio
 const QMap<QString, DevicePin> &AbstractController::devicePins() const
 {
     return m_devicePins;
+}
+
+const std::vector<std::shared_ptr<Register> > &AbstractController::regMap()
+{
+    return m_controllerRegisterMap;
+}
+
+const QString &AbstractController::regMapFileName() const
+{
+    return m_regMapFileName;
 }
 
 const QString &AbstractController::deviceName() const

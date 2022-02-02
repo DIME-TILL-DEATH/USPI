@@ -126,6 +126,7 @@ QList<QByteArray> Register::rawData()
     quint16 chopPosition = 0;
     quint16 prevChopPosition = 0;
 
+
     // chopping for complex registers:
     for(auto it=separationPositions.begin(); it!=separationPositions.end(); ++it)
     {

@@ -21,10 +21,10 @@
 
 class JsonWorker;
 
-enum class  RegisterType
+enum class RegisterType
 {
-    DUT,
-    Controller
+    DUT=0x00,
+    Controller=0x01
 };
 
 class Register

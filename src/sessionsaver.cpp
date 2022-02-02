@@ -113,6 +113,14 @@ QJsonArray SessionSaver::saveWriteSequence()
             jsonItem["local"] = jsonLocalRegisterData;
         }
 
+        if(currentAdapter.getRegister()->registerType() == RegisterType::Controller)
+        {
+            QJsonObject jsonLocalRegisterData;
+            JsonWorker::saveRegister(*currentAdapter.getRegister(), jsonLocalRegisterData);
+
+            jsonItem["controller"] = jsonLocalRegisterData;
+        }
+
         jsonWriteSequenceArray.append(jsonItem);
         index++;
     }
@@ -137,6 +145,21 @@ bool SessionSaver::loadWriteSequence(QJsonObject globalObject)
                 if(variantObject.contains("local"))
                 {
                     QJsonObject jsonLocalRegisterObject = variantObject["local"].toObject();
+
+                    Register* reg_ptr = new Register();
+
+                    JsonWorker::readRegister(jsonLocalRegisterObject, reg_ptr);
+                    m_localRegisterMap->push_back(std::shared_ptr<Register>(reg_ptr));
+
+                    RegisterAdapter adapter(m_localRegisterMap->back());
+                    adapter.setIsLocal(true);
+
+                    m_registerWriteSequenceModel->changeItem(adapter, registerIndex);
+                }
+
+                if(variantObject.contains("controller"))
+                {
+                    QJsonObject jsonLocalRegisterObject = variantObject["controller"].toObject();
 
                     Register* reg_ptr = new Register();
 

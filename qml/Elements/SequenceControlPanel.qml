@@ -12,8 +12,6 @@ import "../CreateFunctions.js" as Scripts
 Rectangle{
     id: _root
 
-    //property var registerMapView
-
     property int currentIndex : -1
     property int regCount : 0
 

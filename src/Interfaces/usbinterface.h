@@ -35,7 +35,7 @@ public:
 
     const QString &interfaceName() const override;
 
-    std::vector<std::shared_ptr<AbstractController> >& connectedControllers() override;
+    //std::vector<std::shared_ptr<AbstractController> >& connectedControllers() override;
     const USBController &activeController() const;
 
     void refreshUSBDevices();
@@ -45,6 +45,8 @@ private:
 
     libusb_context* m_USBSession {nullptr};
 
+    // путаница с контроллерами в AbstractController. переписать чтоб использовался оттуда.
+    // по месту делать dynamic_cast если нужны специфичные пункты
     // TODO:
     // пока так, только один тип устройств
     // потом добавить функцию проверки соответствует ли устройство в списке полученных устройств USB

@@ -126,7 +126,7 @@ Row {
             listModel: DelegateModelRegList{
                 id: _controllerRegisterListModel
 
-                model: RegisterSequenceModel
+                model: ControllerRegMapModel
                 modelView: _controllerRegisterList
             }
         }
