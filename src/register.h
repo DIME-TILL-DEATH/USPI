@@ -21,9 +21,16 @@
 
 class JsonWorker;
 
+enum class RegisterType
+{
+    DUT=0x00,
+    Controller=0x01
+};
+
 class Register
 {
 public:
+
     friend class JsonWorker;
 
     Register();
@@ -50,11 +57,15 @@ public:
 
     quint16 bitSize() const;
 
+    RegisterType registerType() const;
+
 private:
     quint16 m_uniqueId;
 
-    QString m_name;
+    QString m_name{"Undefined"};
     quint16 m_bitSize;
+
+    RegisterType m_registerType{RegisterType::DUT};
 
     // shared pointer?
     std::vector<AbstractField*> m_fields;

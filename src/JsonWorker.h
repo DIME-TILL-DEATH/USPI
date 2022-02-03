@@ -15,6 +15,8 @@
 #include "register.h"
 #include "parseerror.h"
 
+#include "abstractcontroller.h"
+
 #include "abstractfield.h"
 #include "bitfield.h"
 #include "integerfield.h"
@@ -32,11 +34,12 @@ public:
 
     bool loadFile(const QString& name, ParseError* error = nullptr);
 
-    // может надо всё переписать на static? чтобы не надо было нигде создавать объект?
+    bool loadControllerRegMap(std::shared_ptr<AbstractController> controller, ParseError* error);
+
     bool readHeader(DUTDevice::Header *header, ParseError* error = nullptr);
     void saveHeader(const DUTDevice::Header& header);
 
-    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header *header, ParseError* error = nullptr);
+    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, RegisterType registerType, quint8 defaultBitSize, ParseError* error = nullptr);
     void saveRegisterArray(const std::vector<std::shared_ptr<Register> >& registerMap);
 
     static bool readRegister(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);
@@ -50,7 +53,6 @@ public:
 
 private:
     QJsonObject m_deviceGlobalObject;
-
 
     static bool readAbstractField(const QJsonObject &jsonObject, AbstractField* field, ParseError* error = nullptr);
     static void saveAbstractField(AbstractField* abstractField, QJsonObject& fieldObject);

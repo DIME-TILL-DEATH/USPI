@@ -1,0 +1,133 @@
+{
+    "registers" : [
+        {
+            "name" : "DELAY",
+			"size" : 32,
+			"fixed" :[
+				{
+					"name" : "Код команды",
+                    "position" : 0,
+					"size" : 16,
+					"value" : "0x0000",
+					"description"  : "Код команды"
+				}
+			],
+			"variant_lists" : [
+                {
+                    "name" : "Тип",
+					"position" : 16,
+                    "size"   : 8,
+					"description" : "Установка типа задержки перед отправкой команды",
+					"default_value" : "0x1",
+					"variants" : [
+						{
+							"name" : "Выключено",
+							"value" : 0
+						},
+						{
+							"name" : "Только перед следующим пакетом",
+							"value" : 1
+						},
+						{
+							"name" : "Для всех последующих пакетов",
+							"value" : 2
+						}
+					]
+                }
+            ],
+			
+            "integers" : [
+                {
+                    "name" : "Время, мс",
+                    "position" : 24,
+                    "size"   : 8,
+					"description"  : "Величина задежки"
+                }
+            ]
+        },
+		
+		
+        {
+            "name" : "PIN SET",
+			"size" : 32,
+			
+			"fixed" :[
+				{
+					"name" : "Код команды",
+                    "position" : 0,
+					"size" : 16,
+					"value" : "0x0100",
+					"description"  : "Код команды"
+				}
+			],
+			"variant_lists" : [
+                {
+                    "name" : "Значение",
+					"position" : 16,
+                    "size"   : 4,
+					"default_value" : "0x1",
+					"description" : "Установка состояния вывода",
+					"variants" : [
+						{
+							"name" : "Логический 0",
+							"value" : 0
+						},
+						{
+							"name" : "Логическая 1",
+							"value" : 1
+						},
+						{
+							"name" : "Третье состояние",
+							"value" : 2
+						}
+					]
+                },
+				{
+                    "name" : "Порт",
+					"position" : 20,
+                    "size"   : 4,
+					"description" : "Порт",
+					"variants" : [
+						{
+							"name" : "Порт 0",
+							"value" : 0
+						}
+					]
+                }
+            ],
+			
+            "bits" : [
+			    {
+                    "name" : "PIN 0",
+                    "position" : 24,
+					"description"     : "Установка состояния для PIN0"
+                },
+				{
+                    "name" : "PIN 1",
+                    "position" : 25,
+					"description"     : "Установка состояния для PIN1"
+                },
+				{
+                    "name" : "PIN 2",
+                    "position" : 26,
+					"description"     : "Установка состояния для PIN2"
+                },
+				{
+                    "name" : "PIN 3",
+                    "position" : 27,
+					"description"     : "Установка состояния для PIN3"
+                },
+				{
+                    "name" : "PIN 4",
+                    "position" : 28,
+					"description"     : "Установка состояния для PIN4"
+                },
+				{
+                    "name" : "PIN 5",
+                    "position" : 29,
+					"description"     : "Установка состояния для PIN5"
+                }
+            ]
+        }
+	]
+}

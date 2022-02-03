@@ -10,8 +10,9 @@
 class USBController : public AbstractController
 {
 public:
-    USBController(AbstractInterface *interface, const QString &name, const QMap<QString, DevicePin> &devicePins);
+    USBController(const QString &name, const QMap<QString, DevicePin> &devicePins);
 
+    // private????
     // TODO: rearrange
     libusb_device* device_ptr{nullptr};
     libusb_device_handle* handle{nullptr};

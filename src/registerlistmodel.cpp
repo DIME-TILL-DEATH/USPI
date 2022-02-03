@@ -83,7 +83,7 @@ void RegisterListModel::resetModel()
     endResetModel();
 }
 
-void RegisterListModel::resetModel(std::vector<std::shared_ptr<Register> > &registerList)
+void RegisterListModel::resetModel(const std::vector<std::shared_ptr<Register> > &registerList)
 {
     beginResetModel();
     m_data.clear();

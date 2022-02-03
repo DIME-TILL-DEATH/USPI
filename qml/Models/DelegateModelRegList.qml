@@ -10,15 +10,16 @@ import "../CreateFunctions.js" as Scripts
 DelegateModel {
        id: registerListModel
 
-       signal delegateClicked(registerAdapter : var)
+       property var modelView
 
-       model: RegisterMapModel
+       signal delegateClicked(registerAdapter : var, index : int)
 
        delegate: RegisterHeader{
                onClicked: {
                    // hard code!
-                   _registerMapView.currentIndex = index
-                   delegateClicked(register)
+//                   _registerMapView.currentIndex = index
+                   modelView.currentIndex = index
+                   delegateClicked(register, index)
                }
        }
 }

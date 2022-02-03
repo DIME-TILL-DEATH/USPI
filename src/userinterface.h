@@ -52,7 +52,8 @@ public:
     const QString& currentInterface() const;
     bool setCurrentInterface(const QString& interfaceName);
 
-    RegisterListModel *registerMapModel();
+    RegisterListModel *deviceRegMapModel();
+    RegisterListModel *controllerRegMapModel();
     RegisterListModel *registerSequenceModel();
 
     QStringList avaliableInterfaces();
@@ -81,8 +82,9 @@ private:
 
     std::vector<std::shared_ptr<Register> > m_localRegisterMap;
 
-    RegisterListModel m_registerMapModel{m_device.deviceRegisterMap()};
-    RegisterListModel m_registerSequenceModel;
+    RegisterListModel m_deviceRegMapModel{m_device.deviceRegisterMap()};
+    RegisterListModel m_controllerRegMapModel;
+    RegisterListModel m_regSequenceModel;
 
     SessionSaver m_saver;
 

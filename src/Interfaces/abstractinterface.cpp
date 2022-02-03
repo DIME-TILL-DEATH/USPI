@@ -2,7 +2,9 @@
 
 AbstractInterface::AbstractInterface()
 {
-
+   // For debugging purposes
+    std::shared_ptr<AbstractController> defaultUSBController(new AbstractController("ATMega16U2"));
+    connectedControllers().push_back(defaultUSBController);
 }
 
 bool AbstractInterface::writeRegister(Register *wrReg)
@@ -30,6 +32,11 @@ const DUTDevice::Header &AbstractInterface::deviceHeader() const
 void AbstractInterface::setDeviceHeader(const DUTDevice::Header &newDeviceHeader)
 {
     m_deviceHeader = newDeviceHeader;
+}
+
+std::shared_ptr<AbstractController> AbstractInterface::selectedController()
+{
+    return m_connectedControllers.at(0);
 }
 
 std::vector<std::shared_ptr<AbstractController> > &AbstractInterface::connectedControllers()

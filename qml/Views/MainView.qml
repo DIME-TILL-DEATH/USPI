@@ -16,10 +16,19 @@ Item {
 
     property alias fieldsView: _fieldsView
     property alias resultView: _text
-    property alias registerView: _registerMapView
+    property alias registerView: _regListView
     property alias registerSequenceView: _registerSequenceView
 
     property bool autoWrite : _sequenceControlPanel.rbAuto.checked
+
+    function updateRegisterMap()
+    {
+        _sequenceControlPanel.regCount = _regListView.regMaps[_regListView.currentMapIndex].count
+        _sequenceControlPanel.currentRegList = _regListView.regMaps[_regListView.currentMapIndex].listModel.model
+        _sequenceControlPanel.currentIndex = -1
+
+        _registerSequenceView.currentIndex = -1
+    }
 
     Row{
         id: _row
@@ -30,28 +39,36 @@ Item {
         padding: width / 200
         spacing: width / 200
 
-        function selectRegisterMap(registerAdapter)
+
+
+        function selectRegister(registerAdapter, currentIndex)
         {
             Scripts.createRegisterFields(registerAdapter, _root)
+            _sequenceControlPanel.currentIndex = currentIndex
             _flickable.contentY = 0
-           // _registerSequenceView.currentIndex = -1
+        }
+
+        function selectMap(selectedRegisterList)
+        {
+            _sequenceControlPanel.regCount = selectedRegisterList.count
+            _sequenceControlPanel.currentIndex = selectedRegisterList.currentIndex
+            _sequenceControlPanel.currentRegList = selectedRegisterList.listModel.model
         }
 
         Component.onCompleted: {
-            _registerListModel.delegateClicked.connect(selectRegisterMap)
+            _regListView.deviceRegisterListModel.delegateClicked.connect(selectRegister)
+            _regListView.controllerRegisterListModel.delegateClicked.connect(selectRegister)
+
+            _regListView.selectRegMap.connect(selectMap)
         }
 
+        RegListView{
+            id: _regListView
 
-        RegisterList{
-            id: _registerMapView
-
-            headerText: qsTr("Карта регистров:")
-            model: DelegateModelRegList{
-                id: _registerListModel
-            }
-
+            height: parent.height
             width: parent.width * 0.15
         }
+
 
         Flickable{
             id: _flickable
@@ -81,8 +98,8 @@ Item {
         SequenceControlPanel{
             id: _sequenceControlPanel
 
-            registerMapView: _registerMapView
             registerSequenceView: _registerSequenceView
+            currentRegList: RegisterMapModel
         }
 
         Column{
@@ -97,7 +114,7 @@ Item {
 
                 headerText: qsTr("Порядок записи:")
 
-                model: DelegateModelRegSequence{}
+                listModel: DelegateModelRegSequence{}
 
                 height: parent.height-_btnWrite.height-parent.padding*4
             }

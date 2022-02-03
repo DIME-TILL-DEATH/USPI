@@ -6,10 +6,16 @@ QtObject {
     readonly property color borderColorActive:    "blue"
     readonly property color borderColorPassive:   "gray"
 
+    //
     readonly property color regHeaderActiveGlobal  : "skyblue"
     readonly property color regHeaderPassiveGlobal : "white"
     readonly property color regHeaderActiveLocal : "lightgreen"
     readonly property color regHeaderPassiveLocal : "lightgray"
+    //
+    readonly property color regHeaderActiveDUT  : "skyblue"
+    readonly property color regHeaderPassiveDUT : "white"
+    readonly property color regHeaderActiveController : "lightgreen"
+    readonly property color regHeaderPassiveController : "lightgray"
 
     readonly property color separationField  : "azure"
 

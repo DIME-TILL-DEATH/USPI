@@ -59,6 +59,15 @@ QString RegisterAdapter::value()
     return result;
 }
 
+QString RegisterAdapter::registerType()
+{
+    switch(m_register->registerType())
+    {
+        case RegisterType::DUT: return "DUT";
+        case RegisterType::Controller: return "Controller";
+    }
+}
+
 Register *RegisterAdapter::getRegister() const
 {
     return m_register.get();

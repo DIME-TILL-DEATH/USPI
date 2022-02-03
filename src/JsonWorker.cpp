@@ -50,6 +50,12 @@ bool JsonWorker::loadFile(const QString &name, ParseError* error)
     }
 }
 
+bool JsonWorker::loadControllerRegMap(std::shared_ptr<AbstractController> controller, ParseError* error)
+{
+    if(!readRegisterArray(&controller->m_controllerRegisterMap, RegisterType::Controller, 16, error)) return false;
+    return true;
+}
+
 bool JsonWorker::readHeader(DUTDevice::Header* header, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("header") && m_deviceGlobalObject["header"].isObject())
@@ -117,7 +123,7 @@ void JsonWorker::saveHeader(const DUTDevice::Header& header)
     m_deviceGlobalObject["header"] = jsonDeviceHeaderObject;
 }
 
-bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTDevice::Header* header, ParseError *error)
+bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, RegisterType registerType, quint8 defaultBitSize, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("registers") && m_deviceGlobalObject["registers"].isArray())
     {
@@ -131,7 +137,8 @@ bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
             QJsonObject registerObject = registerArray[registerIndex].toObject();
             Register* deviceRegister = new Register;
 
-            deviceRegister->m_bitSize = header->registerSize;
+            deviceRegister->m_registerType = registerType;
+            deviceRegister->m_bitSize = defaultBitSize;
 
             if(!readRegister(registerObject, deviceRegister, error))
             {
@@ -262,6 +269,11 @@ bool JsonWorker::readRegister(const QJsonObject& jsonObject, Register *deviceReg
         deviceRegister->m_bitSize = jsonObject["size"].toDouble();
     }
 
+    if(jsonObject.contains("reg type") && jsonObject["reg type"].isDouble())
+    {
+        deviceRegister->m_registerType = static_cast<RegisterType>(jsonObject["reg type"].toDouble());
+    }
+
     // clear previous pointers
     for(auto it = deviceRegister->m_fields.begin(); it!= deviceRegister->m_fields.end(); ++it)
             delete *it;
@@ -290,6 +302,7 @@ void JsonWorker::saveRegister(const Register &deviceRegister, QJsonObject &jsonR
 {
     jsonRegister["name"] = deviceRegister.name();
     jsonRegister["size"] = deviceRegister.bitSize();
+    jsonRegister["reg type"] = static_cast<quint8>(deviceRegister.registerType());
 
     QJsonArray jsonBitFieldArray;
     QJsonArray jsonFixedFieldArray;

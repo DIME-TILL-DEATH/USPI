@@ -61,10 +61,12 @@ ApplicationWindow {
                 onAccepted: {
                     var result = Backend.loadSession(fileUrl)
 
-                    Scripts.clearRegisterFields(_registerMapView)
+                    Scripts.clearRegisterFields(_mainView)
 
-                    _registerMapView.registerView.currentIndex = -1
-                    _registerMapView.registerSequenceView.currentIndex = -1
+                    _mainView.updateRegisterMap()
+                    //!!!!!!!
+                   // _mainView.registerView.registerView.currentIndex = -1
+                   // _mainView.registerView.registerSequenceView.currentIndex = -1
                 }
                 Component.onCompleted: visible = false
             }
@@ -99,12 +101,12 @@ ApplicationWindow {
     OpenFileDeviceDialog{
         id: _fileDeviceDialog
 
-        registerMapView: _registerMapView
+        mainView: _mainView
     }
 
 
-    RegisterMapView{
-        id: _registerMapView
+    MainView{
+        id: _mainView
 
         width: parent.width
         height: parent.height *0.8
@@ -119,9 +121,9 @@ ApplicationWindow {
     }
 
     function fieldChanged(fieldId, newValue){
-        _registerMapView.resultView.text = "Результат: 0x" + _registerMapView.fieldsView.registerAdapter.value()
+        _mainView.resultView.text = "Результат: 0x" + _mainView.fieldsView.registerAdapter.value()
 
-        if(_registerMapView.autoWrite)
+        if(_mainView.autoWrite)
         {
             Backend.writeSequence()
         }

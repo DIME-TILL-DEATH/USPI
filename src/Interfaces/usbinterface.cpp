@@ -4,7 +4,7 @@
 
 USBInterface::USBInterface()
     :m_interfaceName{InterfaceNames::USB},
-     m_activeController{this, "null", {}}
+     m_activeController{"null", {}}
 {
     int rtnValue;
     rtnValue = libusb_init(&m_USBSession);
@@ -103,8 +103,7 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
                 }
             }
 
-            regData.prepend((uchar)0x00); //reserved byte
-//            regData.prepend((*itSeq)->bitSize());
+            regData.prepend((uchar)(*itSeq)->registerType());
             regData.prepend(bitSize);
 
             bytesInPacket += regData.size();
@@ -148,10 +147,10 @@ const QString &USBInterface::interfaceName() const
     return m_interfaceName;
 }
 
-std::vector<std::shared_ptr<AbstractController> > &USBInterface::connectedControllers()
-{
+//std::vector<std::shared_ptr<AbstractController> > &USBInterface::connectedControllers()
+//{
 
-}
+//}
 
 const USBController &USBInterface::activeController() const
 {
@@ -344,8 +343,11 @@ QByteArray USBInterface::formHeader(quint16 regCount, quint16 packetSize)
     uchar reservedByte = 0x00;
 
     QByteArray result;
-    result.append((1 << USBBitPosition::SPI)|(0<<USBBitPosition::PARALLEL)|
-                  (m_deviceHeader.isMSB<<USBBitPosition::ORDER)|(0<<USBBitPosition::TRIGGER));
+   // result.append((1 << USBBitPosition::SPI)|(0<<USBBitPosition::PARALLEL)|
+
+    //              (m_deviceHeader.isMSB<<USBBitPosition::ORDER)|(0<<USBBitPosition::TRIGGER));
+
+    result.append(0<<USBBitPosition::TRIGGER);
     result.append(regCount);
     result.append(packetSize + USBFieldSize::HEADER);
     result.append(reservedByte); //reserved byte

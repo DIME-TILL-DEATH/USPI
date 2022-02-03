@@ -61,9 +61,18 @@ MouseArea{
 
         radius: width/10
 
-        color: isLocal ?
-               (parent.ListView.isCurrentItem ? Style.regHeaderActiveLocal : Style.regHeaderPassiveLocal) :
-               (parent.ListView.isCurrentItem ? Style.regHeaderActiveGlobal : Style.regHeaderPassiveGlobal)
+        color: {
+            if(register!==undefined){
+                switch(register.registerType){
+                   case "DUT": return parent.ListView.isCurrentItem ? Style.regHeaderActiveDUT : Style.regHeaderPassiveDUT
+                   case "Controller": return parent.ListView.isCurrentItem ? Style.regHeaderActiveController : Style.regHeaderPassiveController
+                   }
+            }
+            else
+                return "white"
+        }
+//            isLocal ? (parent.ListView.isCurrentItem ? Style.regHeaderActiveLocal : Style.regHeaderPassiveLocal) :
+//                      (parent.ListView.isCurrentItem ? Style.regHeaderActiveGlobal : Style.regHeaderPassiveGlobal)
 
 
         Drag.active: _rootMA.held
