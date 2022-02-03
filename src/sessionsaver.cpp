@@ -129,6 +129,8 @@ QJsonArray SessionSaver::saveWriteSequence()
 
 bool SessionSaver::loadWriteSequence(QJsonObject globalObject)
 {
+    m_registerWriteSequenceModel->resetModel();
+
     if(globalObject.contains("write sequence") && globalObject["write sequence"].isArray())
     {
         QJsonArray sequnceArray = globalObject["write sequence"].toArray();
