@@ -106,14 +106,38 @@ Rectangle{
             enabled: (registerSequenceView.count>0) ? true : false
             text: "<<"
             onPressed: {
-                for(var i=registerSequenceView.count-1; i >= 0; i--)
-                {
-                    RegisterSequenceModel.removeItem(i)
+                dialog.open()
+            }
+
+            Dialog {
+                id: dialog
+
+                title: qsTr("Подтверждение удаления")
+                standardButtons: Dialog.Ok | Dialog.Cancel
+                modal: true
+
+                Label {
+                   text: "Вы действительно хотите удалить все регистры?"
                 }
 
-                if(registerSequenceView.currentIndex > -1)
+                onAccepted:
                 {
-                    Scripts.clearRegisterFields(_root.parent.parent)
+                    for(var i=registerSequenceView.count-1; i >= 0; i--)
+                    {
+                        RegisterSequenceModel.removeItem(i)
+                    }
+
+                    if(registerSequenceView.currentIndex > -1)
+                    {
+                        Scripts.clearRegisterFields(_root.parent.parent)
+                    }
+                }
+
+                //onRejected: console.log("Cancel clicked")
+                //[transitions]
+                enter: Transition {
+                        NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 250  }
+
                 }
             }
         }
