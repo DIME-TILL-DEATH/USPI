@@ -21,6 +21,7 @@ void JsonWorker::setDeviceGlobalObject(const QJsonObject &newDeviceGlobalObject)
 bool JsonWorker::loadFile(const QString &name, ParseError* error)
 {
     QFile deviceFile(name);
+
     if(!deviceFile.open(QIODevice::ReadOnly))
     {
         if(error != nullptr) error->setErrorType(ParseError::ErrorType::FileError, name);

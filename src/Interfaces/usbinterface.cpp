@@ -187,6 +187,9 @@ bool USBInterface::initUSB()
 
     if(m_activeController.handle == nullptr)
     {
+        m_activeController.deviceName.clear();
+        m_activeController.deviceInfo.clear();
+
         qWarning() << QObject::tr("Не удалось открыть USB устройство.");
         return false;
     }
@@ -347,7 +350,7 @@ QByteArray USBInterface::formHeader(quint16 regCount, quint16 packetSize)
 
     //              (m_deviceHeader.isMSB<<USBBitPosition::ORDER)|(0<<USBBitPosition::TRIGGER));
 
-    result.append(0<<USBBitPosition::TRIGGER);
+    result.append(0<<USBBitPosition::TRIGGER | (m_deviceHeader.channelNumber & 0xF));
     result.append(regCount);
     result.append(packetSize + USBFieldSize::HEADER);
     result.append(reservedByte); //reserved byte

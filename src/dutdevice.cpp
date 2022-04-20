@@ -48,6 +48,16 @@ const DUTDevice::Header &DUTDevice::deviceHeader() const
     return m_deviceHeader;
 }
 
+void DUTDevice::setChannelNumber(quint8 chNum)
+{
+    m_deviceHeader.channelNumber = chNum;
+}
+
+quint8 DUTDevice::channelNumber()
+{
+    return m_deviceHeader.channelNumber;
+}
+
 std::shared_ptr<Register> DUTDevice::registerByUniqueId(quint16 uniqueId)
 {
     for(auto it = m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)

@@ -39,12 +39,14 @@ signals:
     void loadRequest(QString plugInName, const QMap<QString, QString>& dataToLoad);
 
     void writeRegisterSequenceRequest(QStringList registerNames);
+    void writeRegisterSequenceRequest();
 
 public slots:
     void setFieldValue(QString registerName, QString fieldName, QVariant value);
     void getFieldValue(QString registerName, QString fieldName, QVariant& value);
 
     void writeRegisterSequence(QStringList registerNames);
+    void writeRegisterSequence();
 };
 
 #endif // EXTENSIONMANAGER_H

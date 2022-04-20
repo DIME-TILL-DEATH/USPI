@@ -24,12 +24,16 @@ public:
         QString version{""};
         quint8 registerSize{32};
         bool isMSB{true};
+        quint8 channelNumber{0};
     };
 
     const QString& name() const;
 
     std::vector<std::shared_ptr<Register> > &deviceRegisterMap();
     const Header &deviceHeader() const;
+
+    void setChannelNumber(quint8 chNum);
+    quint8 channelNumber();
 
     std::shared_ptr<Register> registerByUniqueId(quint16 uniqueId);
     std::shared_ptr<Register> registerByName(QString registerName);

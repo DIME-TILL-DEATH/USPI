@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 
 import Qt.labs.platform 1.1
 
@@ -17,6 +18,7 @@ Rectangle{
     property int valueTo: (adapter !== undefined) ? adapter.valueTo : 255
 
     signal fieldChanged(fieldId : string, newValue : int)
+
 
     width: parent.width
     height: parent.height/Style.fieldsOnScreen

@@ -86,6 +86,9 @@ void ExtensionManager::loadPlugin(PluginInfo pluginInfo)
         connect(dynamic_cast<QObject*>(plugin), SIGNAL(writeRegisterSequence(QStringList)),
                 this, SLOT(writeRegisterSequence(QStringList)));
 
+        connect(dynamic_cast<QObject*>(plugin), SIGNAL(writeRegisterSequence()),
+                this, SLOT(writeRegisterSequence()));
+
 
         connect(this, SIGNAL(saveRequest(QString,QMap<QString,QString>&)),
                 dynamic_cast<QObject*>(plugin), SLOT(saveRequest(QString,QMap<QString,QString>&)));
@@ -276,4 +279,9 @@ void ExtensionManager::getFieldValue(QString registerName, QString fieldName, QV
 void ExtensionManager::writeRegisterSequence(QStringList registerNames)
 {
     emit writeRegisterSequenceRequest(registerNames);
+}
+
+void ExtensionManager::writeRegisterSequence()
+{
+    emit writeRegisterSequenceRequest();
 }

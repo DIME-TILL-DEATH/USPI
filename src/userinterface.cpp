@@ -37,7 +37,8 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
     font.setStyleStrategy(QFont::NoSubpixelAntialias);
     QGuiApplication::setFont(font);
 
-    connect(&extensionManager, &ExtensionManager::writeRegisterSequenceRequest, this, &UserInterface::writeCustomSequence);
+    connect(&extensionManager, SIGNAL(writeRegisterSequenceRequest()), this, SLOT(writeSequence()));
+    connect(&extensionManager, SIGNAL(writeRegisterSequenceRequest(QStringList)), this, SLOT(writeCustomSequence(QStringList)));
 }
 
 UserInterface::~UserInterface()
@@ -69,7 +70,7 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
 {
     QList<AbstractInterface*> avaliableInterfacesList = m_avaliableInterfaces->values();
 
-    // такой поиск чтобы проверить что интерфейс точно найден QHash->value() возвращает defual constr. если не найден
+    // такой поиск чтобы проверить что интерфейс точно найден QHash->value() возвращает default constr. если не найден
     for(auto it = avaliableInterfacesList.begin(); it != avaliableInterfacesList.end(); ++it)
     {
         if((*it)->interfaceName() == interfaceName)
