@@ -22,7 +22,10 @@ Rectangle{
     color: Style.separationField
 
     FieldTip{
-        tipText: (adapter !== undefined) ? (adapter.name + ":\n\n" + adapter.description) : "описание"
+        tipText: (adapter !== undefined) ? (adapter.name + ":\n\n"
+                                            + adapter.description
+                                            + ((adapter.comment!=="") ? "\n\n" + adapter.comment : ""))
+                                         : "описание"
     }
 
 //    Row{
