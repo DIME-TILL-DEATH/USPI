@@ -1,6 +1,10 @@
 #include "fileinterface.h"
 
-FileInterface::FileInterface()
+#include "interfacenames.h"
+
+FileInterface::FileInterface(QObject *parent)
+              : AbstractInterface(parent),
+                m_interfaceName{InterfaceNames::File}
 {
     m_settings.beginGroup("FileInterface");
     m_filePath = m_settings.value("filePath", "result.txt").toString();

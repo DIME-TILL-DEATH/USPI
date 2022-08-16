@@ -18,6 +18,7 @@
 #include "abstractinterface.h"
 #include "fileinterface.h"
 #include "usbinterface.h"
+#include "ethernetinterface.h"
 
 struct UserSettings
 {
@@ -70,17 +71,21 @@ public:
     Q_INVOKABLE void updateAvaliableInterfaces();
 
     // нейминг не очень
-    Q_INVOKABLE void changeWriteItemLocal(quint16 index);
+//    Q_INVOKABLE void changeWriteItemLocal(quint16 index);
+
+    Q_INVOKABLE void addRegisterToSequence(const RegisterAdapter& regAdapter, qint16 index = -1);
+    Q_INVOKABLE void removeRegisterFromSequence(qint16 index);
 
     const UserSettings &userSettings() const;
     void setUserSettings(const UserSettings &newSettings);
+
 
 private:
     DUTDevice m_device;
 
     ExtensionManager extensionManager;
 
-    std::vector<std::shared_ptr<Register> > m_localRegisterMap;
+    std::vector<std::shared_ptr<Register> > m_regSequenceMap;
 
     RegisterListModel m_deviceRegMapModel{m_device.deviceRegisterMap()};
     RegisterListModel m_controllerRegMapModel;
@@ -93,9 +98,11 @@ private:
 
     quint32 m_globalRegIdCounter;
 
+    // Лист с указателями?
     AbstractInterface* m_abstractInterface;
     FileInterface* m_fileInterface;
     USBInterface* m_usbInterface;
+    EthernetInterface* m_ethernetInterface;
 
     QSettings m_applicationSettings;
 

@@ -2,16 +2,17 @@
 
 
 
-USBInterface::USBInterface()
-    :m_interfaceName{InterfaceNames::USB},
-     m_activeController{"null", {}}
+USBInterface::USBInterface(QObject *parent)
+     :AbstractInterface(parent),
+      m_interfaceName{InterfaceNames::USB},
+      m_activeController{"null", {}}
 {
     int rtnValue;
     rtnValue = libusb_init(&m_USBSession);
 
     if(rtnValue < 0)
     {
-        qWarning() << QObject::tr("Не удалось инициализировать libusb: ") << libusb_error_name(rtnValue);
+        qWarning() << tr("Не удалось инициализировать libusb: ") << libusb_error_name(rtnValue);
         m_isAvaliable = false;
     }
     else
@@ -64,7 +65,7 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
 {
     if(m_activeController.handle == nullptr)
     {
-        qWarning() << QObject::tr("Устройство USB не готово");
+        qWarning() << tr("Устройство USB не готово");
         return false;
     }
 
@@ -130,12 +131,12 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
 
     if(rtnValue < 0)
     {
-        qWarning() << QObject::tr("Ошибка отправки на USB устройство:") << libusb_strerror(rtnValue);
+        qWarning() << tr("Ошибка отправки на USB устройство:") << libusb_strerror(rtnValue);
         return false;
     }
     if(dataSize > actualWrittenBytes)
     {
-        qWarning() << QObject::tr("Отправлено: ") << actualWrittenBytes << QObject::tr(", тогда как размер посылки: ") << dataSize;
+        qWarning() << tr("Отправлено: ") << actualWrittenBytes << tr(", тогда как размер посылки: ") << dataSize;
         return false;
     }
 
@@ -190,13 +191,13 @@ bool USBInterface::initUSB()
         m_activeController.deviceName.clear();
         m_activeController.deviceInfo.clear();
 
-        qWarning() << QObject::tr("Не удалось открыть USB устройство.");
+        qWarning() << tr("Не удалось открыть USB устройство.");
         return false;
     }
 
     if(!initDevice(m_activeController))
     {
-        qWarning() << QObject::tr("Не удалось инициализировать USB устройство.");
+        qWarning() << tr("Не удалось инициализировать USB устройство.");
         return false;
     }
 
@@ -214,7 +215,7 @@ bool USBInterface::initDevice(USBController& device)
 
         if(rtnValue < 0)
         {
-            qWarning() << QObject::tr("Failed to claim interface: ") << libusb_strerror(rtnValue);
+            qWarning() << tr("Failed to claim interface: ") << libusb_strerror(rtnValue);
             return false;
         }
 
@@ -225,7 +226,7 @@ bool USBInterface::initDevice(USBController& device)
 
         if (rtnValue < 0)
         {
-            qWarning() << QObject::tr("Failed to get device descriptor: ") << libusb_strerror(rtnValue);
+            qWarning() << tr("Failed to get device descriptor: ") << libusb_strerror(rtnValue);
             return false;
         }
         unsigned char manufacturer[200];
@@ -346,14 +347,11 @@ QByteArray USBInterface::formHeader(quint16 regCount, quint16 packetSize)
     uchar reservedByte = 0x00;
 
     QByteArray result;
-   // result.append((1 << USBBitPosition::SPI)|(0<<USBBitPosition::PARALLEL)|
-
-    //              (m_deviceHeader.isMSB<<USBBitPosition::ORDER)|(0<<USBBitPosition::TRIGGER));
 
     result.append(0<<USBBitPosition::TRIGGER | (m_deviceHeader.channelNumber & 0xF));
     result.append(regCount);
     result.append(packetSize + USBFieldSize::HEADER);
-    result.append(reservedByte); //reserved byte
+    result.append(reservedByte);
 
     return result;
 }

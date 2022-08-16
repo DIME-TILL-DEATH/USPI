@@ -1,2 +1,2 @@
-windeployqt USPI-deploy\USPI.exe -qmldir qml
+windeployqt ..\USPI-deploy\USPI.exe -qmldir qml
 pause

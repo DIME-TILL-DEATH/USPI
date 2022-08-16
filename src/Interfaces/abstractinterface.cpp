@@ -1,6 +1,7 @@
 #include "abstractinterface.h"
 
-AbstractInterface::AbstractInterface()
+AbstractInterface::AbstractInterface(QObject *parent)
+                  :QObject(parent)
 {
    // For debugging purposes
     std::shared_ptr<AbstractController> defaultUSBController(new AbstractController("ATMega16U2"));

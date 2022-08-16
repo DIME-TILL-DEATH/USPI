@@ -28,7 +28,7 @@ private:
 
     DUTDevice* m_device;
     ExtensionManager *m_extensionManager;
-    std::vector<std::shared_ptr<Register> >* m_localRegisterMap;
+    std::vector<std::shared_ptr<Register> >* m_regSequenceMap;
     RegisterListModel* m_registerMapModel;
     RegisterListModel* m_registerWriteSequenceModel;
 

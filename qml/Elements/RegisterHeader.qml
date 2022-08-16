@@ -71,9 +71,6 @@ MouseArea{
             else
                 return "white"
         }
-//            isLocal ? (parent.ListView.isCurrentItem ? Style.regHeaderActiveLocal : Style.regHeaderPassiveLocal) :
-//                      (parent.ListView.isCurrentItem ? Style.regHeaderActiveGlobal : Style.regHeaderPassiveGlobal)
-
 
         Drag.active: _rootMA.held
         Drag.source: _rootMA

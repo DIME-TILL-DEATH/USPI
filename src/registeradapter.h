@@ -35,15 +35,15 @@ public:
 
     Register *getRegister() const;
 
-    bool isLocal() const;
-    void setIsLocal(bool newIsLocal);
+//    bool isLocal() const;
+//    void setIsLocal(bool newIsLocal);
 
 private:
     std::shared_ptr<Register> m_register;
 
     QMap<quint16, FieldAdapter> m_bufferedFieldAdapters;
 
-    bool m_isLocal{false};
+//    bool m_isLocal{false};
 };
 Q_DECLARE_METATYPE(RegisterAdapter)
 

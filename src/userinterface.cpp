@@ -8,12 +8,13 @@
 UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent)
     : QObject(parent),
       extensionManager(&m_device),
-      m_saver{&m_device, &extensionManager, &m_localRegisterMap, &m_deviceRegMapModel, &m_regSequenceModel},
+      m_saver{&m_device, &extensionManager, &m_regSequenceMap, &m_deviceRegMapModel, &m_regSequenceModel},
       m_avaliableInterfaces{avaliableInterfaces}
 {
-    m_abstractInterface = new AbstractInterface();
-    m_fileInterface = new FileInterface();
-    m_usbInterface = new USBInterface();
+    m_abstractInterface = new AbstractInterface(this);
+    m_fileInterface = new FileInterface(this);
+    m_usbInterface = new USBInterface(this);
+    m_ethernetInterface = new EthernetInterface(this);
 
     updateAvaliableInterfaces();
     if(m_interface_ptr == nullptr)
@@ -51,9 +52,9 @@ UserInterface::~UserInterface()
 
     m_applicationSettings.endGroup();
 
-    delete m_abstractInterface;
-    delete m_fileInterface;
-    delete m_usbInterface;
+//    delete m_abstractInterface;
+//    delete m_fileInterface;
+//    delete m_usbInterface;
 }
 
 const QString &UserInterface::dutDeviceName() const
@@ -120,6 +121,7 @@ bool UserInterface::loadDevice(const QUrl &fileName)
 
     emit dutDeviceUpdated();
     m_regSequenceModel.resetModel();
+    m_regSequenceMap.clear();
     m_deviceRegMapModel.resetModel(m_device.deviceRegisterMap());
 
     // load plugins for device
@@ -247,6 +249,8 @@ void UserInterface::updateAvaliableInterfaces()
     m_usbInterface->refreshUSBDevices();
     if(m_usbInterface->isAvaliable()) m_avaliableInterfaces->insert(m_usbInterface->interfaceName(), m_usbInterface);
 
+    m_avaliableInterfaces->insert(m_ethernetInterface->interfaceName(), m_ethernetInterface);
+
     if(m_avaliableInterfaces->contains(prevSelectedInterface))
     {
         //m_interface_ptr = m_avaliableInterfaces->value(prevSelectedInterface);
@@ -262,28 +266,54 @@ void UserInterface::updateAvaliableInterfaces()
     emit interfaceUpdated();
 }
 
-void UserInterface::changeWriteItemLocal(quint16 index)
+//void UserInterface::changeWriteItemLocal(quint16 index)
+//{
+//    if(!m_regSequenceModel.registerAdaptersList().at(index).isLocal())
+//    {
+//        Register* regCopy_ptr = new Register(*(m_regSequenceModel.registerAdaptersList().at(index).getRegister()));
+//        m_regSequenceMap.push_back(std::shared_ptr<Register>(regCopy_ptr));
+
+//        RegisterAdapter adapter(m_regSequenceMap.back());
+//        adapter.setIsLocal(true);
+//        m_regSequenceModel.changeItem(adapter, index);
+//    }
+//    else
+//    {
+//        Register* regRef = m_regSequenceModel.registerAdaptersList().at(index).getRegister();
+//        quint16 uniqueId = regRef->uniqueId();
+//        m_regSequenceMap.erase(std::find_if(m_regSequenceMap.begin(), m_regSequenceMap.end(),
+//                                              [&](std::shared_ptr<Register> const& ptr) -> bool {return *ptr == *regRef;}));
+
+//        RegisterAdapter adapter(m_device.registerByUniqueId(uniqueId));
+//        adapter.setIsLocal(false);
+//        m_regSequenceModel.changeItem(adapter, index);
+//    }
+//}
+
+void UserInterface::addRegisterToSequence(const RegisterAdapter &regAdapter, qint16 index)
 {
-    if(!m_regSequenceModel.registerAdaptersList().at(index).isLocal())
-    {
-        Register* regCopy_ptr = new Register(*(m_regSequenceModel.registerAdaptersList().at(index).getRegister()));
-        m_localRegisterMap.push_back(std::shared_ptr<Register>(regCopy_ptr));
+    if(index<0) index=0;
 
-        RegisterAdapter adapter(m_localRegisterMap.back());
-        adapter.setIsLocal(true);
-        m_regSequenceModel.changeItem(adapter, index);
-    }
-    else
+    if((quint16)index > m_regSequenceMap.size())
     {
-        Register* regRef = m_regSequenceModel.registerAdaptersList().at(index).getRegister();
-        quint16 uniqueId = regRef->uniqueId();
-        m_localRegisterMap.erase(std::find_if(m_localRegisterMap.begin(), m_localRegisterMap.end(),
-                                              [&](std::shared_ptr<Register> const& ptr) -> bool {return *ptr == *regRef;}));
-
-        RegisterAdapter adapter(m_device.registerByUniqueId(uniqueId));
-        adapter.setIsLocal(false);
-        m_regSequenceModel.changeItem(adapter, index);
+        qWarning() << __FUNCTION__ << ", index больше чем число элеметов";
+        index = m_regSequenceMap.size()-1;
     }
+
+    Register* newRegister = new Register(*(regAdapter.getRegister()));
+    std::shared_ptr<Register> newRegister_ptr(newRegister);
+
+    m_regSequenceMap.insert(m_regSequenceMap.begin()+index, newRegister_ptr);
+
+    RegisterAdapter adapter(newRegister_ptr);
+
+    m_regSequenceModel.addItem(adapter, index);
+}
+
+void UserInterface::removeRegisterFromSequence(qint16 index)
+{
+    m_regSequenceModel.removeItem(index);
+    m_regSequenceMap.erase(m_regSequenceMap.begin()+index);
 }
 
 const UserSettings &UserInterface::userSettings() const

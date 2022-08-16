@@ -39,11 +39,10 @@ public:
     std::vector<RegisterAdapter>& registerAdaptersList();
 private:
     std::vector<RegisterAdapter> m_data;
-    std::vector<std::shared_ptr<Register> > m_registers;
+//    std::vector<std::shared_ptr<Register> > m_registers;
 
     enum ListRoles{
         RegisterAdapterRole = Qt::UserRole + 1,
-        isLocalRole
     };
 };
 

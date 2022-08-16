@@ -11,10 +11,10 @@
 
 #include "abstractcontroller.h"
 
-class AbstractInterface
+class AbstractInterface : public QObject
 {
 public:
-    AbstractInterface();
+    AbstractInterface(QObject* parent=nullptr);
     virtual ~AbstractInterface() {};
 
     virtual bool writeRegister(Register* wrReg);

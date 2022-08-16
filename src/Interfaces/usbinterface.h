@@ -12,8 +12,8 @@
 
 namespace USBBitPosition
 {
-    const quint8 SPI{7};
-    const quint8 PARALLEL{6};
+//    const quint8 SPI{7};
+//    const quint8 PARALLEL{6};
     const quint8 ORDER{5};
     const quint8 TRIGGER{4};
 }
@@ -26,7 +26,7 @@ namespace USBFieldSize
 class USBInterface : public AbstractInterface
 {
 public:
-    USBInterface();
+    USBInterface(QObject* parent=nullptr);
     ~USBInterface();
 
     /** Write data to register */

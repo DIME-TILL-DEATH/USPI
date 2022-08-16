@@ -73,12 +73,12 @@ Register *RegisterAdapter::getRegister() const
     return m_register.get();
 }
 
-bool RegisterAdapter::isLocal() const
-{
-    return m_isLocal;
-}
+//bool RegisterAdapter::isLocal() const
+//{
+//    return m_isLocal;
+//}
 
-void RegisterAdapter::setIsLocal(bool newIsLocal)
-{
-    m_isLocal = newIsLocal;
-}
+//void RegisterAdapter::setIsLocal(bool newIsLocal)
+//{
+//    m_isLocal = newIsLocal;
+//}

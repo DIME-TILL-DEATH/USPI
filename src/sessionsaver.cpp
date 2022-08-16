@@ -4,7 +4,7 @@
 SessionSaver::SessionSaver(DUTDevice *device, ExtensionManager *extensionManager, std::vector<std::shared_ptr<Register> >* localRegisterMap, RegisterListModel *registerMapModel, RegisterListModel *registerWriteSequenceModel)
     :m_device{device},
      m_extensionManager{extensionManager},
-     m_localRegisterMap{localRegisterMap},
+     m_regSequenceMap{localRegisterMap},
      m_registerMapModel{registerMapModel},
      m_registerWriteSequenceModel{registerWriteSequenceModel}
 {
@@ -105,13 +105,13 @@ QJsonArray SessionSaver::saveWriteSequence()
         jsonItem["order"] = index;
         jsonItem["SourceUniqueID"] = currentAdapter.getRegister()->uniqueId();
 
-        if(currentAdapter.isLocal())
-        {
-            QJsonObject jsonLocalRegisterData;
-            JsonWorker::saveRegister(*currentAdapter.getRegister(), jsonLocalRegisterData);
-
-            jsonItem["local"] = jsonLocalRegisterData;
-        }
+//        if(currentAdapter.isLocal())
+//        {
+        QJsonObject jsonRegisterData;
+        JsonWorker::saveRegister(*currentAdapter.getRegister(), jsonRegisterData);
+        // для обратной совместимости
+        jsonItem["local"] = jsonRegisterData;
+//        }
 
         if(currentAdapter.getRegister()->registerType() == RegisterType::Controller)
         {
@@ -130,6 +130,7 @@ QJsonArray SessionSaver::saveWriteSequence()
 bool SessionSaver::loadWriteSequence(QJsonObject globalObject)
 {
     m_registerWriteSequenceModel->resetModel();
+    m_regSequenceMap->clear();
 
     if(globalObject.contains("write sequence") && globalObject["write sequence"].isArray())
     {
@@ -151,10 +152,10 @@ bool SessionSaver::loadWriteSequence(QJsonObject globalObject)
                     Register* reg_ptr = new Register();
 
                     JsonWorker::readRegister(jsonLocalRegisterObject, reg_ptr);
-                    m_localRegisterMap->push_back(std::shared_ptr<Register>(reg_ptr));
+                    m_regSequenceMap->push_back(std::shared_ptr<Register>(reg_ptr));
 
-                    RegisterAdapter adapter(m_localRegisterMap->back());
-                    adapter.setIsLocal(true);
+                    RegisterAdapter adapter(m_regSequenceMap->back());
+//                    adapter.setIsLocal(true);
 
                     m_registerWriteSequenceModel->changeItem(adapter, registerIndex);
                 }
@@ -166,10 +167,10 @@ bool SessionSaver::loadWriteSequence(QJsonObject globalObject)
                     Register* reg_ptr = new Register();
 
                     JsonWorker::readRegister(jsonLocalRegisterObject, reg_ptr);
-                    m_localRegisterMap->push_back(std::shared_ptr<Register>(reg_ptr));
+                    m_regSequenceMap->push_back(std::shared_ptr<Register>(reg_ptr));
 
-                    RegisterAdapter adapter(m_localRegisterMap->back());
-                    adapter.setIsLocal(true);
+                    RegisterAdapter adapter(m_regSequenceMap->back());
+//                    adapter.setIsLocal(true);
 
                     m_registerWriteSequenceModel->changeItem(adapter, registerIndex);
                 }

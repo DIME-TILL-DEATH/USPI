@@ -27,7 +27,7 @@ ApplicationWindow {
     minimumHeight: 480
 
     visible: true
-    title: qsTr("USPI")
+    title: qsTr("USPI (v.") + Qt.application.version + ")";
 
     onClosing:
     {

@@ -46,7 +46,8 @@ Rectangle{
                 if(registerSequenceView.count>0) index = registerSequenceView.currentIndex+1
                 else index = 0
 
-                RegisterSequenceModel.addItem(currentRegList.getItem(currentIndex), index)
+//                RegisterSequenceModel.addItem(currentRegList.getItem(currentIndex), index)
+                Backend.addRegisterToSequence(currentRegList.getItem(currentIndex), index);
                 registerSequenceView.currentIndex += 1
             }
         }
@@ -66,7 +67,8 @@ Rectangle{
                     if(registerSequenceView.count>0) index = registerSequenceView.currentIndex+1
                     else index = 0
 
-                    RegisterSequenceModel.addItem(currentRegList.getItem(i), index)
+                    Backend.addRegisterToSequence(currentRegList.getItem(i), index);
+//                    RegisterSequenceModel.addItem(currentRegList.getItem(i), index)
                 }
             }
         }
@@ -78,7 +80,8 @@ Rectangle{
             text: "<"
             enabled: (registerSequenceView.currentIndex>-1) ? true : false
             onPressed: {
-                RegisterSequenceModel.removeItem(registerSequenceView.currentIndex)
+                //RegisterSequenceModel.removeItem(registerSequenceView.currentIndex)
+                Backend.removeRegisterFromSequence(registerSequenceView.currentIndex);
 
                 // топорное решение, придумать что-то получше
                 // может быть сделать fieldsView моделью и передавать ему регистр
@@ -124,7 +127,7 @@ Rectangle{
                 {
                     for(var i=registerSequenceView.count-1; i >= 0; i--)
                     {
-                        RegisterSequenceModel.removeItem(i)
+                         Backend.removeRegisterFromSequence(i);
                     }
 
                     if(registerSequenceView.currentIndex > -1)
@@ -133,7 +136,6 @@ Rectangle{
                     }
                 }
 
-                //onRejected: console.log("Cancel clicked")
                 //[transitions]
                 enter: Transition {
                         NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 250  }

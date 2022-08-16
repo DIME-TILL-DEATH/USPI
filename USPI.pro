@@ -4,9 +4,8 @@ QT += widgets
 
 CONFIG += c++11
 
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
+VERSION = 0.5.0.0
 
 SOURCES += \
         main.cpp \
@@ -24,6 +23,7 @@ SOURCES += \
         src/Fields/variantlistfield.cpp \
         src/Fields/separationfield.cpp \
         src/Interfaces/abstractinterface.cpp \
+    src/Interfaces/ethernetinterface.cpp \
         src/Interfaces/fileinterface.cpp \
         src/Interfaces/usbinterface.cpp \
         src/JsonWorker.cpp \
@@ -39,9 +39,6 @@ SOURCES += \
 
 
 RESOURCES += qml.qrc
-
-# Additional import path used to resolve QML modules in Qt Creator's code model
-#QML_IMPORT_PATH =
 
 # Additional import path used to resolve QML modules just for Qt Quick Designer
 QML_IMPORT_PATH += $$PWD/qml
@@ -67,6 +64,7 @@ HEADERS += \
     src/Fields/variantlistfield.h \
     src/Fields/separationfield.h \
     src/Interfaces/abstractinterface.h \
+    src/Interfaces/ethernetinterface.h \
     src/Interfaces/fileinterface.h \
     src/Interfaces/interfacenames.h \
     src/Interfaces/usbinterface.h \
@@ -89,3 +87,16 @@ INCLUDEPATH += src/Extensions/
 
 INCLUDEPATH += $$PWD/libusb/include
 LIBS += -L$$PWD/libusb/static -lusb-1.0
+
+CONFIG(release, debug|release) {
+    QMAKE_POST_LINK += windeployqt.exe  release/$${TARGET}.exe -qmldir=$${PWD}/qml/ --dir deploy $$escape_expand(\\n\\t)# $$RETURN
+
+    file = release/$${TARGET}.exe
+    dir = deploy
+    # replace slashes in source path for Windows
+    win32:file ~= s,/,\\,g
+    # replace slashes in destination path for Windows
+    win32:dir ~= s,/,\\,g
+
+    QMAKE_POST_LINK += $$QMAKE_COPY_DIR $$shell_quote($$file) $$shell_quote($$dir) $$escape_expand(\\n\\t)
+}

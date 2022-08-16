@@ -12,7 +12,7 @@
 class FileInterface : public AbstractInterface
 {
 public:
-    FileInterface();
+    FileInterface(QObject* parent=nullptr);
 
     bool writeSequence(const std::vector<Register*> &wrSequence) override;
 
@@ -26,7 +26,7 @@ public:
     void setFilePath(const QString &newFilePath);
 
 private:
-    QString m_interfaceName{"File"};
+    QString m_interfaceName;
 
     QString m_hexSeparator;
     QString m_binarySeparator;
