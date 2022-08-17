@@ -56,6 +56,7 @@ public:
     RegisterListModel *deviceRegMapModel();
     RegisterListModel *controllerRegMapModel();
     RegisterListModel *registerSequenceModel();
+    RegisterListModel *currentRegMapModel();
 
     QStringList avaliableInterfaces();
     QStringList avaliablePlugins();
@@ -70,14 +71,14 @@ public:
 
     Q_INVOKABLE void updateAvaliableInterfaces();
 
-    // нейминг не очень
-//    Q_INVOKABLE void changeWriteItemLocal(quint16 index);
-
     Q_INVOKABLE void addRegisterToSequence(const RegisterAdapter& regAdapter, qint16 index = -1);
     Q_INVOKABLE void removeRegisterFromSequence(qint16 index);
 
+    Q_INVOKABLE void setCurrentRegisterMap(qint16 index);
+
     const UserSettings &userSettings() const;
     void setUserSettings(const UserSettings &newSettings);
+
 
 
 private:
@@ -87,6 +88,7 @@ private:
 
     std::vector<std::shared_ptr<Register> > m_regSequenceMap;
 
+    RegisterListModel m_currentRegMapModel;
     RegisterListModel m_deviceRegMapModel{m_device.deviceRegisterMap()};
     RegisterListModel m_controllerRegMapModel;
     RegisterListModel m_regSequenceModel;

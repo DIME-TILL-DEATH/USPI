@@ -23,8 +23,8 @@ Item {
 
     function updateRegisterMap()
     {
-        _sequenceControlPanel.regCount = _regListView.regMaps[_regListView.currentMapIndex].count
-        _sequenceControlPanel.currentRegList = _regListView.regMaps[_regListView.currentMapIndex].listModel.model
+        _sequenceControlPanel.regCount = _regListView.deviceRegisterListModel.count //_regListView.regMaps[_regListView.currentMapIndex].count
+        _sequenceControlPanel.currentRegList = _regListView.deviceRegisterListModel.model //_regListView.regMaps[_regListView.currentMapIndex].listModel.model
         _sequenceControlPanel.currentIndex = -1
 
         _registerSequenceView.currentIndex = -1
@@ -57,7 +57,7 @@ Item {
 
         Component.onCompleted: {
             _regListView.deviceRegisterListModel.delegateClicked.connect(selectRegister)
-            _regListView.controllerRegisterListModel.delegateClicked.connect(selectRegister)
+//            _regListView.controllerRegisterListModel.delegateClicked.connect(selectRegister)
 
             _regListView.selectRegMap.connect(selectMap)
         }

@@ -14,10 +14,12 @@ import "../CreateFunctions.js" as Scripts
 Row {
     property alias registerView: _registerMapView
     property alias deviceRegisterListModel: _deviceRegisterListModel
-    property alias controllerRegisterListModel: _controllerRegisterListModel
+//    property alias controllerRegisterListModel: _controllerRegisterListModel
 
-    property alias regMaps: _stack.children
-    property alias currentMapIndex: _stack.currentIndex
+//    property alias regMaps: _stack.children
+//    property alias currentMapIndex: _stack.currentIndex
+
+   // property alias registerMap: _registerMapView.listModel.model
 
     signal selectRegMap(selectedRegList : var)
 
@@ -91,48 +93,52 @@ Row {
                      }
                      onClicked: {
                          _tabSelectMap.currentIndex = index
-                         selectRegMap(_stack.children[index])
+                         Backend.setCurrentRegisterMap(index)
+                         selectRegMap(_registerMapView)//selectRegMap(_stack.children[index])
                      }
                 }
         }
     }
 
 
-    StackLayout{
-        id: _stack
+//    StackLayout{
+//        id: _stack
 
-        width: parent.width * 0.8
-        height: parent.height
-        currentIndex: _tabSelectMap.currentIndex
+//        width: parent.width * 0.8
+//        height: parent.height
+//        currentIndex: _tabSelectMap.currentIndex
 
         RegisterList{
             id: _registerMapView
+
+            width: parent.width * 0.8
+            height: parent.height
 
             headerText: qsTr("Регистры устройства:")
 
             listModel: DelegateModelRegList{
                 id: _deviceRegisterListModel
 
-                model: RegisterMapModel
+                model: CurrentRegMapModel//RegisterMapModel
                 modelView: _registerMapView
             }
         }
 
-        RegisterList{
-            id: _controllerRegisterList
+//        RegisterList{
+//            id: _controllerRegisterList
 
-            headerText: qsTr("Управление контроллером:")
+//            headerText: qsTr("Управление контроллером:")
 
-            listModel: DelegateModelRegList{
-                id: _controllerRegisterListModel
+//            listModel: DelegateModelRegList{
+//                id: _controllerRegisterListModel
 
-                model: ControllerRegMapModel
-                modelView: _controllerRegisterList
-            }
-        }
-    }
+//                model: ControllerRegMapModel
+//                modelView: _controllerRegisterList
+//            }
+//        }
+//    }
 
-    Component.onCompleted: {
-        selectRegMap(_stack.children[0])
-    }
+//    Component.onCompleted: {
+//        selectRegMap(_stack.children[0])
+//    }
 }

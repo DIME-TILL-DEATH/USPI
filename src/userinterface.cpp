@@ -30,13 +30,13 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
     m_userSettings.m_windowWidth = m_applicationSettings.value("windowWidth", 0).toInt();
     m_userSettings.m_windowHeight = m_applicationSettings.value("windowHeight", 0).toInt();
 
-//    font.setFamily("Times new roman");
-//    font.setPointSize(9);
-
     m_applicationSettings.endGroup();
 
     font.setStyleStrategy(QFont::NoSubpixelAntialias);
     QGuiApplication::setFont(font);
+
+    // tesing --------------------------------
+    setCurrentRegisterMap(0);
 
     connect(&extensionManager, SIGNAL(writeRegisterSequenceRequest()), this, SLOT(writeSequence()));
     connect(&extensionManager, SIGNAL(writeRegisterSequenceRequest(QStringList)), this, SLOT(writeCustomSequence(QStringList)));
@@ -120,6 +120,7 @@ bool UserInterface::loadDevice(const QUrl &fileName)
     }
 
     emit dutDeviceUpdated();
+
     m_regSequenceModel.resetModel();
     m_regSequenceMap.clear();
     m_deviceRegMapModel.resetModel(m_device.deviceRegisterMap());
@@ -266,30 +267,6 @@ void UserInterface::updateAvaliableInterfaces()
     emit interfaceUpdated();
 }
 
-//void UserInterface::changeWriteItemLocal(quint16 index)
-//{
-//    if(!m_regSequenceModel.registerAdaptersList().at(index).isLocal())
-//    {
-//        Register* regCopy_ptr = new Register(*(m_regSequenceModel.registerAdaptersList().at(index).getRegister()));
-//        m_regSequenceMap.push_back(std::shared_ptr<Register>(regCopy_ptr));
-
-//        RegisterAdapter adapter(m_regSequenceMap.back());
-//        adapter.setIsLocal(true);
-//        m_regSequenceModel.changeItem(adapter, index);
-//    }
-//    else
-//    {
-//        Register* regRef = m_regSequenceModel.registerAdaptersList().at(index).getRegister();
-//        quint16 uniqueId = regRef->uniqueId();
-//        m_regSequenceMap.erase(std::find_if(m_regSequenceMap.begin(), m_regSequenceMap.end(),
-//                                              [&](std::shared_ptr<Register> const& ptr) -> bool {return *ptr == *regRef;}));
-
-//        RegisterAdapter adapter(m_device.registerByUniqueId(uniqueId));
-//        adapter.setIsLocal(false);
-//        m_regSequenceModel.changeItem(adapter, index);
-//    }
-//}
-
 void UserInterface::addRegisterToSequence(const RegisterAdapter &regAdapter, qint16 index)
 {
     if(index<0) index=0;
@@ -316,6 +293,16 @@ void UserInterface::removeRegisterFromSequence(qint16 index)
     m_regSequenceMap.erase(m_regSequenceMap.begin()+index);
 }
 
+void UserInterface::setCurrentRegisterMap(qint16 index)
+{
+    switch(index)
+    {
+        case 0: m_currentRegMapModel.resetModel(m_device.deviceRegisterMap()); break;
+        case 1: m_currentRegMapModel.resetModel(m_interface_ptr->connectedControllers().at(0)->regMap()); break;
+        default: qInfo() << __FUNCTION__ << "Index: " << index;
+    }
+}
+
 const UserSettings &UserInterface::userSettings() const
 {
     return m_userSettings;
@@ -325,6 +312,7 @@ void UserInterface::setUserSettings(const UserSettings &newSettings)
 {
     m_userSettings = newSettings;
 }
+
 
 void UserInterface::writeCustomSequence(QStringList registerNames)
 {
@@ -345,6 +333,11 @@ void UserInterface::writeCustomSequence(QStringList registerNames)
 void UserInterface::registerTypes()
 {
     qRegisterMetaType<UserSettings>("UserSettings");
+}
+
+RegisterListModel *UserInterface::currentRegMapModel()
+{
+    return &m_currentRegMapModel;
 }
 
 RegisterListModel* UserInterface::deviceRegMapModel()

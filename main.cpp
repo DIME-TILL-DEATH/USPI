@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("Backend", &ui);
     engine.rootContext()->setContextProperty("InterfaceSettings", &interfacesSettings);
     engine.rootContext()->setContextProperty("Log", &log);
+    engine.rootContext()->setContextProperty("CurrentRegMapModel", ui.currentRegMapModel());
     engine.rootContext()->setContextProperty("RegisterMapModel", ui.deviceRegMapModel());
     engine.rootContext()->setContextProperty("ControllerRegMapModel", ui.controllerRegMapModel());
     engine.rootContext()->setContextProperty("RegisterSequenceModel", ui.registerSequenceModel());
