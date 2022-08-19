@@ -1,6 +1,8 @@
 #ifndef DUTDEVICE_H
 #define DUTDEVICE_H
 
+#include <QtQml>
+
 #include <QString>
 #include <QDataStream>
 
@@ -11,26 +13,40 @@
 #include "register.h"
 #include "registeradapter.h"
 
-//class Register;
+struct DUTHeader
+{
+    private:
+        Q_GADGET
+
+        Q_PROPERTY(QString deviceName MEMBER deviceName);
+        Q_PROPERTY(QString description MEMBER description);
+        Q_PROPERTY(quint8 registerSize MEMBER registerSize);
+        Q_PROPERTY(bool isMSB MEMBER isMSB);
+        Q_PROPERTY(quint8 channelNumber MEMBER channelNumber);
+    public:
+    QString deviceName{QObject::tr("Выбрать")};
+    QString description;
+    QString version{""};
+    quint8 registerSize{32};
+    bool isMSB{true};
+    quint8 channelNumber{0};
+};
+Q_DECLARE_METATYPE(DUTHeader)
 
 class DUTDevice
 {
 public:
+    DUTDevice();
+
     bool loadFromFile(const QString& fileName, ParseError* error = nullptr);
     bool loadFromJsonObject(const QJsonObject& jsonObject, ParseError* error = nullptr);
 
-    struct Header{
-        QString deviceName{QObject::tr("Выбрать")};
-        QString version{""};
-        quint8 registerSize{32};
-        bool isMSB{true};
-        quint8 channelNumber{0};
-    };
+    static void registerTypes();
 
     const QString& name() const;
 
     std::vector<std::shared_ptr<Register> > &deviceRegisterMap();
-    const Header &deviceHeader() const;
+    const DUTHeader &deviceHeader() const;
 
     void setChannelNumber(quint8 chNum);
     quint8 channelNumber();
@@ -43,9 +59,10 @@ public:
     friend QDataStream& operator<<(QDataStream& stream, const DUTDevice& device);
     friend QDataStream& operator>>(QDataStream& stream, DUTDevice& device);
 private:
-    Header m_deviceHeader;
+    DUTHeader m_deviceHeader;
 
     std::vector<std::shared_ptr<Register> > m_deviceRegisterMap{};
 };
+
 
 #endif // DUTDEVICE_H

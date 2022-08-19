@@ -50,14 +50,15 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("InterfaceSettings", &interfacesSettings);
     engine.rootContext()->setContextProperty("Log", &log);
     engine.rootContext()->setContextProperty("CurrentRegMapModel", ui.currentRegMapModel());
-    engine.rootContext()->setContextProperty("RegisterMapModel", ui.deviceRegMapModel());
-    engine.rootContext()->setContextProperty("ControllerRegMapModel", ui.controllerRegMapModel());
     engine.rootContext()->setContextProperty("RegisterSequenceModel", ui.registerSequenceModel());
+    engine.rootContext()->setContextProperty("DutListModel", ui.dutListModel());
 
     RegisterAdapter::registerTypes();
     FieldAdapter::registerTypes();
     InterfacesSettingsAdapter::registerTypes();
     UserInterface::registerTypes();
+    DUTDevice::registerTypes();
+
     //---------------------------------------------------------------
 
     engine.addImportPath(":/qml");

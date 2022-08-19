@@ -53,11 +53,11 @@ bool JsonWorker::loadFile(const QString &name, ParseError* error)
 
 bool JsonWorker::loadControllerRegMap(std::shared_ptr<AbstractController> controller, ParseError* error)
 {
-    if(!readRegisterArray(&controller->m_controllerRegisterMap, RegisterType::Controller, 16, error)) return false;
+    if(!readRegisterArray(&controller->m_controllerRegisterMap, RegisterType::Controller, &controller->m_controllerHeader, error)) return false;
     return true;
 }
 
-bool JsonWorker::readHeader(DUTDevice::Header* header, ParseError *error)
+bool JsonWorker::readHeader(DUTHeader* header, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("header") && m_deviceGlobalObject["header"].isObject())
     {
@@ -112,7 +112,7 @@ bool JsonWorker::readHeader(DUTDevice::Header* header, ParseError *error)
     }
 }
 
-void JsonWorker::saveHeader(const DUTDevice::Header& header)
+void JsonWorker::saveHeader(const DUTHeader& header)
 {
     QJsonObject jsonDeviceHeaderObject;
 
@@ -124,7 +124,7 @@ void JsonWorker::saveHeader(const DUTDevice::Header& header)
     m_deviceGlobalObject["header"] = jsonDeviceHeaderObject;
 }
 
-bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, RegisterType registerType, quint8 defaultBitSize, ParseError *error)
+bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, RegisterType registerType, DUTHeader *deviceHeader, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("registers") && m_deviceGlobalObject["registers"].isArray())
     {
@@ -136,10 +136,10 @@ bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
         for (int registerIndex = 0; registerIndex < registerArray.size(); ++registerIndex)
         {
             QJsonObject registerObject = registerArray[registerIndex].toObject();
-            Register* deviceRegister = new Register;
+            Register* deviceRegister = new Register(deviceHeader);
 
             deviceRegister->m_registerType = registerType;
-            deviceRegister->m_bitSize = defaultBitSize;
+            deviceRegister->m_bitSize = deviceHeader->registerSize;
 
             if(!readRegister(registerObject, deviceRegister, error))
             {

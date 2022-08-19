@@ -6,6 +6,7 @@
 
 //#include "abstractinterface.h"
 
+#include "dutdevice.h"
 #include "register.h"
 #include "devicepin.h"
 
@@ -27,8 +28,11 @@ public:
     const std::vector<std::shared_ptr<Register> >& regMap();
     const QString &regMapFileName() const;
 
+    const DUTHeader &controllerHeader() const;
+
 protected:
     //AbstractInterface* m_interface;
+    DUTHeader m_controllerHeader;
 
     std::vector<std::shared_ptr<Register> > m_controllerRegisterMap{};
 

@@ -22,6 +22,7 @@ QHash<int, QByteArray> RegisterListModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[ListRoles::RegisterAdapterRole] = "register";
+    roles[ListRoles::ParentDUTHeaderRole] = "deviceHeader";
     return roles;
 }
 
@@ -43,6 +44,11 @@ QVariant RegisterListModel::data(const QModelIndex &index, int role) const
         case ListRoles::RegisterAdapterRole:
         {
             return QVariant::fromValue(m_data.at(index.row()));
+        }
+
+        case ListRoles::ParentDUTHeaderRole:
+        {
+            return QVariant::fromValue(m_data.at(index.row()).parentDUTHeader());
         }
 
         default:

@@ -82,7 +82,7 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
 
         QList<QByteArray> rawDataList = (*itSeq)->rawData();
 
-        if(m_deviceHeader.isMSB)
+        if((*itSeq)->parentDUTHeader()->isMSB)
         {
             std::reverse(rawDataList.begin(), rawDataList.end());
         }
@@ -92,7 +92,7 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
             QByteArray regData = (*itReg);
             quint16 bitSize = regData.size()*8;
 
-            if(m_deviceHeader.isMSB)
+            if((*itSeq)->parentDUTHeader()->isMSB)
             {
                 std::reverse(regData.begin(), regData.end());
             }
@@ -104,7 +104,7 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
                 }
             }
 
-            regData.prepend((uchar)(*itSeq)->registerType());
+            regData.prepend((*itSeq)->parentDUTHeader()->channelNumber<<USBBitPosition::CHANNEL | (uchar)(*itSeq)->registerType());
             regData.prepend(bitSize);
 
             bytesInPacket += regData.size();
@@ -348,7 +348,7 @@ QByteArray USBInterface::formHeader(quint16 regCount, quint16 packetSize)
 
     QByteArray result;
 
-    result.append(0<<USBBitPosition::TRIGGER | (m_deviceHeader.channelNumber & 0xF));
+    result.append(0<<USBBitPosition::TRIGGER);// | (m_deviceHeader.channelNumber & 0xF));
     result.append(regCount);
     result.append(packetSize + USBFieldSize::HEADER);
     result.append(reservedByte);

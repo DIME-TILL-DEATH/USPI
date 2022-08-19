@@ -5,6 +5,8 @@
 #include <QVariant>
 #include <memory>
 
+#include "dutdevice.h"
+
 #include "fieldadapter.h"
 #include "register.h"
 
@@ -23,6 +25,8 @@ public:
     RegisterAdapter(std::shared_ptr<Register> reg);
 
     static void registerTypes();
+
+    const DUTHeader& parentDUTHeader() const;
 
     QString name() const;
     quint16 fieldsCount();

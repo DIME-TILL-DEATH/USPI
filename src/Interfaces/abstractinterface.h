@@ -22,17 +22,12 @@ public:
 
     virtual const QString &interfaceName() const;
 
-    const DUTDevice::Header &deviceHeader() const;
-    void setDeviceHeader(const DUTDevice::Header &newDeviceHeader);
-
     std::shared_ptr<AbstractController> selectedController();
     virtual std::vector<std::shared_ptr<AbstractController> >& connectedControllers();
 
     bool isAvaliable() const;
 
 protected:
-    DUTDevice::Header m_deviceHeader;
-
     std::vector<std::shared_ptr<AbstractController> > m_connectedControllers;
     bool m_isAvaliable{true};
 

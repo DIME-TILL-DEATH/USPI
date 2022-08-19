@@ -3,3 +3,4 @@ module Views
 LogView 1.0 LogView.qml
 MainView 1.0 MainView.qml
 RegListView 1.0 RegListView.qml
+DutListView 1.0 DutListView.qml

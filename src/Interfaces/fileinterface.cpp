@@ -25,18 +25,19 @@ bool FileInterface::writeSequence(const std::vector<Register *> &wrSequence)
     QTextCodec::setCodecForLocale(codec);
     out.setCodec(codec);
 
-    out << QString("Целевое устройство: ") << m_deviceHeader.deviceName << "\n";
-    out << QString("Размер регистров: ") << m_deviceHeader.registerSize << QString(" бит\n");
-    out << QString("Порядок следования: ") << QString(m_deviceHeader.isMSB ? "Старшим битов вперёд(MSB)" : "Младшим битов вперёд LSB") << "\n\n";
+  //  out << QString("Целевое устройство: ") << m_deviceHeader.deviceName << "\n";
+ //   out << QString("Размер регистров: ") << m_deviceHeader.registerSize << QString(" бит\n");
+  //  out << QString("Порядок следования: ") << QString(m_deviceHeader.isMSB ? "Старшим битов вперёд(MSB)" : "Младшим битов вперёд LSB") << "\n\n";
 
     for(auto itSeq = wrSequence.begin(); itSeq != wrSequence.end(); ++itSeq)
     {
-        out << (*itSeq)->name() << ":\n";
+        out << (*itSeq)->name() << QString(", канал №") << (*itSeq)->parentDUTHeader()->channelNumber
+            << QString(", в устройство ") << (*itSeq)->parentDUTHeader()->deviceName << ":\n";
 
 //        QByteArray rawData = (*it)->rawData();
 
         QList<QByteArray> rawDataList = (*itSeq)->rawData();
-        if(m_deviceHeader.isMSB)
+        if((*itSeq)->parentDUTHeader()->isMSB)
         {
             std::reverse(rawDataList.begin(), rawDataList.end());
         }
@@ -45,7 +46,7 @@ bool FileInterface::writeSequence(const std::vector<Register *> &wrSequence)
         {
             QByteArray rawData = (*itReg);
 
-            if(m_deviceHeader.isMSB) std::reverse(rawData.begin(), rawData.end());
+            if((*itSeq)->parentDUTHeader()->isMSB) std::reverse(rawData.begin(), rawData.end());
 
             out << "Hexadecimal: 0x" << rawData.toHex(m_hexSeparator.data()->toLatin1()) << "\n";
 
@@ -56,11 +57,11 @@ bool FileInterface::writeSequence(const std::vector<Register *> &wrSequence)
                 uchar oneByte = rawData.at(i);
                 QString byteToBinary = QString("%1").arg(oneByte, 8, 2, QLatin1Char('0'));
 
-                if(!m_deviceHeader.isMSB) std::reverse(byteToBinary.begin(), byteToBinary.end());
+                if(!(*itSeq)->parentDUTHeader()->isMSB) std::reverse(byteToBinary.begin(), byteToBinary.end());
 
                 out << byteToBinary << m_binarySeparator;
             }
-            out << "\n";
+            out << "\n\n";
     }
     }
 

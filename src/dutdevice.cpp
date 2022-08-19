@@ -1,6 +1,11 @@
 #include "dutdevice.h"
 #include "JsonWorker.h"
 
+DUTDevice::DUTDevice()
+{
+
+}
+
 bool DUTDevice::loadFromFile(const QString &fileName, ParseError *error)
 {
     JsonWorker jsonFile;
@@ -16,7 +21,7 @@ bool DUTDevice::loadFromJsonObject(const QJsonObject &jsonObject, ParseError *er
     JsonWorker worker(jsonObject);
 
     if(!worker.readHeader(&m_deviceHeader, error)) return false;
-    if(!worker.readRegisterArray(&m_deviceRegisterMap, RegisterType::DUT, m_deviceHeader.registerSize, error)) return false;
+    if(!worker.readRegisterArray(&m_deviceRegisterMap, RegisterType::DUT, &m_deviceHeader, error)) return false;
 
     for(auto it=m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)
     {
@@ -33,6 +38,11 @@ bool DUTDevice::loadFromJsonObject(const QJsonObject &jsonObject, ParseError *er
     return true;
 }
 
+void DUTDevice::registerTypes()
+{
+    qmlRegisterUncreatableType<DUTHeader>("DUTDevice", 1, 0, "DeviceHeader", "DUT header");
+}
+
 const QString &DUTDevice::name() const
 {
     return m_deviceHeader.deviceName;
@@ -43,7 +53,7 @@ std::vector<std::shared_ptr<Register> > &DUTDevice::deviceRegisterMap()
     return m_deviceRegisterMap;
 }
 
-const DUTDevice::Header &DUTDevice::deviceHeader() const
+const DUTHeader &DUTDevice::deviceHeader() const
 {
     return m_deviceHeader;
 }

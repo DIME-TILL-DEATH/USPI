@@ -8,7 +8,8 @@
 UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent)
     : QObject(parent),
       extensionManager(&m_device),
-      m_saver{&m_device, &extensionManager, &m_regSequenceMap, &m_deviceRegMapModel, &m_regSequenceModel},
+//      m_saver{&m_device, &extensionManager, &m_regSequenceMap, &m_deviceRegMapModel, &m_regSequenceModel},
+      m_saver{&m_device, &extensionManager, &m_regSequenceMap, &m_currentRegMapModel, &m_regSequenceModel}, // Не только текующую, но и все устройства!
       m_avaliableInterfaces{avaliableInterfaces}
 {
     m_abstractInterface = new AbstractInterface(this);
@@ -34,9 +35,6 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
 
     font.setStyleStrategy(QFont::NoSubpixelAntialias);
     QGuiApplication::setFont(font);
-
-    // tesing --------------------------------
-    setCurrentRegisterMap(0);
 
     connect(&extensionManager, SIGNAL(writeRegisterSequenceRequest()), this, SLOT(writeSequence()));
     connect(&extensionManager, SIGNAL(writeRegisterSequenceRequest(QStringList)), this, SLOT(writeCustomSequence(QStringList)));
@@ -100,8 +98,6 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
                 return false;
             }
 
-            m_controllerRegMapModel.resetModel(controller->regMap());
-
             emit interfaceUpdated();
             return true;
         }
@@ -119,11 +115,20 @@ bool UserInterface::loadDevice(const QUrl &fileName)
         return false;
     }
 
-    emit dutDeviceUpdated();
+    DUTDevice* newDevice = new DUTDevice;
 
-    m_regSequenceModel.resetModel();
-    m_regSequenceMap.clear();
-    m_deviceRegMapModel.resetModel(m_device.deviceRegisterMap());
+    if(!newDevice->loadFromFile(fileName.toLocalFile(), &error))
+    {
+        qWarning() << error.errorString();
+//        m_dutList.pop_back();
+        return false;
+    }
+
+    emit dutUpdated();
+
+ //   m_regSequenceModel.resetModel();
+ //   m_regSequenceMap.clear();
+ //   m_currentRegMapModel.resetModel(m_device.deviceRegisterMap());
 
     // load plugins for device
     JsonWorker jsonFile;
@@ -142,7 +147,13 @@ bool UserInterface::loadDevice(const QUrl &fileName)
     extensionManager.loadPlugins(plugList);
     emit avaliablePluginsUpdated();
 
-    qInfo() << tr("Карта регистров для устройства '") << m_device.name() << tr("' загружена");
+    //----------------------------------------
+    m_device.setChannelNumber(m_device.deviceHeader().channelNumber+1);
+
+    newDevice->setChannelNumber(m_device.deviceHeader().channelNumber);
+    m_dutListModel.addDutToList(newDevice);
+    //------------------------------------------
+    qInfo() << tr("Карта регистров для устройства '") << newDevice->name() << tr("' загружена");
     return true;
 }
 
@@ -164,7 +175,7 @@ bool UserInterface::writeSequence()
             }
             resultMessage.chop(2);
 
-            m_interface_ptr->setDeviceHeader(m_device.deviceHeader());
+//            m_interface_ptr->setDeviceHeader(m_device.deviceHeader());
 
             if(!m_interface_ptr->writeSequence(wrSequence))
             {
@@ -194,7 +205,7 @@ bool UserInterface::loadSession(const QUrl& fileName)
 {
     if(m_saver.loadSession(fileName.toLocalFile()))
     {
-        emit dutDeviceUpdated();
+        emit dutUpdated();
         emit avaliablePluginsUpdated();
         return true;
     }
@@ -295,11 +306,17 @@ void UserInterface::removeRegisterFromSequence(qint16 index)
 
 void UserInterface::setCurrentRegisterMap(qint16 index)
 {
-    switch(index)
+    if(index == -1)
     {
-        case 0: m_currentRegMapModel.resetModel(m_device.deviceRegisterMap()); break;
-        case 1: m_currentRegMapModel.resetModel(m_interface_ptr->connectedControllers().at(0)->regMap()); break;
-        default: qInfo() << __FUNCTION__ << "Index: " << index;
+        m_currentRegMapModel.resetModel(m_interface_ptr->connectedControllers().at(0)->regMap());
+    }
+    else if(index>=0 && (quint16)index<m_dutList.size())
+    {
+        m_currentRegMapModel.resetModel(m_dutList.at(index)->deviceRegisterMap());
+    }
+    else
+    {
+        qWarning() << __FUNCTION__ << "Incorrect index: " << index;
     }
 }
 
@@ -314,6 +331,7 @@ void UserInterface::setUserSettings(const UserSettings &newSettings)
 }
 
 
+// Добавить device для которого пишется кастомная последовательность
 void UserInterface::writeCustomSequence(QStringList registerNames)
 {
     std::vector<Register*> wrSequence;
@@ -322,7 +340,7 @@ void UserInterface::writeCustomSequence(QStringList registerNames)
         wrSequence.push_back(m_device.registerByName(name).get());
     }
 
-    m_interface_ptr->setDeviceHeader(m_device.deviceHeader());
+//    m_interface_ptr->setDeviceHeader(m_device.deviceHeader());
 
     if(!m_interface_ptr->writeSequence(wrSequence))
     {
@@ -340,17 +358,12 @@ RegisterListModel *UserInterface::currentRegMapModel()
     return &m_currentRegMapModel;
 }
 
-RegisterListModel* UserInterface::deviceRegMapModel()
-{
-    return &m_deviceRegMapModel;
-}
-
-RegisterListModel *UserInterface::controllerRegMapModel()
-{
-    return &m_controllerRegMapModel;
-}
-
 RegisterListModel *UserInterface::registerSequenceModel()
 {
     return &m_regSequenceModel;
+}
+
+DutListModel *UserInterface::dutListModel()
+{
+    return &m_dutListModel;
 }

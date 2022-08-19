@@ -46,7 +46,6 @@ Rectangle{
                 if(registerSequenceView.count>0) index = registerSequenceView.currentIndex+1
                 else index = 0
 
-//                RegisterSequenceModel.addItem(currentRegList.getItem(currentIndex), index)
                 Backend.addRegisterToSequence(currentRegList.getItem(currentIndex), index);
                 registerSequenceView.currentIndex += 1
             }
@@ -60,7 +59,6 @@ Rectangle{
             //enabled: (registerMapView.count>0) ? true : false
             enabled: (regCount>0) ? true : false
             onPressed: {
-                //for(var i=registerMapView.count-1; i >= 0; i--)
                 for(var i=regCount-1; i >= 0; i--)
                 {
                     var index
@@ -68,7 +66,6 @@ Rectangle{
                     else index = 0
 
                     Backend.addRegisterToSequence(currentRegList.getItem(i), index);
-//                    RegisterSequenceModel.addItem(currentRegList.getItem(i), index)
                 }
             }
         }

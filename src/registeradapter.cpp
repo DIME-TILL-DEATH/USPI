@@ -14,6 +14,11 @@ void RegisterAdapter::registerTypes()
     qRegisterMetaType<RegisterAdapter>("RegisterAdapter");
 }
 
+const DUTHeader &RegisterAdapter::parentDUTHeader() const
+{
+    return *(m_register->parentDUTHeader());
+}
+
 QString RegisterAdapter::name() const
 {
     return m_register->name();

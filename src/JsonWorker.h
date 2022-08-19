@@ -36,10 +36,10 @@ public:
 
     bool loadControllerRegMap(std::shared_ptr<AbstractController> controller, ParseError* error);
 
-    bool readHeader(DUTDevice::Header *header, ParseError* error = nullptr);
-    void saveHeader(const DUTDevice::Header& header);
+    bool readHeader(DUTHeader *header, ParseError* error = nullptr);
+    void saveHeader(const DUTHeader &header);
 
-    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, RegisterType registerType, quint8 defaultBitSize, ParseError* error = nullptr);
+    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, RegisterType registerType, DUTHeader* deviceHeader, ParseError* error = nullptr);
     void saveRegisterArray(const std::vector<std::shared_ptr<Register> >& registerMap);
 
     static bool readRegister(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);

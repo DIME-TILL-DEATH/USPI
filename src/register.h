@@ -16,10 +16,13 @@
 #include "variantlistfield.h"
 #include "separationfield.h"
 
+//#include "dutdevice.h"
+
 //#include "fieldadapter.h"
 #include "parseerror.h"
 
 class JsonWorker;
+struct DUTHeader;
 
 enum class RegisterType
 {
@@ -33,7 +36,7 @@ public:
 
     friend class JsonWorker;
 
-    Register();
+    Register(DUTHeader *parentDUTHeader = nullptr);
     ~Register();
 
     Register(const Register& src_reg); // copy
@@ -41,6 +44,8 @@ public:
 
     QString name() const;
     quint16 fieldsCount();
+
+    const DUTHeader* parentDUTHeader() const;
 
     bool sortAndValidateFields(ParseError* error = nullptr);
 
@@ -60,6 +65,8 @@ public:
     RegisterType registerType() const;
 
 private:
+    DUTHeader* m_parentDUTHeader;
+
     quint16 m_uniqueId;
 
     QString m_name{"Undefined"};

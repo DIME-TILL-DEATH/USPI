@@ -23,7 +23,6 @@ FileDialog {
             Scripts.clearRegisterFields(mainView)
             mainView.registerView.registerView.currentIndex = -1
 
-            //regMapLoaded()
             mainView.updateRegisterMap()
         }
     }

@@ -30,5 +30,6 @@
         <file>qml/Models/DelegateModelRegList.qml</file>
         <file>qml/Fields/SeparationField.qml</file>
         <file>qml/Views/RegListView.qml</file>
+        <file>qml/Views/DutListView.qml</file>
     </qresource>
 </RCC>

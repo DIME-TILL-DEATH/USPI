@@ -28,6 +28,7 @@ SOURCES += \
         src/Interfaces/usbinterface.cpp \
         src/JsonWorker.cpp \
         src/dutdevice.cpp \
+    src/dutlistmodel.cpp \
         src/interfacessettingsadapter.cpp \
         src/logger.cpp \
         src/parseerror.cpp \
@@ -70,6 +71,7 @@ HEADERS += \
     src/Interfaces/usbinterface.h \
     src/JsonWorker.h \
     src/dutdevice.h \
+    src/dutlistmodel.h \
     src/interfacessettingsadapter.h \
     src/logger.h \
     src/parseerror.h \

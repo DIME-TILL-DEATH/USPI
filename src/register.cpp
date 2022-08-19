@@ -1,6 +1,7 @@
 #include "register.h"
 
-Register::Register()
+Register::Register(DUTHeader *parentDUTHeader)
+    : m_parentDUTHeader{parentDUTHeader}
 {
 
 }
@@ -11,7 +12,8 @@ Register::~Register()
 }
 
 Register::Register(const Register &src_reg)
-     : m_uniqueId{src_reg.m_uniqueId},
+     : m_parentDUTHeader{src_reg.m_parentDUTHeader},
+       m_uniqueId{src_reg.m_uniqueId},
        m_name{src_reg.m_name},
        m_bitSize{src_reg.m_bitSize},
        m_registerType{src_reg.m_registerType}
@@ -59,6 +61,11 @@ bool operator==(const Register& lr, const Register& rr)
 quint16 Register::fieldsCount()
 {
     return m_fields.size();
+}
+
+const DUTHeader *Register::parentDUTHeader() const
+{
+    return m_parentDUTHeader;
 }
 
 bool Register::sortAndValidateFields(ParseError *error)

@@ -23,7 +23,7 @@ ApplicationWindow {
             : ((Backend.userSettings.windowHeight !==0) ? Backend.userSettings.windowHeight
                                                      : Screen.height*0.65)
 
-    minimumWidth: 640
+    minimumWidth: 800
     minimumHeight: 480
 
     visible: true

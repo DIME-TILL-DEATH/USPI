@@ -1,7 +1,10 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.15
+import QtQml.Models 2.15
 
 import QtQuick.Layouts 1.15
+
+import DUTDevice 1.0
 
 import StyleSettings 1.0
 import Elements 1.0
@@ -11,134 +14,32 @@ import Models 1.0
 
 import "../CreateFunctions.js" as Scripts
 
-Row {
+RegisterList{
+    id: _registerMapView
+
     property alias registerView: _registerMapView
     property alias deviceRegisterListModel: _deviceRegisterListModel
-//    property alias controllerRegisterListModel: _controllerRegisterListModel
 
-//    property alias regMaps: _stack.children
-//    property alias currentMapIndex: _stack.currentIndex
+    signal selectRegister(registerAdapter : var, index : int)
 
-   // property alias registerMap: _registerMapView.listModel.model
+    width: parent.width
+    height: parent.height
 
-    signal selectRegMap(selectedRegList : var)
+    headerText: qsTr("Регистры:")
 
-    padding: width / 50
-    spacing: width / 25
+    listModel: DelegateModelRegList{
+        id: _deviceRegisterListModel
 
-    TabBar{
-        id: _tabSelectMap
+        model: CurrentRegMapModel
+        modelView: _registerMapView
 
-        height: parent.height
-        width: parent.width * 0.15
-
-        TabButton{
-            id:  control
-            text: qsTr("Устройство")
-
-        }
-        TabButton{
-            text: qsTr("Контроллер")
-        }
-
-        contentItem: ListView {
-                id: _listView
-
-                model: ListModel{
-                    ListElement{ tabText: "Устройство"}
-                    ListElement{ tabText: "Контроллер"}
-                }
-
-                currentIndex: _tabSelectMap.currentIndex
-
-
-                spacing: height/200
-                orientation: ListView.Vertical   // <<-- VERTICAL
-
-                delegate:
-                Button{
-                    id: _delegateButton
-                    width: _listView.width
-                    height: _listView.height / 6
-
-                    Text {
-                        id: _btnText
-
-                         text: tabText
-
-
-                        transform: Rotation {
-                            origin.x: t_metrics.tightBoundingRect.width/2
-                            origin.y: t_metrics.tightBoundingRect.height/2
-                            angle: -90}
-
-                        anchors.horizontalCenter:  _delegateButton.horizontalCenter
-                        anchors.verticalCenter:  _delegateButton.verticalCenter
-
-                        // opacity: enabled ? 1.0 : 0.3
-                     }
-
-                    TextMetrics {
-                            id:     t_metrics
-                            font:   _btnText.font
-                            text:   _btnText.text
-                        }
-
-                     background: Rectangle {
-                       //  opacity: enabled ? 1 : 0.3
-                         color: (_tabSelectMap.currentIndex === index) ? "lightgreen" : "lightgray"
-                         border.color: control.down ? "#17a81a" : "#21be2b"
-                         border.width: 1
-                         radius: 4
-                     }
-                     onClicked: {
-                         _tabSelectMap.currentIndex = index
-                         Backend.setCurrentRegisterMap(index)
-                         selectRegMap(_registerMapView)//selectRegMap(_stack.children[index])
-                     }
-                }
-        }
     }
 
-
-//    StackLayout{
-//        id: _stack
-
-//        width: parent.width * 0.8
-//        height: parent.height
-//        currentIndex: _tabSelectMap.currentIndex
-
-        RegisterList{
-            id: _registerMapView
-
-            width: parent.width * 0.8
-            height: parent.height
-
-            headerText: qsTr("Регистры устройства:")
-
-            listModel: DelegateModelRegList{
-                id: _deviceRegisterListModel
-
-                model: CurrentRegMapModel//RegisterMapModel
-                modelView: _registerMapView
-            }
+    Connections{
+        target: _deviceRegisterListModel
+        function onDelegateClicked(registerAdapter, currentIndex)
+        {
+            selectRegister(registerAdapter, currentIndex);
         }
-
-//        RegisterList{
-//            id: _controllerRegisterList
-
-//            headerText: qsTr("Управление контроллером:")
-
-//            listModel: DelegateModelRegList{
-//                id: _controllerRegisterListModel
-
-//                model: ControllerRegMapModel
-//                modelView: _controllerRegisterList
-//            }
-//        }
-//    }
-
-//    Component.onCompleted: {
-//        selectRegMap(_stack.children[0])
-//    }
+    }
 }

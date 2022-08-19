@@ -43,6 +43,7 @@ private:
 
     enum ListRoles{
         RegisterAdapterRole = Qt::UserRole + 1,
+        ParentDUTHeaderRole
     };
 };
 

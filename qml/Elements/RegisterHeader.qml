@@ -77,22 +77,41 @@ MouseArea{
         Drag.hotSpot.x: width / 2
         Drag.hotSpot.y: height / 2
 
-        Text{
-            text: register.name
-
-            leftPadding: width/10
-            rightPadding: width/10
-            width: parent.width
-
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-
-            elide: Text.ElideMiddle
-            wrapMode: Text.WordWrap
-            maximumLineCount: 2
-
+        Column{
             anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width
+            Text{
+                visible: dragEnabled
+
+                text: deviceHeader.deviceName + " кан.№" + deviceHeader.channelNumber
+
+                leftPadding: width/10
+                rightPadding: width/10
+                width: parent.width
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                elide: Text.ElideMiddle
+            }
+
+            Text{
+                text: register.name
+
+                leftPadding: width/10
+                rightPadding: width/10
+                width: parent.width
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                elide: Text.ElideMiddle
+//                wrapMode: Text.WordWrap
+//                maximumLineCount: 2
+
+//                anchors.verticalCenter: parent.verticalCenter
+//                anchors.horizontalCenter: parent.horizontalCenter
+            }
         }
         //[rect.states]
         states: State {

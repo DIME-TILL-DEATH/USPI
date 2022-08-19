@@ -25,16 +25,6 @@ const QString &AbstractInterface::interfaceName() const
     return m_interfaceName;
 }
 
-const DUTDevice::Header &AbstractInterface::deviceHeader() const
-{
-    return m_deviceHeader;
-}
-
-void AbstractInterface::setDeviceHeader(const DUTDevice::Header &newDeviceHeader)
-{
-    m_deviceHeader = newDeviceHeader;
-}
-
 std::shared_ptr<AbstractController> AbstractInterface::selectedController()
 {
     return m_connectedControllers.at(0);

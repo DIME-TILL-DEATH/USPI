@@ -9,8 +9,9 @@
 #include <memory>
 
 #include "logger.h"
-#include "registeradapter.h"
 #include "dutdevice.h"
+#include "dutlistmodel.h"
+#include "registeradapter.h"
 #include "registerlistmodel.h"
 #include "sessionsaver.h"
 #include "extensionmanager.h"
@@ -37,7 +38,7 @@ class UserInterface : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString dutDeviceName READ dutDeviceName NOTIFY dutDeviceUpdated)
+    Q_PROPERTY(QString dutDeviceName READ dutDeviceName NOTIFY dutUpdated)
     Q_PROPERTY(QString currentInterface READ currentInterface WRITE setCurrentInterface NOTIFY interfaceUpdated)
     Q_PROPERTY(QStringList avaliableInterfaces READ avaliableInterfaces NOTIFY avaliableInterfacesUpdated)
     Q_PROPERTY(QStringList avaliablePlugins READ avaliablePlugins NOTIFY avaliablePluginsUpdated)
@@ -53,10 +54,9 @@ public:
     const QString& currentInterface() const;
     bool setCurrentInterface(const QString& interfaceName);
 
-    RegisterListModel *deviceRegMapModel();
-    RegisterListModel *controllerRegMapModel();
-    RegisterListModel *registerSequenceModel();
     RegisterListModel *currentRegMapModel();
+    RegisterListModel *registerSequenceModel();
+    DutListModel *dutListModel();
 
     QStringList avaliableInterfaces();
     QStringList avaliablePlugins();
@@ -82,15 +82,16 @@ public:
 
 
 private:
+
+    std::vector<std::shared_ptr<DUTDevice> > m_dutList;
     DUTDevice m_device;
+    DutListModel m_dutListModel{&m_dutList};
 
     ExtensionManager extensionManager;
 
     std::vector<std::shared_ptr<Register> > m_regSequenceMap;
 
     RegisterListModel m_currentRegMapModel;
-    RegisterListModel m_deviceRegMapModel{m_device.deviceRegisterMap()};
-    RegisterListModel m_controllerRegMapModel;
     RegisterListModel m_regSequenceModel;
 
     SessionSaver m_saver;
@@ -111,7 +112,7 @@ private:
     UserSettings m_userSettings;
 
 signals:
-    void dutDeviceUpdated();
+    void dutUpdated();
     void interfaceUpdated();
     void avaliableInterfacesUpdated();
     void avaliablePluginsUpdated();

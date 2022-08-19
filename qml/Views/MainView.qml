@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.15
-
+import QtQml.Models 2.15
 import QtQuick.Layouts 1.15
 
 import StyleSettings 1.0
@@ -23,10 +23,9 @@ Item {
 
     function updateRegisterMap()
     {
-        _sequenceControlPanel.regCount = _regListView.deviceRegisterListModel.count //_regListView.regMaps[_regListView.currentMapIndex].count
-        _sequenceControlPanel.currentRegList = _regListView.deviceRegisterListModel.model //_regListView.regMaps[_regListView.currentMapIndex].listModel.model
+        _sequenceControlPanel.regCount = _regListView.deviceRegisterListModel.count
+        _sequenceControlPanel.currentRegList = _regListView.deviceRegisterListModel.model
         _sequenceControlPanel.currentIndex = -1
-
         _registerSequenceView.currentIndex = -1
     }
 
@@ -39,40 +38,42 @@ Item {
         padding: width / 200
         spacing: width / 200
 
+        DutListView{
+            id: _dutListView
 
+            height: parent.height
+            width: parent.width * 0.1
 
-        function selectRegister(registerAdapter, currentIndex)
-        {
-            Scripts.createRegisterFields(registerAdapter, _root)
-            _sequenceControlPanel.currentIndex = currentIndex
-            _flickable.contentY = 0
-        }
+            Connections{
+                function onDelegateClicked(index){
+                    Backend.setCurrentRegisterMap(index)
 
-        function selectMap(selectedRegisterList)
-        {
-            _sequenceControlPanel.regCount = selectedRegisterList.count
-            _sequenceControlPanel.currentIndex = selectedRegisterList.currentIndex
-            _sequenceControlPanel.currentRegList = selectedRegisterList.listModel.model
-        }
-
-        Component.onCompleted: {
-            _regListView.deviceRegisterListModel.delegateClicked.connect(selectRegister)
-//            _regListView.controllerRegisterListModel.delegateClicked.connect(selectRegister)
-
-            _regListView.selectRegMap.connect(selectMap)
+                    _sequenceControlPanel.regCount = _regListView.registerView.count;
+                    _sequenceControlPanel.currentIndex = _regListView.registerView.currentIndex;
+                    _sequenceControlPanel.currentRegList = _regListView.registerView.listModel.model;
+                }
+            }
         }
 
         RegListView{
             id: _regListView
 
             height: parent.height
-            width: parent.width * 0.15
-        }
+            width: parent.width * 0.1
 
+            Connections{
+                function onSelectRegister(registerAdapter, currentIndex)
+                {
+                    Scripts.createRegisterFields(registerAdapter, _root);
+                    _sequenceControlPanel.currentIndex = currentIndex;
+                    _flickable.contentY = 0;
+                }
+            }
+        }
 
         Flickable{
             id: _flickable
-            width: _row.width * 0.47
+            width: _row.width * 0.45
             height: _row.height
 
             contentHeight: (_fieldsView.children.length+1) * height/Style.fieldsOnScreen
@@ -99,7 +100,7 @@ Item {
             id: _sequenceControlPanel
 
             registerSequenceView: _registerSequenceView
-            currentRegList: RegisterMapModel
+            currentRegList: CurrentRegMapModel
         }
 
         Column{
@@ -135,7 +136,6 @@ Item {
                 }
             }
         }
-
     }
 
     Rectangle{

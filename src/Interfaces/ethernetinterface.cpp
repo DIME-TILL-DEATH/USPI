@@ -35,7 +35,7 @@ bool EthernetInterface::writeSequence(const std::vector<Register *> &wrSequence)
     {
         QList<QByteArray> rawDataList = (*itSeq)->rawData();
 
-        if(m_deviceHeader.isMSB)
+        if((*itSeq)->parentDUTHeader()->isMSB)
         {
             std::reverse(rawDataList.begin(), rawDataList.end());
         }
@@ -45,7 +45,7 @@ bool EthernetInterface::writeSequence(const std::vector<Register *> &wrSequence)
             QByteArray regData = (*itReg);
             quint16 bitSize = regData.size()*8;
 
-            if(m_deviceHeader.isMSB)
+            if((*itSeq)->parentDUTHeader()->isMSB)
             {
                 std::reverse(regData.begin(), regData.end());
             }
@@ -107,7 +107,7 @@ QByteArray EthernetInterface::formHeader(quint16 regCount, quint16 packetSize)
 
     result.append(EthernetFrames::SendData);
     result.append(EthernetConstants::ProtocolVersion);
-    result.append(0<<EthernetBitPosition::TRIGGER | (m_deviceHeader.channelNumber & 0xF));
+    result.append(0<<EthernetBitPosition::TRIGGER); // | (m_deviceHeader.channelNumber & 0xF));
     result.append(regCount);
     result.append(packetSize + EthernetConstants::HeaderSize);
     result.append(reservedByte);
