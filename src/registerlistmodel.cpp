@@ -151,3 +151,8 @@ std::vector<RegisterAdapter> &RegisterListModel::registerAdaptersList()
 {
     return m_data;
 }
+
+void RegisterListModel::dutUpdated()
+{
+    emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
+}

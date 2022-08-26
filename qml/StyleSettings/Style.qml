@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick 2.0
 
 QtObject {
+    readonly property color labelColor: "cornsilk"
 
     readonly property color borderColorActive:    "blue"
     readonly property color borderColorPassive:   "gray"
@@ -11,11 +12,12 @@ QtObject {
     readonly property color regHeaderPassiveGlobal : "white"
     readonly property color regHeaderActiveLocal : "lightgreen"
     readonly property color regHeaderPassiveLocal : "lightgray"
+    readonly property color regMapPassive : "lightgray"
     //
     readonly property color regHeaderActiveDUT  : "skyblue"
     readonly property color regHeaderPassiveDUT : "white"
     readonly property color regHeaderActiveController : "lightgreen"
-    readonly property color regHeaderPassiveController : "lightgray"
+    readonly property color regHeaderPassiveController : "gray"
 
     readonly property color separationField  : "azure"
 

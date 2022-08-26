@@ -1,0 +1,3 @@
+module Globals
+
+singleton Status 1.0 Status.qml

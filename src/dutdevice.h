@@ -15,7 +15,7 @@
 
 struct DUTHeader
 {
-    private:
+private:
         Q_GADGET
 
         Q_PROPERTY(QString deviceName MEMBER deviceName);
@@ -23,7 +23,7 @@ struct DUTHeader
         Q_PROPERTY(quint8 registerSize MEMBER registerSize);
         Q_PROPERTY(bool isMSB MEMBER isMSB);
         Q_PROPERTY(quint8 channelNumber MEMBER channelNumber);
-    public:
+public:
     QString deviceName{QObject::tr("Выбрать")};
     QString description;
     QString version{""};

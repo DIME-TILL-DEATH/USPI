@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.15
 
 import QtQuick.Dialogs 1.3
 
+import DeviceManager 1.0
 import Elements 1.0
 import Fields 1.0
 import Views 1.0
@@ -95,13 +96,36 @@ ApplicationWindow {
         width: _appWindow.width
         height: _appWindow.height/15
 
-        openFileDeviceDialog: _fileDeviceDialog
+//        openFileDeviceDialog: _fileDeviceDialog
+        Connections{
+            function onOpenDeviceManager()
+            {
+                _deviceManagerWindow.active = true
+            }
+        }
     }
 
-    OpenFileDeviceDialog{
-        id: _fileDeviceDialog
+    Loader{
+        id: _deviceManagerWindow
+        active: false
+        sourceComponent: DeviceManagerWindow{
+            id: _deviceManagerWindowComponent
 
-        mainView: _mainView
+            width: _appWindow.width*0.9
+            height: _appWindow.height*0.7
+
+            onClosing: _deviceManagerWindow.active = false
+
+            Connections{
+                target: _deviceManagerWindowComponent
+                function onSgRefreshFields()
+                {
+                    Scripts.clearRegisterFields(_mainView)
+                    _mainView.registerView.registerView.currentIndex = -1
+                    _mainView.updateRegisterMap()
+                }
+            }
+        }
     }
 
 

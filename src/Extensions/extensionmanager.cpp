@@ -17,7 +17,7 @@ ExtensionManager::~ExtensionManager()
 
 }
 
-QStringList ExtensionManager::getPlugins(QString path)
+QStringList ExtensionManager::getPlugins(const QString &path)
 {
     QStringList plugins;
 
@@ -37,14 +37,20 @@ QStringList ExtensionManager::getPlugins(QString path)
     return plugins;
 }
 
-QStringList ExtensionManager::avaliablePlugInsNames()
+QStringList ExtensionManager::avaliablePlugIns()
 {
-    return m_pluginsList.keys();
+    QStringList result;
+    foreach(PluginInfo pluginInfo, m_loadedPlugInsInfo)
+    {
+        result.append(pluginInfo.name() + tr(" - кан.№") + QString("%1").arg(pluginInfo.targetDevice()->channelNumber()));
+    }
+    return result;
 }
 
-void ExtensionManager::loadPlugins(std::vector<PluginInfo> pluginsList)
+void ExtensionManager::loadPlugins(const std::vector<PluginInfo> &pluginsList)
 {
-    m_loadedPlugInsInfo = pluginsList;
+   // m_loadedPlugInsInfo = pluginsList;
+
     foreach(PluginInfo pluginInfo, pluginsList)
     {
         loadPlugin(pluginInfo);
@@ -61,7 +67,7 @@ std::vector<PluginInfo> ExtensionManager::loadedPlugInsInfo()
     return m_loadedPlugInsInfo;
 }
 
-void ExtensionManager::loadPlugin(PluginInfo pluginInfo)
+void ExtensionManager::loadPlugin(PluginInfo &pluginInfo)
 {
     QString fileAddress = QFileInfo(pluginInfo.path()).absoluteFilePath();
 
@@ -102,41 +108,50 @@ void ExtensionManager::loadPlugin(PluginInfo pluginInfo)
     else
     {
         qWarning() << "Could not cast: " << pluginInfo.name() << " : " << loader->fileName();
+        return;
     }
 
-    m_pluginsList.insert(pluginInfo.name(), loader);
+    plugin->setTargetDeviceNumber(m_loadedPlugInsInfo.size());
+    pluginInfo.setLoader(loader);
+
+    // Для того, чтобы для одного и того же dll создавались разные копии плагина для устройства
+    // необходимо чтобы САМ плагин был фабрикой по созданию копий
+    // те, возможно, в интерфейсе стоит заменить showPanel на Create
+    m_loadedPlugInsInfo.push_back(pluginInfo);
 }
 
 void ExtensionManager::unloadPlugins()
 {
-    foreach(QPluginLoader* plugin, m_pluginsList)
-    {
-        plugin->unload();
-        delete plugin;
-    }
-    m_pluginsList.clear();
+//    foreach(QPluginLoader* plugin, m_pluginsList)
+//    {
+//        plugin->unload();
+//        delete plugin;
+//    }
+//    m_pluginsList.clear();
 }
 
-void ExtensionManager::runPlugin(QString pluginName)
+
+void ExtensionManager::runPlugin(quint16 number)
 {
-    if(!m_pluginsList.contains(pluginName))
+    if(number > m_loadedPlugInsInfo.size())
     {
-        qWarning() << "Plugin with name " << pluginName << " not found in list";
+        qWarning() << "Номер расширения больше чем число доступных расширений";
         return;
     }
 
-    QPluginLoader* loader = m_pluginsList.value(pluginName);
-
-    ControlPanelInterface* plugin = qobject_cast<ControlPanelInterface*>(loader->instance());
+    QPluginLoader* loader= m_loadedPlugInsInfo.at(number).loader();
+    ControlPanelInterface* plugin= qobject_cast<ControlPanelInterface*>(loader->instance());
+    // Костыль для случая множества копий одного и того же плагина
+    // для разных плагинов не нужен
+    plugin->setTargetDeviceNumber(number);
 
     if(plugin)
     {
-
         plugin->showPanel();
     }
     else
     {
-        qWarning() << tr("Could not cast: ") << pluginName << " : " << loader->fileName();
+        qWarning() << tr("Could not cast: ") << m_loadedPlugInsInfo.at(number).name() << " : " << loader->fileName();
     }
 
     // в примере определяют простым перебором вариантов:
@@ -171,117 +186,147 @@ void ExtensionManager::setPlugInSettings(const QString &plugInName, const QMap<Q
 
 void ExtensionManager::setFieldValue(QString registerName, QString fieldName, QVariant value)
 {
-    AbstractField* field = m_controlledDevice->findField(registerName, fieldName);
+    ControlPanelInterface* plugin = qobject_cast<ControlPanelInterface*>(sender());
 
-    if(field == nullptr) return;
-
-    switch (field->type())
+    if(plugin)
     {
-        case AbstractField::FieldType::IntegerField:
+        DUTDevice* targetDevice = m_loadedPlugInsInfo.at(plugin->targetDeviceNumber()).targetDevice();
+        AbstractField* field = targetDevice->findField(registerName, fieldName);
+
+        if(field == nullptr) return;
+
+        switch (field->type())
         {
-            IntegerField* intField = dynamic_cast<IntegerField*>(field);
-            qulonglong setVal = value.toULongLong();
+            case AbstractField::FieldType::IntegerField:
+            {
+                IntegerField* intField = dynamic_cast<IntegerField*>(field);
+                qulonglong setVal = value.toULongLong();
 
-            if(intField) intField->setData(setVal);
-            else qWarning() << tr("Не удается преобразовать тип поля");
+                if(intField) intField->setData(setVal);
+                else qWarning() << tr("Не удается преобразовать тип поля");
 
-            break;
+                break;
+            }
+
+            case AbstractField::FieldType::BitField:
+            {
+                BitField* bitField = dynamic_cast<BitField*>(field);
+                bool setVal = value.toBool();
+
+                if(bitField) bitField->setBit(setVal);
+                else qWarning() << tr("Не удается преобразовать тип поля");
+
+                break;
+            }
+
+            case AbstractField::FieldType::VariantListField:
+            {
+                VariantListField* variantListField = dynamic_cast<VariantListField*>(field);
+                QString setVal = value.toString();
+
+                if(!variantListField->containsVariant(setVal)) qWarning() << tr("Ошибка установки VariantListField. Нет такого варианта в списке");
+
+                if(variantListField) variantListField->setSelected(setVal);
+                else qWarning() << tr("Не удается преобразовать тип поля");
+
+                break;
+            }
+
+            default:
+            {
+                qWarning() << tr("ExtensionManager: ошибка записи в поле ") << fieldName << tr(" в регистре ") << registerName;
+                qWarning() << tr("Запись значений в данный тип поля не поддерживается");
+            }
         }
-
-        case AbstractField::FieldType::BitField:
-        {
-            BitField* bitField = dynamic_cast<BitField*>(field);
-            bool setVal = value.toBool();
-
-            if(bitField) bitField->setBit(setVal);
-            else qWarning() << tr("Не удается преобразовать тип поля");
-
-            break;
-        }
-
-        case AbstractField::FieldType::VariantListField:
-        {
-            VariantListField* variantListField = dynamic_cast<VariantListField*>(field);
-            QString setVal = value.toString();
-
-            if(!variantListField->containsVariant(setVal)) qWarning() << tr("Ошибка установки VariantListField. Нет такого варианта в списке");
-
-            if(variantListField) variantListField->setSelected(setVal);
-            else qWarning() << tr("Не удается преобразовать тип поля");
-
-            break;
-        }
-
-        default:
-        {
-            qWarning() << tr("ExtensionManager: ошибка записи в поле ") << fieldName << tr(" в регистре ") << registerName;
-            qWarning() << tr("Запись значений в данный тип поля не поддерживается");
-        }
+    }
+    else
+    {
+        qWarning() << tr("ExtensionManager: не удаётся преобразовать QObject в ControlPanelInterface");
     }
 }
 
 void ExtensionManager::getFieldValue(QString registerName, QString fieldName, QVariant &value)
 {
-    AbstractField* field = m_controlledDevice->findField(registerName, fieldName);
+    ControlPanelInterface* plugin = qobject_cast<ControlPanelInterface*>(sender());
 
-    if(field == nullptr) return;
-
-    switch (field->type())
+    if(plugin)
     {
-        case AbstractField::FieldType::IntegerField:
+        DUTDevice* targetDevice = m_loadedPlugInsInfo.at(plugin->targetDeviceNumber()).targetDevice();
+
+        AbstractField* field = targetDevice->findField(registerName, fieldName);
+
+        if(field == nullptr) return;
+
+        switch (field->type())
         {
-            IntegerField* intField = dynamic_cast<IntegerField*>(field);
+            case AbstractField::FieldType::IntegerField:
+            {
+                IntegerField* intField = dynamic_cast<IntegerField*>(field);
 
-            if(intField) value = intField->data();
-            else qWarning() << tr("Не удается преобразовать тип поля");
+                if(intField) value = intField->data();
+                else qWarning() << tr("Не удается преобразовать тип поля");
 
-            break;
+                break;
+            }
+
+            case AbstractField::FieldType::BitField:
+            {
+                BitField* bitField = dynamic_cast<BitField*>(field);
+
+                if(bitField) value = bitField->getBit();
+                else qWarning() << tr("Не удается преобразовать тип поля");
+
+                break;
+            }
+
+            case AbstractField::FieldType::VariantListField:
+            {
+                VariantListField* variantListField = dynamic_cast<VariantListField*>(field);
+
+                if(variantListField) value = variantListField->selected();
+                else qWarning() << tr("Не удается преобразовать тип поля");
+
+                break;
+            }
+
+            case AbstractField::FieldType::FixedField:
+            {
+                FixedField* fixedField = dynamic_cast<FixedField*>(field);
+
+                if(fixedField) value = fixedField->data();
+                else qWarning() << tr("Не удается преобразовать тип поля");
+
+                break;
+            }
+
+            default:
+            {
+                qWarning() << tr("ExtensionManager: ошибка чтения поля ") << fieldName << tr(" в регистре ") << registerName;
+                qWarning() << tr("Чтение данного типа поля не поддерживается");
+            }
         }
-
-        case AbstractField::FieldType::BitField:
-        {
-            BitField* bitField = dynamic_cast<BitField*>(field);
-
-            if(bitField) value = bitField->getBit();
-            else qWarning() << tr("Не удается преобразовать тип поля");
-
-            break;
-        }
-
-        case AbstractField::FieldType::VariantListField:
-        {
-            VariantListField* variantListField = dynamic_cast<VariantListField*>(field);
-
-            if(variantListField) value = variantListField->selected();
-            else qWarning() << tr("Не удается преобразовать тип поля");
-
-            break;
-        }
-
-        case AbstractField::FieldType::FixedField:
-        {
-            FixedField* fixedField = dynamic_cast<FixedField*>(field);
-
-            if(fixedField) value = fixedField->data();
-            else qWarning() << tr("Не удается преобразовать тип поля");
-
-            break;
-        }
-
-        default:
-        {
-            qWarning() << tr("ExtensionManager: ошибка чтения поля ") << fieldName << tr(" в регистре ") << registerName;
-            qWarning() << tr("Чтение данного типа поля не поддерживается");
-        }
+    }
+    else
+    {
+        qWarning() << tr("ExtensionManager: не удаётся преобразовать QObject в ControlPanelInterface");
     }
 }
 
 void ExtensionManager::writeRegisterSequence(QStringList registerNames)
 {
-    emit writeRegisterSequenceRequest(registerNames);
+    qInfo() << "Call writeRegisterSequence, object: " << sender()->objectName();
+
+    ControlPanelInterface* plugin = qobject_cast<ControlPanelInterface*>(sender());
+
+    if(plugin)
+    {
+        qInfo() << "qobject_cast success";
+        DUTDevice* targetDevice = m_loadedPlugInsInfo.at(plugin->targetDeviceNumber()).targetDevice();
+        emit writeCustomSequenceRequest(registerNames, targetDevice);
+    }
 }
 
 void ExtensionManager::writeRegisterSequence()
 {
-    emit writeRegisterSequenceRequest();
+    emit writeSequenceRequest();
 }

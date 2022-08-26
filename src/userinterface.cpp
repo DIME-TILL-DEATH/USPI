@@ -36,8 +36,11 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
     font.setStyleStrategy(QFont::NoSubpixelAntialias);
     QGuiApplication::setFont(font);
 
-    connect(&extensionManager, SIGNAL(writeRegisterSequenceRequest()), this, SLOT(writeSequence()));
-    connect(&extensionManager, SIGNAL(writeRegisterSequenceRequest(QStringList)), this, SLOT(writeCustomSequence(QStringList)));
+    connect(&extensionManager, SIGNAL(writeSequenceRequest()), this, SLOT(writeSequence()));
+    connect(&extensionManager, &ExtensionManager::writeCustomSequenceRequest, this, &UserInterface::writeCustomSequence);
+
+    connect(this, &UserInterface::dutUpdated, &m_dutListModel, &DutListModel::dutUpdated);
+    connect(this, &UserInterface::dutUpdated, &m_regSequenceModel, &RegisterListModel::dutUpdated);
 }
 
 UserInterface::~UserInterface()
@@ -124,7 +127,6 @@ bool UserInterface::loadDevice(const QUrl &fileName)
         return false;
     }
 
-    emit dutUpdated();
 
  //   m_regSequenceModel.resetModel();
  //   m_regSequenceMap.clear();
@@ -142,17 +144,25 @@ bool UserInterface::loadDevice(const QUrl &fileName)
 
     jsonFile.readPluginsArray(jsonFile.deviceGlobalObject() ,&plugList);
 
-    extensionManager.unloadPlugins();
+//    extensionManager.unloadPlugins();
+
+    for(PluginInfo& it : plugList)
+    {
+        it.setTargetDevice(newDevice);
+    }
 
     extensionManager.loadPlugins(plugList);
-    emit avaliablePluginsUpdated();
 
     //----------------------------------------
-    m_device.setChannelNumber(m_device.deviceHeader().channelNumber+1);
-
     newDevice->setChannelNumber(m_device.deviceHeader().channelNumber);
     m_dutListModel.addDutToList(newDevice);
+
+    m_device.setChannelNumber(m_device.deviceHeader().channelNumber+1);
     //------------------------------------------
+
+    emit dutUpdated();
+    emit avaliablePluginsUpdated();
+
     qInfo() << tr("Карта регистров для устройства '") << newDevice->name() << tr("' загружена");
     return true;
 }
@@ -217,10 +227,15 @@ bool UserInterface::saveSession(const QUrl& fileName)
     return m_saver.saveSession(fileName.toLocalFile());
 }
 
-void UserInterface::runPlugin(QString pluginName)
+void UserInterface::runPlugin(quint16 pluginNumber)
 {
-    extensionManager.runPlugin(pluginName);
+    extensionManager.runPlugin(pluginNumber);
 }
+
+//void UserInterface::runPlugin(QString pluginName)
+//{
+//    extensionManager.runPlugin(pluginName);
+//}
 
 QStringList UserInterface::avaliableInterfaces()
 {
@@ -234,7 +249,12 @@ QStringList UserInterface::avaliableInterfaces()
 
 QStringList UserInterface::avaliablePlugins()
 {
-    return extensionManager.avaliablePlugInsNames();
+    return extensionManager.avaliablePlugIns();
+}
+
+QStringList UserInterface::avaliableChannels()
+{
+    return QStringList{{"Кан.№0 - SPI"}, {"Кан.№1 - SPI"}, {"Кан.№2 - SPI"}, {"Кан.№3 - SPI"}};
 }
 
 void UserInterface::updateAvaliableInterfaces()
@@ -304,6 +324,13 @@ void UserInterface::removeRegisterFromSequence(qint16 index)
     m_regSequenceMap.erase(m_regSequenceMap.begin()+index);
 }
 
+void UserInterface::setChannelForDevice(qint16 deviceNum, qint16 channelNum)
+{
+    m_dutList.at(deviceNum)->setChannelNumber(channelNum);
+    emit dutUpdated();
+    emit avaliablePluginsUpdated();
+}
+
 void UserInterface::setCurrentRegisterMap(qint16 index)
 {
     if(index == -1)
@@ -332,12 +359,18 @@ void UserInterface::setUserSettings(const UserSettings &newSettings)
 
 
 // Добавить device для которого пишется кастомная последовательность
-void UserInterface::writeCustomSequence(QStringList registerNames)
+void UserInterface::writeCustomSequence(QStringList registerNames, DUTDevice *targetDevice)
 {
+    if(targetDevice == nullptr)
+    {
+        qWarning() << "Не указано устройство для записи";
+        return;
+    }
+
     std::vector<Register*> wrSequence;
     foreach(QString name, registerNames)
     {
-        wrSequence.push_back(m_device.registerByName(name).get());
+        wrSequence.push_back(targetDevice->registerByName(name).get());
     }
 
 //    m_interface_ptr->setDeviceHeader(m_device.deviceHeader());

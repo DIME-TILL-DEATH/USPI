@@ -31,5 +31,12 @@
         <file>qml/Fields/SeparationField.qml</file>
         <file>qml/Views/RegListView.qml</file>
         <file>qml/Views/DutListView.qml</file>
+        <file>qml/DeviceManager/qmldir</file>
+        <file>qml/DeviceManager/DeviceManagerWindow.qml</file>
+        <file>qml/DeviceManager/DeviceTableHeader.qml</file>
+        <file>qml/DeviceManager/DeviceTableSizes.qml</file>
+        <file>qml/DeviceManager/DeviceTableDelegate.qml</file>
+        <file>qml/Globals/qmldir</file>
+        <file>qml/Globals/Status.qml</file>
     </qresource>
 </RCC>

@@ -17,14 +17,14 @@ FileDialog {
     title: "Выберите файл"
     nameFilters: [ "Файлы карты регистров (*.json)", "All files (*)" ]
 
-    onAccepted: {
-        if(Backend.loadDevice(_fileDialog.fileUrl))
-        {
-            Scripts.clearRegisterFields(mainView)
-            mainView.registerView.registerView.currentIndex = -1
+//    onAccepted: {
+//        if(Backend.loadDevice(_fileDialog.fileUrl))
+//        {
+//            Scripts.clearRegisterFields(mainView)
+//            mainView.registerView.registerView.currentIndex = -1
 
-            mainView.updateRegisterMap()
-        }
-    }
+//            mainView.updateRegisterMap()
+//        }
+//    }
     Component.onCompleted: visible = false
 }

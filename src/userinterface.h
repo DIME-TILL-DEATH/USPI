@@ -42,6 +42,7 @@ class UserInterface : public QObject
     Q_PROPERTY(QString currentInterface READ currentInterface WRITE setCurrentInterface NOTIFY interfaceUpdated)
     Q_PROPERTY(QStringList avaliableInterfaces READ avaliableInterfaces NOTIFY avaliableInterfacesUpdated)
     Q_PROPERTY(QStringList avaliablePlugins READ avaliablePlugins NOTIFY avaliablePluginsUpdated)
+    Q_PROPERTY(QStringList avaliableChannels READ avaliableChannels NOTIFY avaliableChannelsUpdated)
 
     Q_PROPERTY(UserSettings userSettings READ userSettings WRITE setUserSettings NOTIFY userSettingsUpdated)
 public:
@@ -60,6 +61,7 @@ public:
 
     QStringList avaliableInterfaces();
     QStringList avaliablePlugins();
+    QStringList avaliableChannels();
 
     Q_INVOKABLE bool loadDevice(const QUrl& fileName);
     Q_INVOKABLE bool writeSequence();
@@ -67,13 +69,15 @@ public:
     Q_INVOKABLE bool loadSession(const QUrl& fileName);
     Q_INVOKABLE bool saveSession(const QUrl& fileName);
 
-    Q_INVOKABLE void runPlugin(QString pluginName);
+    Q_INVOKABLE void runPlugin(quint16 pluginNumber);
+//    Q_INVOKABLE void runPlugin(QString pluginName);
 
     Q_INVOKABLE void updateAvaliableInterfaces();
 
     Q_INVOKABLE void addRegisterToSequence(const RegisterAdapter& regAdapter, qint16 index = -1);
     Q_INVOKABLE void removeRegisterFromSequence(qint16 index);
 
+    Q_INVOKABLE void setChannelForDevice(qint16 deviceNum, qint16 channelNum);
     Q_INVOKABLE void setCurrentRegisterMap(qint16 index);
 
     const UserSettings &userSettings() const;
@@ -116,10 +120,11 @@ signals:
     void interfaceUpdated();
     void avaliableInterfacesUpdated();
     void avaliablePluginsUpdated();
+    void avaliableChannelsUpdated();
     void userSettingsUpdated();
 
 public slots:
-    void writeCustomSequence(QStringList registerNames);
+    void writeCustomSequence(QStringList registerNames, DUTDevice* targetDevice = nullptr);
 };
 
 #endif // USERINTERFACE_H

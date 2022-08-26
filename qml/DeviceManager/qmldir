@@ -1,0 +1,6 @@
+module DeviceManager
+
+singleton DeviceTableSizes 1.0 DeviceTableSizes.qml
+DeviceManagerWindow 1.0 DeviceManagerWindow.qml
+DeviceTableDelegate 1.0 DeviceTableDelegate.qml
+DeviceTableHeader   1.0 DeviceTableHeader.qml

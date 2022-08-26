@@ -73,6 +73,11 @@ bool JsonWorker::readHeader(DUTHeader* header, ParseError *error)
             return false;
         }
 
+        if(jsonHeader.contains("description") && jsonHeader["description"].isString())
+        {
+            header->description = jsonHeader["description"].toString();
+        }
+
         if(jsonHeader.contains("version") && jsonHeader["version"].isString())
         {
             header->version = jsonHeader["version"].toString();

@@ -10,6 +10,8 @@ public:
     virtual void showPanel() = 0;
     virtual void closePanel() = 0;
 
+    virtual void setTargetDeviceNumber(quint16 number) = 0;
+    virtual quint16 targetDeviceNumber() = 0;
 signals:
     virtual void setFieldValue(QString registerName, QString fieldName, QVariant value) = 0;
     virtual void getFieldValue(QString registerName, QString fieldName, QVariant& value) = 0;

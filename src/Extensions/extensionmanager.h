@@ -14,19 +14,19 @@ public:
     ExtensionManager(DUTDevice* controllingDevice, QObject* parent = nullptr);
     ~ExtensionManager();
 
-    QStringList getPlugins(QString path);
-    QStringList avaliablePlugInsNames();
-    void loadPlugins(std::vector<PluginInfo> pluginsList);
+    QStringList getPlugins(const QString& path);
+    QStringList avaliablePlugIns();
+    void loadPlugins(const std::vector<PluginInfo>& pluginsList);
     std::vector<PluginInfo> loadedPlugInsInfo();
-    void loadPlugin(PluginInfo pluginIngo);
+    void loadPlugin(PluginInfo &pluginInfo);
 
     void unloadPlugins();
 
-    void runPlugin(QString pluginName);
-
+//    void runPlugin(const QString& pluginName);
+    void runPlugin(quint16 number);
 
 private:
-    QMap<QString, QPluginLoader*> m_pluginsList;
+//    QMap<QString, QPluginLoader*> m_pluginsList;
     std::vector<PluginInfo> m_loadedPlugInsInfo;
 
     QMap<QString, QString> getPlugInSettings(const QString& plugInName);
@@ -38,8 +38,8 @@ signals:
     void saveRequest(QString plugInName, QMap<QString, QString>& dataToSave);
     void loadRequest(QString plugInName, const QMap<QString, QString>& dataToLoad);
 
-    void writeRegisterSequenceRequest(QStringList registerNames);
-    void writeRegisterSequenceRequest();
+    void writeCustomSequenceRequest(QStringList registerNames, DUTDevice *targetDevice);
+    void writeSequenceRequest();
 
 public slots:
     void setFieldValue(QString registerName, QString fieldName, QVariant value);

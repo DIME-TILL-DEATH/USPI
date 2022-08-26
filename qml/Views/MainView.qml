@@ -73,7 +73,7 @@ Item {
 
         Flickable{
             id: _flickable
-            width: _row.width * 0.45
+            width: _row.width * 0.44
             height: _row.height
 
             contentHeight: (_fieldsView.children.length+1) * height/Style.fieldsOnScreen
@@ -104,7 +104,7 @@ Item {
         }
 
         Column{
-            width: parent.width * 0.15
+            width: parent.width * 0.14
             height: parent.height
 
             spacing: height/200

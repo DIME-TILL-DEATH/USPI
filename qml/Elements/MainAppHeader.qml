@@ -7,6 +7,7 @@ import QtQuick.Dialogs 1.3
 
 import StyleSettings 1.0
 
+import DeviceManager 1.0
 import Elements 1.0
 import Fields 1.0
 import Views 1.0
@@ -17,6 +18,8 @@ Rectangle{
 
         property var openFileDeviceDialog
 
+        signal openDeviceManager()
+
         border.width: 1
         color: Style.headerColor
 
@@ -26,10 +29,10 @@ Rectangle{
             padding: width / 100
             spacing: width / 100
 
-            Text{
-                text: "Устройство:"
-                anchors.verticalCenter: parent.verticalCenter
-            }
+//            Text{
+//                text: "Устройство:"
+//                anchors.verticalCenter: parent.verticalCenter
+//            }
 
             Button{
                 id: _btnChooseDevice
@@ -37,7 +40,7 @@ Rectangle{
                 height: _headerRect.height*0.8
                 anchors.verticalCenter: parent.verticalCenter
 
-                text: (Backend !== null) ? Backend.dutDeviceName : ""
+                text: "Менеджер устройств"//(Backend !== null) ? Backend.dutDeviceName : ""
 
                 background: Rectangle{
                     border.width: 1
@@ -47,7 +50,9 @@ Rectangle{
                     opacity: _btnChooseDevice.pressed ? 0.5 : 1
                 }
                 onPressed: {
-                    openFileDeviceDialog.open()
+                    openDeviceManager()
+//                    openFileDeviceDialog.open()
+//                    _deviceManagerWindow.active = true
                 }
             }
 
@@ -82,7 +87,7 @@ Rectangle{
             ComboBox{
                 id: _pluginSelector
 
-                width: parent.width/4
+                width: parent.width/3.8
                 height: _headerRect.height*0.8
 
                 anchors.verticalCenter: parent.verticalCenter
@@ -113,7 +118,8 @@ Rectangle{
                 }
 
                 onPressed: {
-                    Backend.runPlugin(_pluginSelector.currentText)
+//                    Backend.runPlugin(_pluginSelector.currentText)
+                    Backend.runPlugin(_pluginSelector.currentIndex)
                 }
             }
 
@@ -130,5 +136,6 @@ Rectangle{
                     onClosing: _interfaceSettingsWindowLoader.active = false
                 }
             }
+
         }
     }

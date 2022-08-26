@@ -33,3 +33,23 @@ void PluginInfo::setSettings(const QMap<QString, QString> &newSettings)
 {
     m_settings = newSettings;
 }
+
+DUTDevice *PluginInfo::targetDevice()
+{
+    return m_targetDevice;
+}
+
+void PluginInfo::setTargetDevice(DUTDevice *newTargetDevice)
+{
+    m_targetDevice = newTargetDevice;
+}
+
+QPluginLoader *PluginInfo::loader()
+{
+    return m_loader;
+}
+
+void PluginInfo::setLoader(QPluginLoader *newLoader)
+{
+    m_loader = newLoader;
+}

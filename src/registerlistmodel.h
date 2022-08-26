@@ -37,6 +37,10 @@ public:
     RegisterAdapter* getRegisterAdapterByUniqueId(quint16 uniqueID);
 
     std::vector<RegisterAdapter>& registerAdaptersList();
+
+public slots:
+    void dutUpdated();
+
 private:
     std::vector<RegisterAdapter> m_data;
 //    std::vector<std::shared_ptr<Register> > m_registers;

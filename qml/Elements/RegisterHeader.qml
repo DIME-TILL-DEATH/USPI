@@ -2,17 +2,20 @@ import QtQuick 2.15
 import QtQml.Models 2.15
 
 import StyleSettings 1.0
+import Globals 1.0
 
 import "../CreateFunctions.js" as Scripts
 
 MouseArea{
     id: _rootMA
 
-    width: _registerMapView.width*0.9
+    width: _registerMapView.width
     height: _registerMapView.height/10
 
     property bool dragEnabled: false
     property bool held: false
+
+    property var panelType
 
     drag.target: held ? contentRectangle : undefined
     drag.axis: Drag.YAxis
@@ -44,7 +47,7 @@ MouseArea{
     Rectangle{
         id: contentRectangle
 
-        width: _rootMA.width
+        width: _rootMA.width*0.9
         height: _rootMA.height
         opacity: _rootMA.held ? 0.8 : 1
 
@@ -64,8 +67,10 @@ MouseArea{
         color: {
             if(register!==undefined){
                 switch(register.registerType){
-                   case "DUT": return parent.ListView.isCurrentItem ? Style.regHeaderActiveDUT : Style.regHeaderPassiveDUT
-                   case "Controller": return parent.ListView.isCurrentItem ? Style.regHeaderActiveController : Style.regHeaderPassiveController
+                   case "DUT": return parent.ListView.isCurrentItem ? ((Status.selectedPanel === panelType) ? Style.regHeaderActiveDUT : Style.regMapPassive)
+                                                                    : Style.regHeaderPassiveDUT
+                   case "Controller": return parent.ListView.isCurrentItem ? ((Status.selectedPanel === panelType) ? Style.regHeaderActiveController : Style.regMapPassive)
+                                                                           : Style.regHeaderPassiveController
                    }
             }
             else

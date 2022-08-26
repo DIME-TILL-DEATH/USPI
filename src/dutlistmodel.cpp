@@ -67,3 +67,8 @@ void DutListModel::removeDutFromList()
 {
 
 }
+
+void DutListModel::dutUpdated()
+{
+    emit dataChanged(createIndex(0, 0), createIndex(m_data->size(), 0));
+}

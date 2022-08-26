@@ -2,11 +2,12 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.15
 
+import StyleSettings 1.0
 import Elements 1.0
 
 import "../CreateFunctions.js" as Scripts
 
-Item{
+Rectangle{
     id: _root
 
     property alias delegate: _rootList.delegate
@@ -19,19 +20,15 @@ Item{
     width: parent.width
     height: parent.height
 
-    Text {
-        id: _headerRegisterMapText
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: headerText
-    }
+    border.width: 1
 
     ListView{
         id: _rootList
 
-        width: _root.width
-        height: _root.height-_headerRegisterMapText.height
+        anchors.fill: parent
 
-        anchors.top: _headerRegisterMapText.bottom
+        topMargin: height/200
+        bottomMargin: topMargin
 
         model: _root.model
 
@@ -41,6 +38,24 @@ Item{
         ScrollBar.vertical: ScrollBar{}
 
         spacing: height/200
+
+        headerPositioning: ListView.OverlayHeader
+        header: Rectangle{
+            z:10
+
+            border.width: 1
+            color: Style.labelColor
+            width:_rootList.width
+            height: _rootList.height/20
+            Text{
+                text: headerText
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
 
         //[transitions]
         remove: Transition {

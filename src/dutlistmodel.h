@@ -25,6 +25,9 @@ public:
     void addDutToList(DUTDevice* newDevice);
     void removeDutFromList();
 
+public slots:
+    void dutUpdated();
+
 private:
     std::vector<std::shared_ptr<DUTDevice> >* m_data;
 

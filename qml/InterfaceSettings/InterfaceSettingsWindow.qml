@@ -8,7 +8,7 @@ ApplicationWindow {
 
     visible: true
     flags: Qt.Dialog
-    title: qsTr("Interface settings")
+    title: qsTr("Настройки интерфейсов")
 
     property int baseMargins: width/50
 
