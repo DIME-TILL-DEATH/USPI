@@ -12,6 +12,7 @@
 #include <QJsonObject>
 
 #include "dutdevice.h"
+#include "registerlistmodel.h"
 #include "register.h"
 #include "parseerror.h"
 
@@ -37,10 +38,20 @@ public:
     bool loadControllerRegMap(std::shared_ptr<AbstractController> controller, ParseError* error);
 
     bool readHeader(DUTHeader *header, ParseError* error = nullptr);
-    void saveHeader(const DUTHeader &header);
+//    void saveHeader(const DUTHeader &header);
 
-    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, RegisterType registerType, DUTHeader* deviceHeader, ParseError* error = nullptr);
-    void saveRegisterArray(const std::vector<std::shared_ptr<Register> >& registerMap);
+    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTHeader* deviceHeader, ParseError* error = nullptr);
+
+    static QJsonObject jsonSaveDut(DUTDevice &device);
+    static QJsonArray jsonSaveDutList(std::vector<std::shared_ptr<DUTDevice> > *dutList);
+
+    static DUTDevice *jsonLoadDut(QJsonObject jsonObjectDevice);
+//    static std::vector<std::shared_ptr<DUTDevice> > *jsonLoadDutList(QJsonObject jsonGlobalObject);
+    static void jsonLoadDutList(QJsonObject jsonGlobalObject, std::vector<std::shared_ptr<DUTDevice> > *dutList,
+                                QMap<qint16, DUTHeader *>* deviceReferenceList = nullptr);
+
+    static bool loadWriteSequence(QJsonObject globalObject, const QMap<qint16, DUTHeader *>& deviceReferenceList,
+                                  std::vector<std::shared_ptr<Register> >* regSequenceMap, RegisterListModel* registerWriteSequenceModel);
 
     static bool readRegister(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);
     static void saveRegister(const Register& deviceRegister, QJsonObject& jsonRegister);

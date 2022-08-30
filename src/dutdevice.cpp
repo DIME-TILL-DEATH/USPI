@@ -21,7 +21,10 @@ bool DUTDevice::loadFromJsonObject(const QJsonObject &jsonObject, ParseError *er
     JsonWorker worker(jsonObject);
 
     if(!worker.readHeader(&m_deviceHeader, error)) return false;
-    if(!worker.readRegisterArray(&m_deviceRegisterMap, RegisterType::DUT, &m_deviceHeader, error)) return false;
+
+    m_deviceHeader.deviceType = DeviceType::DUT;
+
+    if(!worker.readRegisterArray(&m_deviceRegisterMap, &m_deviceHeader, error)) return false;
 
     for(auto it=m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)
     {
@@ -58,12 +61,12 @@ const DUTHeader &DUTDevice::deviceHeader() const
     return m_deviceHeader;
 }
 
-void DUTDevice::setChannelNumber(quint8 chNum)
+void DUTDevice::setChannelNumber(qint8 chNum)
 {
     m_deviceHeader.channelNumber = chNum;
 }
 
-quint8 DUTDevice::channelNumber()
+qint8 DUTDevice::channelNumber()
 {
     return m_deviceHeader.channelNumber;
 }

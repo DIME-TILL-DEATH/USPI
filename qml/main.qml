@@ -96,7 +96,6 @@ ApplicationWindow {
         width: _appWindow.width
         height: _appWindow.height/15
 
-//        openFileDeviceDialog: _fileDeviceDialog
         Connections{
             function onOpenDeviceManager()
             {

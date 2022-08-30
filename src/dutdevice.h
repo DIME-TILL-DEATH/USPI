@@ -13,6 +13,14 @@
 #include "register.h"
 #include "registeradapter.h"
 
+class JsonWorker;
+
+enum class DeviceType
+{
+    DUT=0x00,
+    Controller=0x01
+};
+
 struct DUTHeader
 {
 private:
@@ -24,18 +32,24 @@ private:
         Q_PROPERTY(bool isMSB MEMBER isMSB);
         Q_PROPERTY(quint8 channelNumber MEMBER channelNumber);
 public:
+
     QString deviceName{QObject::tr("Выбрать")};
     QString description;
     QString version{""};
     quint8 registerSize{32};
     bool isMSB{true};
     quint8 channelNumber{0};
+    qint16 uniqueId;
+
+    DeviceType deviceType;
 };
 Q_DECLARE_METATYPE(DUTHeader)
 
 class DUTDevice
 {
 public:
+    friend class JsonWorker;
+
     DUTDevice();
 
     bool loadFromFile(const QString& fileName, ParseError* error = nullptr);
@@ -48,8 +62,8 @@ public:
     std::vector<std::shared_ptr<Register> > &deviceRegisterMap();
     const DUTHeader &deviceHeader() const;
 
-    void setChannelNumber(quint8 chNum);
-    quint8 channelNumber();
+    void setChannelNumber(qint8 chNum);
+    qint8 channelNumber();
 
     std::shared_ptr<Register> registerByUniqueId(quint16 uniqueId);
     std::shared_ptr<Register> registerByName(QString registerName);

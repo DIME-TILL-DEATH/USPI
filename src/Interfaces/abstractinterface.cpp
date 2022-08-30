@@ -1,10 +1,11 @@
 #include "abstractinterface.h"
+#include "usbcontroller.h"
 
 AbstractInterface::AbstractInterface(QObject *parent)
                   :QObject(parent)
 {
    // For debugging purposes
-    std::shared_ptr<AbstractController> defaultUSBController(new AbstractController("ATMega16U2"));
+    std::shared_ptr<AbstractController> defaultUSBController(new USBController("ATMega16U2"));
     connectedControllers().push_back(defaultUSBController);
 }
 

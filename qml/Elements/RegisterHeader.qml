@@ -88,7 +88,9 @@ MouseArea{
             Text{
                 visible: dragEnabled
 
-                text: deviceHeader.deviceName + " кан.№" + deviceHeader.channelNumber
+                // замена quint8 на qint8 приводит к тому, что номер не передаётся. Разобраться где теряется связь
+                text: deviceHeader.deviceName +
+                          ((deviceHeader.channelNumber !== 255) ? (" кан.№" + deviceHeader.channelNumber) : "")
 
                 leftPadding: width/10
                 rightPadding: width/10
@@ -111,11 +113,6 @@ MouseArea{
                 verticalAlignment: Text.AlignVCenter
 
                 elide: Text.ElideMiddle
-//                wrapMode: Text.WordWrap
-//                maximumLineCount: 2
-
-//                anchors.verticalCenter: parent.verticalCenter
-//                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
         //[rect.states]

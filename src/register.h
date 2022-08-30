@@ -24,12 +24,6 @@
 class JsonWorker;
 struct DUTHeader;
 
-enum class RegisterType
-{
-    DUT=0x00,
-    Controller=0x01
-};
-
 class Register
 {
 public:
@@ -62,8 +56,6 @@ public:
 
     quint16 bitSize() const;
 
-    RegisterType registerType() const;
-
 private:
     DUTHeader* m_parentDUTHeader;
 
@@ -71,8 +63,6 @@ private:
 
     QString m_name{"Undefined"};
     quint16 m_bitSize;
-
-    RegisterType m_registerType{RegisterType::DUT};
 
     // shared pointer?
     std::vector<AbstractField*> m_fields;

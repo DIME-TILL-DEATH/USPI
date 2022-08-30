@@ -5,6 +5,9 @@ AbstractController::AbstractController(const QString &name, const QMap<QString, 
       m_devicePins{devicePins}
 {
     m_controllerHeader.deviceName = "Контроллер";
+    m_controllerHeader.channelNumber = -1;
+    m_controllerHeader.deviceType = DeviceType::Controller;
+    m_controllerHeader.uniqueId = -1;
 }
 
 bool AbstractController::setPinFunction(const DevicePin &pin, DevicePin::Function function)

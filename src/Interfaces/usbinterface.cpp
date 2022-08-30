@@ -104,7 +104,7 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
                 }
             }
 
-            regData.prepend((*itSeq)->parentDUTHeader()->channelNumber<<USBBitPosition::CHANNEL | (uchar)(*itSeq)->registerType());
+            regData.prepend((*itSeq)->parentDUTHeader()->channelNumber<<USBBitPosition::CHANNEL | (uchar)(*itSeq)->parentDUTHeader()->deviceType);
             regData.prepend(bitSize);
 
             bytesInPacket += regData.size();

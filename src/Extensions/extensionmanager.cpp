@@ -5,9 +5,8 @@
 #include "controlpanelinterface.h"
 #include "extensionmanager.h"
 
-ExtensionManager::ExtensionManager(DUTDevice* controllingDevice, QObject *parent)
-    :QObject{parent},
-    m_controlledDevice{controllingDevice}
+ExtensionManager::ExtensionManager(QObject *parent)
+    :QObject{parent}
 {
 
 }
@@ -122,12 +121,13 @@ void ExtensionManager::loadPlugin(PluginInfo &pluginInfo)
 
 void ExtensionManager::unloadPlugins()
 {
-//    foreach(QPluginLoader* plugin, m_pluginsList)
+//    foreach(PluginInfo* plugin, &m_loadedPlugInsInfo)
 //    {
-//        plugin->unload();
-//        delete plugin;
+//        plugin->loader()->unload();
+////        delete plugin;
+//        m_loadedPlugInsInfo.pop
 //    }
-//    m_pluginsList.clear();
+//    m_loadedPlugInsInfo.clear();
 }
 
 

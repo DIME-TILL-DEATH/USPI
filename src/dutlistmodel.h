@@ -23,10 +23,11 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     void addDutToList(DUTDevice* newDevice);
-    void removeDutFromList();
+    void removeDutFromList(quint16 index);
 
 public slots:
     void dutUpdated();
+    void refreshModel();
 
 private:
     std::vector<std::shared_ptr<DUTDevice> >* m_data;

@@ -7,9 +7,8 @@
 
 UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent)
     : QObject(parent),
-      extensionManager(&m_device),
-//      m_saver{&m_device, &extensionManager, &m_regSequenceMap, &m_deviceRegMapModel, &m_regSequenceModel},
-      m_saver{&m_device, &extensionManager, &m_regSequenceMap, &m_currentRegMapModel, &m_regSequenceModel}, // Не только текующую, но и все устройства!
+      extensionManager(),
+      m_saver{&m_dutList, m_interface_ptr, &extensionManager, &m_regSequenceMap, &m_currentRegMapModel, &m_regSequenceModel}, // Не только текующую, но и все устройства!
       m_avaliableInterfaces{avaliableInterfaces}
 {
     m_abstractInterface = new AbstractInterface(this);
@@ -23,6 +22,7 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
         //m_interface_ptr = m_avaliableInterfaces->value("USB");
         setCurrentInterface("USB");
     }
+    m_saver.setCurrentInterface(m_interface_ptr);
 
     QFont font = QGuiApplication::font();
 
@@ -35,6 +35,7 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
 
     font.setStyleStrategy(QFont::NoSubpixelAntialias);
     QGuiApplication::setFont(font);
+
 
     connect(&extensionManager, SIGNAL(writeSequenceRequest()), this, SLOT(writeSequence()));
     connect(&extensionManager, &ExtensionManager::writeCustomSequenceRequest, this, &UserInterface::writeCustomSequence);
@@ -56,11 +57,6 @@ UserInterface::~UserInterface()
 //    delete m_abstractInterface;
 //    delete m_fileInterface;
 //    delete m_usbInterface;
-}
-
-const QString &UserInterface::dutDeviceName() const
-{
-    return m_device.name();
 }
 
 const QString &UserInterface::currentInterface() const
@@ -112,25 +108,14 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
 bool UserInterface::loadDevice(const QUrl &fileName)
 {
     ParseError error;
-    if(!m_device.loadFromFile(fileName.toLocalFile(), &error))
-    {
-        qWarning() << error.errorString();
-        return false;
-    }
 
     DUTDevice* newDevice = new DUTDevice;
 
     if(!newDevice->loadFromFile(fileName.toLocalFile(), &error))
     {
         qWarning() << error.errorString();
-//        m_dutList.pop_back();
         return false;
     }
-
-
- //   m_regSequenceModel.resetModel();
- //   m_regSequenceMap.clear();
- //   m_currentRegMapModel.resetModel(m_device.deviceRegisterMap());
 
     // load plugins for device
     JsonWorker jsonFile;
@@ -144,8 +129,6 @@ bool UserInterface::loadDevice(const QUrl &fileName)
 
     jsonFile.readPluginsArray(jsonFile.deviceGlobalObject() ,&plugList);
 
-//    extensionManager.unloadPlugins();
-
     for(PluginInfo& it : plugList)
     {
         it.setTargetDevice(newDevice);
@@ -153,18 +136,18 @@ bool UserInterface::loadDevice(const QUrl &fileName)
 
     extensionManager.loadPlugins(plugList);
 
-    //----------------------------------------
-    newDevice->setChannelNumber(m_device.deviceHeader().channelNumber);
     m_dutListModel.addDutToList(newDevice);
-
-    m_device.setChannelNumber(m_device.deviceHeader().channelNumber+1);
-    //------------------------------------------
 
     emit dutUpdated();
     emit avaliablePluginsUpdated();
 
     qInfo() << tr("Карта регистров для устройства '") << newDevice->name() << tr("' загружена");
     return true;
+}
+
+void UserInterface::removeDevice(quint16 index)
+{
+    m_dutListModel.removeDutFromList(index);
 }
 
 bool UserInterface::writeSequence()
@@ -215,7 +198,7 @@ bool UserInterface::loadSession(const QUrl& fileName)
 {
     if(m_saver.loadSession(fileName.toLocalFile()))
     {
-        emit dutUpdated();
+        m_dutListModel.refreshModel();
         emit avaliablePluginsUpdated();
         return true;
     }
@@ -231,11 +214,6 @@ void UserInterface::runPlugin(quint16 pluginNumber)
 {
     extensionManager.runPlugin(pluginNumber);
 }
-
-//void UserInterface::runPlugin(QString pluginName)
-//{
-//    extensionManager.runPlugin(pluginName);
-//}
 
 QStringList UserInterface::avaliableInterfaces()
 {
@@ -254,7 +232,8 @@ QStringList UserInterface::avaliablePlugins()
 
 QStringList UserInterface::avaliableChannels()
 {
-    return QStringList{{"Кан.№0 - SPI"}, {"Кан.№1 - SPI"}, {"Кан.№2 - SPI"}, {"Кан.№3 - SPI"}};
+    return m_interface_ptr->selectedController()->avaliableChannels();
+//    return QStringList{{"Кан.№0 - SPI"}, {"Кан.№1 - SPI"}, {"Кан.№2 - SPI"}, {"Кан.№3 - SPI"}};
 }
 
 void UserInterface::updateAvaliableInterfaces()

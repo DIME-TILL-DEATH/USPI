@@ -12,6 +12,7 @@
 
 class AbstractInterface;
 class JsonWorker;
+class SessionSaver;
 
 class AbstractController
 {
@@ -19,6 +20,7 @@ public:
     AbstractController(const QString& name, const QMap<QString, DevicePin> &m_devicePins = {});
 
     friend class JsonWorker;
+    friend class SessionSaver;
 
     virtual bool setPinFunction(const DevicePin& pin, DevicePin::Function function);
 
@@ -28,7 +30,9 @@ public:
     const std::vector<std::shared_ptr<Register> >& regMap();
     const QString &regMapFileName() const;
 
-    const DUTHeader &controllerHeader() const;
+    const DUTHeader& controllerHeader() const;
+
+    virtual QStringList avaliableChannels() = 0;
 
 protected:
     //AbstractInterface* m_interface;

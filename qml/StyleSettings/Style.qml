@@ -17,7 +17,7 @@ QtObject {
     readonly property color regHeaderActiveDUT  : "skyblue"
     readonly property color regHeaderPassiveDUT : "white"
     readonly property color regHeaderActiveController : "lightgreen"
-    readonly property color regHeaderPassiveController : "gray"
+    readonly property color regHeaderPassiveController : "seashell"
 
     readonly property color separationField  : "azure"
 

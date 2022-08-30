@@ -66,10 +66,10 @@ QString RegisterAdapter::value()
 
 QString RegisterAdapter::registerType()
 {
-    switch(m_register->registerType())
+    switch(m_register->parentDUTHeader()->deviceType)
     {
-        case RegisterType::DUT: return "DUT";
-        case RegisterType::Controller: return "Controller";
+        case DeviceType::DUT: return "DUT";
+        case DeviceType::Controller: return "Controller";
     }
 }
 

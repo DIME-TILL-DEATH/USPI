@@ -87,6 +87,10 @@ Item{
             width: parent.width*0.05
             anchors.verticalCenter: parent.verticalCenter
             text: "X"
+
+            onClicked:{
+                Backend.removeDevice(_rootRect.index)
+            }
         }
     }
 }

@@ -52,7 +52,10 @@ bool DutListModel::insertRows(int row, int count, const QModelIndex &parent)
 
 bool DutListModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-
+    beginRemoveRows(parent, row, row + count - 1);
+    m_data->erase(m_data->begin()+row, m_data->begin()+row+count);
+    endRemoveRows();
+    return true;
 }
 
 void DutListModel::addDutToList(DUTDevice* newDevice)
@@ -63,12 +66,19 @@ void DutListModel::addDutToList(DUTDevice* newDevice)
     emit dataChanged(createIndex(0, 0), createIndex(m_data->size(), 0));
 }
 
-void DutListModel::removeDutFromList()
+void DutListModel::removeDutFromList(quint16 index)
 {
-
+    removeRows(index, 1);
+    emit dataChanged(createIndex(0, 0), createIndex(m_data->size(), 0));
 }
 
 void DutListModel::dutUpdated()
 {
     emit dataChanged(createIndex(0, 0), createIndex(m_data->size(), 0));
+}
+
+void DutListModel::refreshModel()
+{
+    beginResetModel();
+    endResetModel();
 }

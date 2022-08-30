@@ -16,8 +16,6 @@ import InterfaceSettings 1.0
 Rectangle{
         id: _headerRect
 
-        property var openFileDeviceDialog
-
         signal openDeviceManager()
 
         border.width: 1
@@ -28,11 +26,6 @@ Rectangle{
 
             padding: width / 100
             spacing: width / 100
-
-//            Text{
-//                text: "Устройство:"
-//                anchors.verticalCenter: parent.verticalCenter
-//            }
 
             Button{
                 id: _btnChooseDevice
@@ -51,8 +44,6 @@ Rectangle{
                 }
                 onPressed: {
                     openDeviceManager()
-//                    openFileDeviceDialog.open()
-//                    _deviceManagerWindow.active = true
                 }
             }
 
@@ -118,7 +109,6 @@ Rectangle{
                 }
 
                 onPressed: {
-//                    Backend.runPlugin(_pluginSelector.currentText)
                     Backend.runPlugin(_pluginSelector.currentIndex)
                 }
             }

@@ -52,6 +52,25 @@ ApplicationWindow {
             height: _dutList.height/6
         }
 
+        //[transitions]
+        remove: Transition {
+                NumberAnimation { property: "opacity"; to: 0; duration: 500  }
+
+        }
+        removeDisplaced: Transition {
+                 NumberAnimation { properties: "y"; duration: 250 }
+        }
+        add: Transition {
+                 NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 250}
+        }
+        addDisplaced: Transition {
+                 NumberAnimation { properties: "y"; duration: 250 }
+                 NumberAnimation { properties: "opacity"; to: 1; duration: 500}
+        }
+
+        moveDisplaced: Transition {
+                 NumberAnimation { properties: "y"; duration: 150 }
+        }
     }
 
     OpenFileDeviceDialog{

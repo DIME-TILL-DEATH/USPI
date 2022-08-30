@@ -11,7 +11,7 @@ class ExtensionManager : public QObject
 {
     Q_OBJECT
 public:
-    ExtensionManager(DUTDevice* controllingDevice, QObject* parent = nullptr);
+    ExtensionManager(QObject* parent = nullptr);
     ~ExtensionManager();
 
     QStringList getPlugins(const QString& path);
@@ -31,8 +31,6 @@ private:
 
     QMap<QString, QString> getPlugInSettings(const QString& plugInName);
     void setPlugInSettings(const QString& plugInName, const QMap<QString, QString>& plugInSettings);
-
-    DUTDevice* m_controlledDevice;
 
 signals:
     void saveRequest(QString plugInName, QMap<QString, QString>& dataToSave);

@@ -16,15 +16,13 @@ Rectangle{
 
     signal delegateClicked(index : int)
 
-    //    color: "lightgray"
-
     border.width: 1
-
 
     ListView{
         id: _dutList
 
-        anchors.fill: parent
+        width: parent.width
+        height: parent.height
 
         topMargin: height/200
         bottomMargin: topMargin
@@ -38,12 +36,12 @@ Rectangle{
 
         headerPositioning: ListView.OverlayHeader
         header: Rectangle{
-            z:10
-
             border.width: 1
             color: Style.labelColor
+
             width:_dutList.width
             height: _dutList.height/20
+            z:10
             Text{
                 text: qsTr("Устройства:")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -51,6 +49,29 @@ Rectangle{
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+            }
+        }
+
+        footerPositioning: ListView.OverlayHeader
+        footer:     Button{
+            id: _controllerBtn
+
+            text: "Контроллер"
+
+            width:_dutList.width
+            height: _dutList.height/15
+            z:10
+
+            background: Rectangle{
+                border.width: 1
+
+                color: Style.headerButtonBackgroundColor
+                opacity: _controllerBtn.pressed ? 0.5 : 1
+            }
+
+            onClicked: {
+                _dutList.currentIndex = -1
+                delegateClicked(-1)
             }
         }
 
@@ -103,6 +124,26 @@ Rectangle{
                 }
             }
         }
+
+//        //[transitions]
+//        remove: Transition {
+//                NumberAnimation { property: "opacity"; to: 0; duration: 500  }
+
+//        }
+//        removeDisplaced: Transition {
+//                 NumberAnimation { properties: "y"; duration: 250 }
+//        }
+//        add: Transition {
+//                 NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 500}
+//        }
+//        addDisplaced: Transition {
+//                 NumberAnimation { properties: "y"; duration: 250 }
+//                 NumberAnimation { properties: "opacity"; to: 1; duration: 500}
+//        }
+
+//        moveDisplaced: Transition {
+//                 NumberAnimation { properties: "y"; duration: 150 }
+//        }
     }
 }
 

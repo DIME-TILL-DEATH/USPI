@@ -38,7 +38,6 @@ class UserInterface : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString dutDeviceName READ dutDeviceName NOTIFY dutUpdated)
     Q_PROPERTY(QString currentInterface READ currentInterface WRITE setCurrentInterface NOTIFY interfaceUpdated)
     Q_PROPERTY(QStringList avaliableInterfaces READ avaliableInterfaces NOTIFY avaliableInterfacesUpdated)
     Q_PROPERTY(QStringList avaliablePlugins READ avaliablePlugins NOTIFY avaliablePluginsUpdated)
@@ -51,7 +50,6 @@ public:
 
     static void registerTypes();
 
-    const QString& dutDeviceName() const;
     const QString& currentInterface() const;
     bool setCurrentInterface(const QString& interfaceName);
 
@@ -64,6 +62,7 @@ public:
     QStringList avaliableChannels();
 
     Q_INVOKABLE bool loadDevice(const QUrl& fileName);
+    Q_INVOKABLE void removeDevice(quint16 index);
     Q_INVOKABLE bool writeSequence();
 
     Q_INVOKABLE bool loadSession(const QUrl& fileName);
@@ -86,9 +85,7 @@ public:
 
 
 private:
-
     std::vector<std::shared_ptr<DUTDevice> > m_dutList;
-    DUTDevice m_device;
     DutListModel m_dutListModel{&m_dutList};
 
     ExtensionManager extensionManager;

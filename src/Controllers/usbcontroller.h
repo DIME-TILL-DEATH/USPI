@@ -10,7 +10,7 @@
 class USBController : public AbstractController
 {
 public:
-    USBController(const QString &name, const QMap<QString, DevicePin> &devicePins);
+    USBController(const QString &name, const QMap<QString, DevicePin> &devicePins = {});
 
     // private????
     // TODO: rearrange
@@ -26,6 +26,8 @@ public:
     QStringList deviceInfo;
     // TODO: use m_deviceName
     QString deviceName;
+
+    QStringList avaliableChannels() override;
 private:
 
 };

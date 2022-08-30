@@ -57,7 +57,7 @@ bool EthernetInterface::writeSequence(const std::vector<Register *> &wrSequence)
                 }
             }
 
-            regData.prepend((uchar)(*itSeq)->registerType());
+            regData.prepend((uchar)(*itSeq)->parentDUTHeader()->deviceType);
             regData.prepend(bitSize);
 
             bytesInPacket += regData.size();

@@ -53,7 +53,7 @@ bool JsonWorker::loadFile(const QString &name, ParseError* error)
 
 bool JsonWorker::loadControllerRegMap(std::shared_ptr<AbstractController> controller, ParseError* error)
 {
-    if(!readRegisterArray(&controller->m_controllerRegisterMap, RegisterType::Controller, &controller->m_controllerHeader, error)) return false;
+    if(!readRegisterArray(&controller->m_controllerRegisterMap, &controller->m_controllerHeader, error)) return false;
     return true;
 }
 
@@ -117,19 +117,7 @@ bool JsonWorker::readHeader(DUTHeader* header, ParseError *error)
     }
 }
 
-void JsonWorker::saveHeader(const DUTHeader& header)
-{
-    QJsonObject jsonDeviceHeaderObject;
-
-    jsonDeviceHeaderObject["name"] = header.deviceName;
-    jsonDeviceHeaderObject["version"] = header.version;
-    jsonDeviceHeaderObject["register_size"] = header.registerSize;
-    jsonDeviceHeaderObject["isMSB"] = header.isMSB;
-
-    m_deviceGlobalObject["header"] = jsonDeviceHeaderObject;
-}
-
-bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, RegisterType registerType, DUTHeader *deviceHeader, ParseError *error)
+bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTHeader *deviceHeader, ParseError *error)
 {
     if(m_deviceGlobalObject.contains("registers") && m_deviceGlobalObject["registers"].isArray())
     {
@@ -143,7 +131,6 @@ bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
             QJsonObject registerObject = registerArray[registerIndex].toObject();
             Register* deviceRegister = new Register(deviceHeader);
 
-            deviceRegister->m_registerType = registerType;
             deviceRegister->m_bitSize = deviceHeader->registerSize;
 
             if(!readRegister(registerObject, deviceRegister, error))
@@ -165,11 +152,21 @@ bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
     }
 }
 
-void JsonWorker::saveRegisterArray(const std::vector<std::shared_ptr<Register> > &registerMap)
+QJsonObject JsonWorker::jsonSaveDut(DUTDevice &device)
 {
+    QJsonObject jsonHeader;
+
+    jsonHeader["name"] = device.m_deviceHeader.deviceName;
+    jsonHeader["description"] = device.m_deviceHeader.description;
+    jsonHeader["version"] = device.m_deviceHeader.version;
+    jsonHeader["register_size"] = device.m_deviceHeader.registerSize;
+    jsonHeader["isMSB"] = device.m_deviceHeader.isMSB;
+    jsonHeader["channel_num"] = device.m_deviceHeader.channelNumber;
+    jsonHeader["uniqueId"] = device.m_deviceHeader.uniqueId;
+
     QJsonArray jsonRegisterArray;
 
-    foreach(std::shared_ptr<Register> currentRegister, registerMap)
+    for(std::shared_ptr<Register> currentRegister : device.deviceRegisterMap())
     {
         QJsonObject jsonCurrentRegister;
         saveRegister(*currentRegister, jsonCurrentRegister);
@@ -177,7 +174,184 @@ void JsonWorker::saveRegisterArray(const std::vector<std::shared_ptr<Register> >
         jsonRegisterArray.append(jsonCurrentRegister);
     }
 
-    m_deviceGlobalObject["registers"] = jsonRegisterArray;
+    QJsonObject jsonResult;
+
+    jsonResult["header"] = jsonHeader;
+    jsonResult["registers"] = jsonRegisterArray;
+
+    return jsonResult;
+}
+
+QJsonArray JsonWorker::jsonSaveDutList(std::vector<std::shared_ptr<DUTDevice> > *dutList)
+{
+    QJsonArray devicesArray;
+    quint16 uniqueId = 0;
+
+    for(auto currentDevice = dutList->begin(); currentDevice != dutList->end(); ++currentDevice)
+    {
+        currentDevice->get()->m_deviceHeader.uniqueId = uniqueId;
+        QJsonObject jsonCurrentDevice = JsonWorker::jsonSaveDut(*currentDevice->get());
+        devicesArray.append(jsonCurrentDevice);
+        uniqueId++;
+    }
+    return devicesArray;
+}
+
+DUTDevice* JsonWorker::jsonLoadDut(QJsonObject jsonObjectDevice)
+{
+    DUTDevice* resultDevice = new DUTDevice;;
+    if(jsonObjectDevice.contains("header") && jsonObjectDevice["header"].isObject())
+    {
+        QJsonObject jsonHeader = jsonObjectDevice["header"].toObject();
+
+        if(jsonHeader.contains("name") && jsonHeader["name"].isString())
+        {
+            resultDevice->m_deviceHeader.deviceName = jsonHeader["name"].toString();
+        }
+        else qWarning() << "Ошибка при загрузке устройства. Параметр 'name' не найден!";
+
+        if(jsonHeader.contains("description") && jsonHeader["description"].isString())
+        {
+            resultDevice->m_deviceHeader.description = jsonHeader["description"].toString();
+        }
+
+        if(jsonHeader.contains("version") && jsonHeader["version"].isString())
+        {
+            resultDevice->m_deviceHeader.version = jsonHeader["version"].toString();
+        }
+        else qWarning() << "Ошибка при загрузке устройства. Параметр 'version' не найден!";
+
+        if(jsonHeader.contains("register_size") && jsonHeader["register_size"].isDouble())
+        {
+            resultDevice->m_deviceHeader.registerSize = jsonHeader["register_size"].toDouble();
+        }
+        else qWarning() << "Ошибка при загрузке устройства. Параметр 'register_size' не найден!";
+
+        if(jsonHeader.contains("isMSB") && jsonHeader["isMSB"].isBool())
+        {
+            resultDevice->m_deviceHeader.isMSB = jsonHeader["isMSB"].toBool();
+        }
+        else qWarning() << "Ошибка при загрузке устройства. Параметр 'isMSB' не найден!";
+
+        if(jsonHeader.contains("channel_num") && jsonHeader["channel_num"].isDouble())
+        {
+            resultDevice->m_deviceHeader.channelNumber = jsonHeader["channel_num"].toDouble();
+        }
+        else qWarning() << "Ошибка при загрузке устройства. Параметр 'channel_num' не найден!";
+
+        if(jsonHeader.contains("uniqueId") && jsonHeader["uniqueId"].isDouble())
+        {
+            resultDevice->m_deviceHeader.uniqueId = jsonHeader["uniqueId"].toDouble();
+        }
+        else qWarning() << "Ошибка при загрузке устройства. Параметр 'register_size' не найден!";
+    }
+    else qWarning() << "Ошибка при загрузке устройства. Параметр 'header' не найден!";
+
+    resultDevice->m_deviceHeader.deviceType = DeviceType::DUT;
+
+    if(jsonObjectDevice.contains("registers") && jsonObjectDevice["registers"].isArray())
+    {
+        QJsonArray registerArray = jsonObjectDevice["registers"].toArray();
+
+
+        resultDevice->m_deviceRegisterMap.reserve(registerArray.size());
+
+        for (int registerIndex = 0; registerIndex < registerArray.size(); ++registerIndex)
+        {
+            QJsonObject registerObject = registerArray[registerIndex].toObject();
+            Register* deviceRegister = new Register(&resultDevice->m_deviceHeader);
+
+            deviceRegister->m_bitSize = resultDevice->m_deviceHeader.registerSize;
+
+            if(!readRegister(registerObject, deviceRegister))
+            {
+                delete deviceRegister;
+            }
+            else
+            {
+                deviceRegister->m_uniqueId = registerIndex + 0xAA; // просто смещение, чтобы unqiqueId не мог быть 0
+                resultDevice->m_deviceRegisterMap.push_back(std::shared_ptr<Register>(deviceRegister));
+            }
+        }
+    }
+//    if(!readRegisterArray(resultDevice->m_deviceRegisterMap, resultDevice->m_deviceHeader))
+    else
+    {
+        qWarning() << "Карта регистров устройства не найдена";
+    }
+    return resultDevice;
+}
+
+void JsonWorker::jsonLoadDutList(QJsonObject jsonGlobalObject, std::vector<std::shared_ptr<DUTDevice> > *dutList, QMap<qint16, DUTHeader *> *deviceReferenceList)
+{
+    dutList->clear();
+    if(jsonGlobalObject.contains("devices") && jsonGlobalObject["devices"].isArray())
+    {
+        QJsonArray jsonDutArray = jsonGlobalObject["devices"].toArray();
+        for (int registerIndex = 0; registerIndex < jsonDutArray.size(); ++registerIndex)
+        {
+            QJsonObject pluginObject = jsonDutArray[registerIndex].toObject();
+
+            DUTDevice* currentDevice = jsonLoadDut(pluginObject);
+            dutList->push_back(std::shared_ptr<DUTDevice>(currentDevice));
+
+            if(deviceReferenceList != nullptr)
+            {
+                deviceReferenceList->insert(currentDevice->deviceHeader().uniqueId, &currentDevice->m_deviceHeader);
+            }
+        }
+    }
+    else
+    {
+        qWarning() << "Описания устройств не найдены в файле";
+
+        dutList = nullptr;
+    }
+}
+
+bool JsonWorker::loadWriteSequence(QJsonObject globalObject, const QMap<qint16, DUTHeader *>& deviceReferenceList,
+                                   std::vector<std::shared_ptr<Register> >* regSequenceMap, RegisterListModel* registerWriteSequenceModel)
+{
+    registerWriteSequenceModel->resetModel();
+    regSequenceMap->clear();
+
+    if(globalObject.contains("write sequence") && globalObject["write sequence"].isArray())
+    {
+        QJsonArray sequnceArray = globalObject["write sequence"].toArray();
+
+        for (int registerIndex = 0; registerIndex < sequnceArray.size(); ++registerIndex)
+        {
+            quint16 parentUniqueId;
+            QJsonObject variantObject = sequnceArray[registerIndex].toObject();
+            if(variantObject.contains("parent_uniqueID"))
+            {
+                parentUniqueId= variantObject["parent_uniqueID"].toInt();
+            }
+            else
+            {
+                qWarning() << "Не найден параметр 'parent_uniqueID";
+                return false;
+            }
+
+            Register* reg_ptr = new Register();
+            JsonWorker::readRegister(variantObject, reg_ptr);
+            reg_ptr->m_parentDUTHeader = deviceReferenceList.value(parentUniqueId, nullptr);
+
+            if(reg_ptr->m_parentDUTHeader == nullptr)
+            {
+                qWarning() << "Ссылка на заголовок устройства для регистра '" << reg_ptr->name() << "' не найдена!";
+                delete reg_ptr;
+                return false;
+            }
+
+            regSequenceMap->push_back(std::shared_ptr<Register>(reg_ptr));
+
+            RegisterAdapter adapter(regSequenceMap->back());
+            registerWriteSequenceModel->addItem(adapter, registerIndex);
+        }
+        return true;
+    }
+    else return false;
 }
 
 bool JsonWorker::readPluginsArray(QJsonObject globalObject, std::vector<PluginInfo>* pluginsList)
@@ -275,11 +449,6 @@ bool JsonWorker::readRegister(const QJsonObject& jsonObject, Register *deviceReg
         deviceRegister->m_bitSize = jsonObject["size"].toDouble();
     }
 
-    if(jsonObject.contains("reg type") && jsonObject["reg type"].isDouble())
-    {
-        deviceRegister->m_registerType = static_cast<RegisterType>(jsonObject["reg type"].toDouble());
-    }
-
     // clear previous pointers
     for(auto it = deviceRegister->m_fields.begin(); it!= deviceRegister->m_fields.end(); ++it)
             delete *it;
@@ -308,7 +477,7 @@ void JsonWorker::saveRegister(const Register &deviceRegister, QJsonObject &jsonR
 {
     jsonRegister["name"] = deviceRegister.name();
     jsonRegister["size"] = deviceRegister.bitSize();
-    jsonRegister["reg type"] = static_cast<quint8>(deviceRegister.registerType());
+    jsonRegister["reg type"] = static_cast<quint8>(deviceRegister.parentDUTHeader()->deviceType);
 
     QJsonArray jsonBitFieldArray;
     QJsonArray jsonFixedFieldArray;
