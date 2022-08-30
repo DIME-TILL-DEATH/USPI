@@ -16,7 +16,6 @@ class SessionSaver
 {
 public:
     SessionSaver(std::vector<std::shared_ptr<DUTDevice> >* dutList,
-                 AbstractInterface *currentInterface,
                  ExtensionManager *extensionManager,
                  std::vector<std::shared_ptr<Register> > *localRegisterMap,
                  RegisterListModel* registerMap,
@@ -25,7 +24,7 @@ public:
     bool saveSession(const QString& filePath);
     bool loadSession(const QString& filePath);
 
-    void setCurrentInterface(AbstractInterface *newCurrentInterface);
+    void setInterface(AbstractInterface *newCurrentInterface);
 
 private:
     std::vector<std::shared_ptr<DUTDevice> >* m_deviceList;
@@ -38,13 +37,8 @@ private:
     RegisterListModel* m_registerMapModel;
     RegisterListModel* m_registerWriteSequenceModel;
 
-    QJsonArray saveWriteSequence();
-
     QJsonObject saveProjectSettings();
     bool loadProjectSettings(QJsonObject globalObject);
-
-    QJsonArray savePlugInsSettings();
-    bool loadPlugInSettings(QJsonObject globalObject);
 };
 
 #endif // SESSIONSAVER_H

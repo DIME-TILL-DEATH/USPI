@@ -8,7 +8,7 @@
 UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInterfaces, QObject *parent)
     : QObject(parent),
       extensionManager(),
-      m_saver{&m_dutList, m_interface_ptr, &extensionManager, &m_regSequenceMap, &m_currentRegMapModel, &m_regSequenceModel}, // Не только текующую, но и все устройства!
+      m_saver{&m_dutList, &extensionManager, &m_regSequenceMap, &m_currentRegMapModel, &m_regSequenceModel}, // Не только текующую, но и все устройства!
       m_avaliableInterfaces{avaliableInterfaces}
 {
     m_abstractInterface = new AbstractInterface(this);
@@ -22,7 +22,7 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
         //m_interface_ptr = m_avaliableInterfaces->value("USB");
         setCurrentInterface("USB");
     }
-    m_saver.setCurrentInterface(m_interface_ptr);
+    m_saver.setInterface(m_interface_ptr);
 
     QFont font = QGuiApplication::font();
 
@@ -127,7 +127,7 @@ bool UserInterface::loadDevice(const QUrl &fileName)
 
     std::vector<PluginInfo> plugList;
 
-    jsonFile.readPluginsArray(jsonFile.deviceGlobalObject() ,&plugList);
+    jsonFile.readPluginsArray(jsonFile.deviceGlobalObject(), &plugList);
 
     for(PluginInfo& it : plugList)
     {

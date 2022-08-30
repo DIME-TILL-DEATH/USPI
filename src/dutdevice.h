@@ -42,6 +42,7 @@ public:
     qint16 uniqueId;
 
     DeviceType deviceType;
+    DUTDevice* device_ptr;
 };
 Q_DECLARE_METATYPE(DUTHeader)
 

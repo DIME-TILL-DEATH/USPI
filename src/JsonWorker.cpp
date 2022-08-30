@@ -152,7 +152,7 @@ bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *regi
     }
 }
 
-QJsonObject JsonWorker::jsonSaveDut(DUTDevice &device)
+QJsonObject JsonWorker::saveDut(DUTDevice &device)
 {
     QJsonObject jsonHeader;
 
@@ -182,7 +182,7 @@ QJsonObject JsonWorker::jsonSaveDut(DUTDevice &device)
     return jsonResult;
 }
 
-QJsonArray JsonWorker::jsonSaveDutList(std::vector<std::shared_ptr<DUTDevice> > *dutList)
+QJsonArray JsonWorker::saveDutList(std::vector<std::shared_ptr<DUTDevice> > *dutList)
 {
     QJsonArray devicesArray;
     quint16 uniqueId = 0;
@@ -190,14 +190,14 @@ QJsonArray JsonWorker::jsonSaveDutList(std::vector<std::shared_ptr<DUTDevice> > 
     for(auto currentDevice = dutList->begin(); currentDevice != dutList->end(); ++currentDevice)
     {
         currentDevice->get()->m_deviceHeader.uniqueId = uniqueId;
-        QJsonObject jsonCurrentDevice = JsonWorker::jsonSaveDut(*currentDevice->get());
+        QJsonObject jsonCurrentDevice = JsonWorker::saveDut(*currentDevice->get());
         devicesArray.append(jsonCurrentDevice);
         uniqueId++;
     }
     return devicesArray;
 }
 
-DUTDevice* JsonWorker::jsonLoadDut(QJsonObject jsonObjectDevice)
+DUTDevice* JsonWorker::readDut(QJsonObject jsonObjectDevice)
 {
     DUTDevice* resultDevice = new DUTDevice;;
     if(jsonObjectDevice.contains("header") && jsonObjectDevice["header"].isObject())
@@ -269,6 +269,7 @@ DUTDevice* JsonWorker::jsonLoadDut(QJsonObject jsonObjectDevice)
             }
             else
             {
+//                deviceRegister->sortAndValidateFields();
                 deviceRegister->m_uniqueId = registerIndex + 0xAA; // просто смещение, чтобы unqiqueId не мог быть 0
                 resultDevice->m_deviceRegisterMap.push_back(std::shared_ptr<Register>(deviceRegister));
             }
@@ -282,7 +283,7 @@ DUTDevice* JsonWorker::jsonLoadDut(QJsonObject jsonObjectDevice)
     return resultDevice;
 }
 
-void JsonWorker::jsonLoadDutList(QJsonObject jsonGlobalObject, std::vector<std::shared_ptr<DUTDevice> > *dutList, QMap<qint16, DUTHeader *> *deviceReferenceList)
+void JsonWorker::readDutList(QJsonObject jsonGlobalObject, std::vector<std::shared_ptr<DUTDevice> > *dutList, QMap<qint16, DUTHeader *> *deviceReferenceList)
 {
     dutList->clear();
     if(jsonGlobalObject.contains("devices") && jsonGlobalObject["devices"].isArray())
@@ -292,7 +293,7 @@ void JsonWorker::jsonLoadDutList(QJsonObject jsonGlobalObject, std::vector<std::
         {
             QJsonObject pluginObject = jsonDutArray[registerIndex].toObject();
 
-            DUTDevice* currentDevice = jsonLoadDut(pluginObject);
+            DUTDevice* currentDevice = readDut(pluginObject);
             dutList->push_back(std::shared_ptr<DUTDevice>(currentDevice));
 
             if(deviceReferenceList != nullptr)
@@ -309,7 +310,25 @@ void JsonWorker::jsonLoadDutList(QJsonObject jsonGlobalObject, std::vector<std::
     }
 }
 
-bool JsonWorker::loadWriteSequence(QJsonObject globalObject, const QMap<qint16, DUTHeader *>& deviceReferenceList,
+QJsonArray JsonWorker::saveWriteSequence(RegisterListModel* registerWriteSequenceModel)
+{
+        QJsonArray jsonWriteSequenceArray;
+
+        int index =0;
+        foreach(RegisterAdapter currentAdapter, registerWriteSequenceModel->registerAdaptersList())
+        {
+            QJsonObject jsonItem;
+
+            JsonWorker::saveRegister(*currentAdapter.getRegister(), jsonItem);
+            jsonItem["parent_uniqueID"] = currentAdapter.getRegister()->parentDUTHeader()->uniqueId;
+
+            jsonWriteSequenceArray.append(jsonItem);
+            index++;
+        }
+        return jsonWriteSequenceArray;
+}
+
+bool JsonWorker::readWriteSequence(QJsonObject globalObject, const QMap<qint16, DUTHeader *>& deviceReferenceList,
                                    std::vector<std::shared_ptr<Register> >* regSequenceMap, RegisterListModel* registerWriteSequenceModel)
 {
     registerWriteSequenceModel->resetModel();
@@ -354,7 +373,7 @@ bool JsonWorker::loadWriteSequence(QJsonObject globalObject, const QMap<qint16, 
     else return false;
 }
 
-bool JsonWorker::readPluginsArray(QJsonObject globalObject, std::vector<PluginInfo>* pluginsList)
+bool JsonWorker::readPluginsArray(QJsonObject globalObject, std::vector<PluginInfo>* pluginsList, QMap<qint16, DUTHeader *>* deviceReferenceList)
 {
     if(globalObject.contains("plugins") && globalObject["plugins"].isArray())
     {
@@ -395,15 +414,33 @@ bool JsonWorker::readPluginsArray(QJsonObject globalObject, std::vector<PluginIn
                 }
             }
 
-            pluginsList->push_back(PluginInfo(name, path, description, settingsMap));
+            PluginInfo currentPlugin(name, path, description, settingsMap);
+
+            if(deviceReferenceList != nullptr)
+            {
+                quint16 parentUniqueId;
+                if(pluginObject.contains("parent_uniqueID"))
+                {
+                    parentUniqueId= pluginObject["parent_uniqueID"].toInt();
+                }
+                else
+                {
+                    qWarning() << "Не найден параметр 'parent_uniqueID' для расширения " << name;
+                    return false;
+                }
+                currentPlugin.setTargetDevice(deviceReferenceList->value(parentUniqueId)->device_ptr);
+            }
+
+            pluginsList->push_back(currentPlugin);
         }
         return true;
     }
     else return false;
 }
 
-void JsonWorker::savePlugInsArray(const std::vector<PluginInfo>& pluginsList, QJsonArray& jsonPlugInsArray)
+QJsonArray JsonWorker::savePlugInsArray(const std::vector<PluginInfo>& pluginsList)
 {
+    QJsonArray jsonPlugInsArray;
     foreach(PluginInfo currentPlugIn, pluginsList)
     {
         QJsonObject jsonCurrentPlugIn;
@@ -411,6 +448,7 @@ void JsonWorker::savePlugInsArray(const std::vector<PluginInfo>& pluginsList, QJ
         jsonCurrentPlugIn["name"] = currentPlugIn.name();
         jsonCurrentPlugIn["description"] = currentPlugIn.description();
         jsonCurrentPlugIn["path"] = currentPlugIn.path();
+        jsonCurrentPlugIn["parent_uniqueID"] = currentPlugIn.targetDevice()->deviceHeader().uniqueId;
 
         QJsonObject jsonPlugInSettingsObject;
 
@@ -425,6 +463,7 @@ void JsonWorker::savePlugInsArray(const std::vector<PluginInfo>& pluginsList, QJ
 
         jsonPlugInsArray.append(jsonCurrentPlugIn);
     }
+    return jsonPlugInsArray;
 }
 
 bool JsonWorker::readRegister(const QJsonObject& jsonObject, Register *deviceRegister, ParseError *error)
@@ -469,6 +508,19 @@ bool JsonWorker::readRegister(const QJsonObject& jsonObject, Register *deviceReg
                     return false;
             }
         }
+    }
+
+    if(!deviceRegister->sortAndValidateFields(error))
+    {
+        if(error != nullptr)
+        {
+            ParseError fieldError;
+            fieldError.setErrorType(ParseError::ErrorType::RegisterContentError,
+                                    " '" +deviceRegister->name() + "', "+
+                                    error->errorString());
+            *error = fieldError;
+        }
+        return false;
     }
     return true;
 }
@@ -570,7 +622,7 @@ bool JsonWorker::readBitField(const QJsonObject &jsonObject, Register* deviceReg
     }
     else
     {
-        if(error != nullptr) error->setErrorType(ParseError::ErrorType::PointerError, "casting AbstractField to BitField is unsucceccfull!");
+        if(error != nullptr) error->setErrorType(ParseError::ErrorType::PointerError, "casting AbstractField to BitField is unsuccessfull!");
         return false;
     }
 }

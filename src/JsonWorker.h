@@ -42,28 +42,28 @@ public:
 
     bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTHeader* deviceHeader, ParseError* error = nullptr);
 
-    static QJsonObject jsonSaveDut(DUTDevice &device);
-    static QJsonArray jsonSaveDutList(std::vector<std::shared_ptr<DUTDevice> > *dutList);
+    static QJsonObject saveDut(DUTDevice &device);
+    static QJsonArray saveDutList(std::vector<std::shared_ptr<DUTDevice> > *dutList);
 
-    static DUTDevice *jsonLoadDut(QJsonObject jsonObjectDevice);
-//    static std::vector<std::shared_ptr<DUTDevice> > *jsonLoadDutList(QJsonObject jsonGlobalObject);
-    static void jsonLoadDutList(QJsonObject jsonGlobalObject, std::vector<std::shared_ptr<DUTDevice> > *dutList,
+    static DUTDevice *readDut(QJsonObject jsonObjectDevice);
+    static void readDutList(QJsonObject jsonGlobalObject, std::vector<std::shared_ptr<DUTDevice> > *dutList,
                                 QMap<qint16, DUTHeader *>* deviceReferenceList = nullptr);
 
-    static bool loadWriteSequence(QJsonObject globalObject, const QMap<qint16, DUTHeader *>& deviceReferenceList,
+    static QJsonArray saveWriteSequence(RegisterListModel *registerWriteSequenceModel);
+    static bool readWriteSequence(QJsonObject globalObject, const QMap<qint16, DUTHeader *>& deviceReferenceList,
                                   std::vector<std::shared_ptr<Register> >* regSequenceMap, RegisterListModel* registerWriteSequenceModel);
 
-    static bool readRegister(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);
-    static void saveRegister(const Register& deviceRegister, QJsonObject& jsonRegister);
-
-    static bool readPluginsArray(QJsonObject globalObject, std::vector<PluginInfo> *pluginsList);
-    static void savePlugInsArray(const std::vector<PluginInfo>& pluginsList, QJsonArray& jsonPlugInsArray);
+    static bool readPluginsArray(QJsonObject globalObject, std::vector<PluginInfo> *pluginsList, QMap<qint16, DUTHeader *>* deviceReferenceList = nullptr);
+    static QJsonArray savePlugInsArray(const std::vector<PluginInfo>& pluginsList);
 
     const QJsonObject &deviceGlobalObject() const;
     void setDeviceGlobalObject(const QJsonObject &newDeviceGlobalObject);
 
 private:
     QJsonObject m_deviceGlobalObject;
+
+    static bool readRegister(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);
+    static void saveRegister(const Register& deviceRegister, QJsonObject& jsonRegister);
 
     static bool readAbstractField(const QJsonObject &jsonObject, AbstractField* field, ParseError* error = nullptr);
     static void saveAbstractField(AbstractField* abstractField, QJsonObject& fieldObject);

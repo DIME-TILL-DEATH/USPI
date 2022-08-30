@@ -3,7 +3,7 @@
 
 DUTDevice::DUTDevice()
 {
-
+    m_deviceHeader.device_ptr = this;
 }
 
 bool DUTDevice::loadFromFile(const QString &fileName, ParseError *error)
@@ -26,18 +26,6 @@ bool DUTDevice::loadFromJsonObject(const QJsonObject &jsonObject, ParseError *er
 
     if(!worker.readRegisterArray(&m_deviceRegisterMap, &m_deviceHeader, error)) return false;
 
-    for(auto it=m_deviceRegisterMap.begin(); it != m_deviceRegisterMap.end(); ++it)
-    {
-        if(!(*it)->sortAndValidateFields(error))
-        {
-            ParseError fieldError;
-            fieldError.setErrorType(ParseError::ErrorType::RegisterContentError,
-                                    " '" +(*it)->name() + "', "+
-                                    error->errorString());
-            *error = fieldError;
-            return false;
-        }
-    }
     return true;
 }
 

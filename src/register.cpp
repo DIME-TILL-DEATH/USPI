@@ -45,6 +45,12 @@ Register::Register(const Register &src_reg)
                 m_fields.push_back(field_ptr);
                 break;
             }
+            case AbstractField::FieldType::SeparationField:
+            {
+                SeparationField* field_ptr = new SeparationField(*(dynamic_cast<SeparationField*>(*it)));
+                m_fields.push_back(field_ptr);
+                break;
+            }
             default:{break;}
         }
     }

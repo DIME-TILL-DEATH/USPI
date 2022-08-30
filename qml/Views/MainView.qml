@@ -120,7 +120,6 @@ Item {
                 height: parent.height-_btnWrite.height-parent.padding*4
             }
 
-
             Button{
                 id: _btnWrite
 

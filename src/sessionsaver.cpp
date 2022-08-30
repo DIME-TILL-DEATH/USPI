@@ -1,9 +1,8 @@
 #include "sessionsaver.h"
 #include "JsonWorker.h"
 
-SessionSaver::SessionSaver(std::vector<std::shared_ptr<DUTDevice> > *dutList, AbstractInterface *currentInterface, ExtensionManager *extensionManager, std::vector<std::shared_ptr<Register> >* localRegisterMap, RegisterListModel *registerMapModel, RegisterListModel *registerWriteSequenceModel)
+SessionSaver::SessionSaver(std::vector<std::shared_ptr<DUTDevice> > *dutList, ExtensionManager *extensionManager, std::vector<std::shared_ptr<Register> >* localRegisterMap, RegisterListModel *registerMapModel, RegisterListModel *registerWriteSequenceModel)
     :m_deviceList{dutList},
-     m_currentInterface{currentInterface},
      m_extensionManager{extensionManager},
      m_regSequenceMap{localRegisterMap},
      m_registerMapModel{registerMapModel},
@@ -21,10 +20,10 @@ bool SessionSaver::saveSession(const QString &filePath)
 
         QJsonObject jsonGlobalObject;
 
-        jsonGlobalObject["devices"] = JsonWorker::jsonSaveDutList(m_deviceList);
+        jsonGlobalObject["devices"] = JsonWorker::saveDutList(m_deviceList);
         jsonGlobalObject["project settings"] = saveProjectSettings();
-        jsonGlobalObject["plugins"] = savePlugInsSettings();
-        jsonGlobalObject["write sequence"] = saveWriteSequence();
+        jsonGlobalObject["plugins"] = JsonWorker::savePlugInsArray(m_extensionManager->loadedPlugInsInfo());
+        jsonGlobalObject["write sequence"] = JsonWorker::saveWriteSequence(m_registerWriteSequenceModel);
 
         file.write(QJsonDocument(jsonGlobalObject).toJson());
         file.close();
@@ -60,17 +59,22 @@ bool SessionSaver::loadSession(const QString &filePath)
         QMap<qint16, DUTHeader *> deviceReferenceList;
         deviceReferenceList.insert(-1, &m_currentInterface->selectedController()->m_controllerHeader);
 
-        JsonWorker::jsonLoadDutList(globalObject, m_deviceList, &deviceReferenceList);
+        JsonWorker::readDutList(globalObject, m_deviceList, &deviceReferenceList);
         if(m_deviceList == nullptr)
         {
             qWarning() << "Ошибка загрузки описаний устройств";
             return false;
         }
 
-        JsonWorker::loadWriteSequence(globalObject, deviceReferenceList, m_regSequenceMap, m_registerWriteSequenceModel);
+        JsonWorker::readWriteSequence(globalObject, deviceReferenceList, m_regSequenceMap, m_registerWriteSequenceModel);
 
         loadProjectSettings(globalObject);
-        loadPlugInSettings(globalObject);
+
+        std::vector<PluginInfo> plugList;
+
+        if(!JsonWorker::readPluginsArray(globalObject ,&plugList, &deviceReferenceList)) return false;
+        m_extensionManager->unloadPlugins();
+        m_extensionManager->loadPlugins(plugList);
 
         file.close();
         qInfo() << QObject::tr("Сессия") << filePath << QObject::tr("загружена. Версия формата: ") << m_compareVersion;
@@ -81,29 +85,6 @@ bool SessionSaver::loadSession(const QString &filePath)
         qWarning() << QObject::tr("Невозможно открыть файл ") << filePath;
         return false;
     }
-}
-
-void SessionSaver::setCurrentInterface(AbstractInterface *newCurrentInterface)
-{
-    m_currentInterface = newCurrentInterface;
-}
-
-QJsonArray SessionSaver::saveWriteSequence()
-{
-    QJsonArray jsonWriteSequenceArray;
-
-    int index =0;
-    foreach(RegisterAdapter currentAdapter, m_registerWriteSequenceModel->registerAdaptersList())
-    {
-        QJsonObject jsonItem;
-
-        JsonWorker::saveRegister(*currentAdapter.getRegister(), jsonItem);
-        jsonItem["parent_uniqueID"] = currentAdapter.m_register->parentDUTHeader()->uniqueId;
-
-        jsonWriteSequenceArray.append(jsonItem);
-        index++;
-    }
-    return jsonWriteSequenceArray;
 }
 
 QJsonObject SessionSaver::saveProjectSettings()
@@ -134,23 +115,7 @@ bool SessionSaver::loadProjectSettings(QJsonObject globalObject)
     else return false;
 }
 
-QJsonArray SessionSaver::savePlugInsSettings()
+void SessionSaver::setInterface(AbstractInterface *newCurrentInterface)
 {
-    QJsonArray plugInSettingsObject;
-
-    JsonWorker::savePlugInsArray(m_extensionManager->loadedPlugInsInfo(), plugInSettingsObject);
-
-    return plugInSettingsObject;
+    m_currentInterface = newCurrentInterface;
 }
-
-bool SessionSaver::loadPlugInSettings(QJsonObject globalObject)
-{
-    std::vector<PluginInfo> plugList;
-
-    if(!JsonWorker::readPluginsArray(globalObject ,&plugList)) return false;
-    m_extensionManager->unloadPlugins();
-    m_extensionManager->loadPlugins(plugList);
-
-    return true;
-}
-
