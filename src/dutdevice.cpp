@@ -6,29 +6,6 @@ DUTDevice::DUTDevice()
     m_deviceHeader.device_ptr = this;
 }
 
-bool DUTDevice::loadFromFile(const QString &fileName, ParseError *error)
-{
-    JsonWorker jsonFile;
-
-    if(!jsonFile.loadFile(fileName, error)) return false;
-
-    if(!loadFromJsonObject(jsonFile.deviceGlobalObject(), error)) return false;
-    return true;
-}
-
-bool DUTDevice::loadFromJsonObject(const QJsonObject &jsonObject, ParseError *error)
-{
-    JsonWorker worker(jsonObject);
-
-    if(!worker.readHeader(&m_deviceHeader, error)) return false;
-
-    m_deviceHeader.deviceType = DeviceType::DUT;
-
-    if(!worker.readRegisterArray(&m_deviceRegisterMap, &m_deviceHeader, error)) return false;
-
-    return true;
-}
-
 void DUTDevice::registerTypes()
 {
     qmlRegisterUncreatableType<DUTHeader>("DUTDevice", 1, 0, "DeviceHeader", "DUT header");

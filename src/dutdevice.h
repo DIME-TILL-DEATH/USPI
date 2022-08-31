@@ -53,9 +53,6 @@ public:
 
     DUTDevice();
 
-    bool loadFromFile(const QString& fileName, ParseError* error = nullptr);
-    bool loadFromJsonObject(const QJsonObject& jsonObject, ParseError* error = nullptr);
-
     static void registerTypes();
 
     const QString& name() const;

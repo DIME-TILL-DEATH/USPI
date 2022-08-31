@@ -1,30 +1,14 @@
 #include "JsonWorker.h"
 
-JsonWorker::JsonWorker(const QJsonObject &globalObject)
-    :m_deviceGlobalObject{globalObject}
+bool JsonWorker::jsonObjectFromFile(const QString &name, QJsonObject& targetObject)
 {
-
-}
-
-
-const QJsonObject &JsonWorker::deviceGlobalObject() const
-{
-    return m_deviceGlobalObject;
-}
-
-void JsonWorker::setDeviceGlobalObject(const QJsonObject &newDeviceGlobalObject)
-{
-    m_deviceGlobalObject = newDeviceGlobalObject;
-}
-
-
-bool JsonWorker::loadFile(const QString &name, ParseError* error)
-{
+    ParseError error;
     QFile deviceFile(name);
 
     if(!deviceFile.open(QIODevice::ReadOnly))
     {
-        if(error != nullptr) error->setErrorType(ParseError::ErrorType::FileError, name);
+        error.setErrorType(ParseError::ErrorType::FileError, name);
+        qWarning() << error.errorString();
         return false;
     }
     else
@@ -41,87 +25,29 @@ bool JsonWorker::loadFile(const QString &name, ParseError* error)
                                         QObject::tr(" в позиции ") +
                                         QString::number(jsonError.offset, 10)};
 
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::GlobalObjectError, additionalErrorInfo);
+            error.setErrorType(ParseError::ErrorType::GlobalObjectError, additionalErrorInfo);
+            qWarning() << error.errorString();
+
             return false;
         }
-        m_deviceGlobalObject = jsonDoc.object();
-
+        targetObject = jsonDoc.object();
         deviceFile.close();
         return true;
     }
 }
 
-bool JsonWorker::loadControllerRegMap(std::shared_ptr<AbstractController> controller, ParseError* error)
+bool JsonWorker::loadControllerRegMap(QJsonObject globalObject, std::shared_ptr<AbstractController> controller, ParseError* error)
 {
-    if(!readRegisterArray(&controller->m_controllerRegisterMap, &controller->m_controllerHeader, error)) return false;
+    if(!readRegisterArray(globalObject, &controller->m_controllerRegisterMap, &controller->m_controllerHeader, error)) return false;
     return true;
 }
 
-bool JsonWorker::readHeader(DUTHeader* header, ParseError *error)
+bool JsonWorker::readRegisterArray(QJsonObject deviceGlobalObject, std::vector<std::shared_ptr<Register> > *registerMap,
+                                   DUTHeader *deviceHeader, ParseError *error)
 {
-    if(m_deviceGlobalObject.contains("header") && m_deviceGlobalObject["header"].isObject())
+    if(deviceGlobalObject.contains("registers") && deviceGlobalObject["registers"].isArray())
     {
-        QJsonObject jsonHeader = m_deviceGlobalObject["header"].toObject();
-
-        if(jsonHeader.contains("name") && jsonHeader["name"].isString())
-        {
-            header->deviceName = jsonHeader["name"].toString();
-        }
-        else
-        {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::HeaderNameNotFound);
-            return false;
-        }
-
-        if(jsonHeader.contains("description") && jsonHeader["description"].isString())
-        {
-            header->description = jsonHeader["description"].toString();
-        }
-
-        if(jsonHeader.contains("version") && jsonHeader["version"].isString())
-        {
-            header->version = jsonHeader["version"].toString();
-        }
-        else
-        {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::HeaderVersionNotFound);
-            return false;
-        }
-
-        if(jsonHeader.contains("register_size") && jsonHeader["register_size"].isDouble())
-        {
-            header->registerSize = jsonHeader["register_size"].toDouble();
-        }
-        else
-        {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::HeaderRegisterSizeNotFound);
-            return false;
-        }
-
-        if(jsonHeader.contains("isMSB") && jsonHeader["isMSB"].isBool())
-        {
-            header->isMSB = jsonHeader["isMSB"].toBool();
-        }
-        else
-        {
-            if(error != nullptr) error->setErrorType(ParseError::ErrorType::HeaderDataOrderNotFound);
-            return false;
-        }
-
-        return true;
-    }
-    else
-    {
-        error->setErrorType(ParseError::ErrorType::HeaderNotFound);
-        return false;
-    }
-}
-
-bool JsonWorker::readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTHeader *deviceHeader, ParseError *error)
-{
-    if(m_deviceGlobalObject.contains("registers") && m_deviceGlobalObject["registers"].isArray())
-    {
-        QJsonArray registerArray = m_deviceGlobalObject["registers"].toArray();
+        QJsonArray registerArray = deviceGlobalObject["registers"].toArray();
 
         registerMap->clear();
         registerMap->reserve(registerArray.size());
@@ -199,6 +125,7 @@ QJsonArray JsonWorker::saveDutList(std::vector<std::shared_ptr<DUTDevice> > *dut
 
 DUTDevice* JsonWorker::readDut(QJsonObject jsonObjectDevice)
 {
+    ParseError error;
     DUTDevice* resultDevice = new DUTDevice;;
     if(jsonObjectDevice.contains("header") && jsonObjectDevice["header"].isObject())
     {
@@ -208,7 +135,12 @@ DUTDevice* JsonWorker::readDut(QJsonObject jsonObjectDevice)
         {
             resultDevice->m_deviceHeader.deviceName = jsonHeader["name"].toString();
         }
-        else qWarning() << "Ошибка при загрузке устройства. Параметр 'name' не найден!";
+        else
+        {
+            qWarning() << "Ошибка при загрузке устройства. Параметр 'name' не найден!";
+            delete resultDevice;
+            return nullptr;
+        }
 
         if(jsonHeader.contains("description") && jsonHeader["description"].isString())
         {
@@ -219,66 +151,43 @@ DUTDevice* JsonWorker::readDut(QJsonObject jsonObjectDevice)
         {
             resultDevice->m_deviceHeader.version = jsonHeader["version"].toString();
         }
-        else qWarning() << "Ошибка при загрузке устройства. Параметр 'version' не найден!";
 
         if(jsonHeader.contains("register_size") && jsonHeader["register_size"].isDouble())
         {
             resultDevice->m_deviceHeader.registerSize = jsonHeader["register_size"].toDouble();
         }
-        else qWarning() << "Ошибка при загрузке устройства. Параметр 'register_size' не найден!";
+        else qWarning() << "Параметр 'register_size' для устройства '" << resultDevice->m_deviceHeader.deviceName << "' не найден! Значение по-умолчанию '32'";
 
         if(jsonHeader.contains("isMSB") && jsonHeader["isMSB"].isBool())
         {
             resultDevice->m_deviceHeader.isMSB = jsonHeader["isMSB"].toBool();
         }
-        else qWarning() << "Ошибка при загрузке устройства. Параметр 'isMSB' не найден!";
+        else qWarning() << "Параметр 'isMSB' для устройства'" << resultDevice->m_deviceHeader.deviceName << "' не найден! Значение по-умолчанию 'true'";
 
         if(jsonHeader.contains("channel_num") && jsonHeader["channel_num"].isDouble())
         {
             resultDevice->m_deviceHeader.channelNumber = jsonHeader["channel_num"].toDouble();
         }
-        else qWarning() << "Ошибка при загрузке устройства. Параметр 'channel_num' не найден!";
 
         if(jsonHeader.contains("uniqueId") && jsonHeader["uniqueId"].isDouble())
         {
             resultDevice->m_deviceHeader.uniqueId = jsonHeader["uniqueId"].toDouble();
         }
-        else qWarning() << "Ошибка при загрузке устройства. Параметр 'register_size' не найден!";
     }
-    else qWarning() << "Ошибка при загрузке устройства. Параметр 'header' не найден!";
+    else
+    {
+        qWarning() << "Ошибка при загрузке устройства. Параметр 'header' не найден!";
+        delete resultDevice;
+        return nullptr;
+    }
 
     resultDevice->m_deviceHeader.deviceType = DeviceType::DUT;
 
-    if(jsonObjectDevice.contains("registers") && jsonObjectDevice["registers"].isArray())
+    if(!readRegisterArray(jsonObjectDevice, &resultDevice->m_deviceRegisterMap, &resultDevice->m_deviceHeader, &error))
     {
-        QJsonArray registerArray = jsonObjectDevice["registers"].toArray();
-
-
-        resultDevice->m_deviceRegisterMap.reserve(registerArray.size());
-
-        for (int registerIndex = 0; registerIndex < registerArray.size(); ++registerIndex)
-        {
-            QJsonObject registerObject = registerArray[registerIndex].toObject();
-            Register* deviceRegister = new Register(&resultDevice->m_deviceHeader);
-
-            deviceRegister->m_bitSize = resultDevice->m_deviceHeader.registerSize;
-
-            if(!readRegister(registerObject, deviceRegister))
-            {
-                delete deviceRegister;
-            }
-            else
-            {
-//                deviceRegister->sortAndValidateFields();
-                deviceRegister->m_uniqueId = registerIndex + 0xAA; // просто смещение, чтобы unqiqueId не мог быть 0
-                resultDevice->m_deviceRegisterMap.push_back(std::shared_ptr<Register>(deviceRegister));
-            }
-        }
-    }
-//    if(!readRegisterArray(resultDevice->m_deviceRegisterMap, resultDevice->m_deviceHeader))
-    else
-    {
-        qWarning() << "Карта регистров устройства не найдена";
+        qWarning() << error.errorString();
+        delete resultDevice;
+        return nullptr;
     }
     return resultDevice;
 }
@@ -294,18 +203,19 @@ void JsonWorker::readDutList(QJsonObject jsonGlobalObject, std::vector<std::shar
             QJsonObject pluginObject = jsonDutArray[registerIndex].toObject();
 
             DUTDevice* currentDevice = readDut(pluginObject);
-            dutList->push_back(std::shared_ptr<DUTDevice>(currentDevice));
-
-            if(deviceReferenceList != nullptr)
+            if(currentDevice != nullptr)
             {
-                deviceReferenceList->insert(currentDevice->deviceHeader().uniqueId, &currentDevice->m_deviceHeader);
+                dutList->push_back(std::shared_ptr<DUTDevice>(currentDevice));
+                if(deviceReferenceList != nullptr)
+                {
+                    deviceReferenceList->insert(currentDevice->deviceHeader().uniqueId, &currentDevice->m_deviceHeader);
+                }
             }
         }
     }
     else
     {
         qWarning() << "Описания устройств не найдены в файле";
-
         dutList = nullptr;
     }
 }

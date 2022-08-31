@@ -75,7 +75,7 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
         {
             m_interface_ptr = *it;
 
-            JsonWorker jsonFile;
+            QJsonObject jsonObject;
             ParseError error;
 
             QDir dir = QDir::current();
@@ -83,15 +83,14 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
 
             // заменить ATMega на имя файла
 
-            if(!jsonFile.loadFile(dir.absoluteFilePath(m_interface_ptr->selectedController()->regMapFileName()), &error))
+            if(!JsonWorker::jsonObjectFromFile(dir.absoluteFilePath(m_interface_ptr->selectedController()->regMapFileName()), jsonObject))
             {
-                qWarning() << error.errorString();
                 return false;
             }
 
             std::shared_ptr<AbstractController> controller = m_interface_ptr->connectedControllers().at(0);
 
-            if(!jsonFile.loadControllerRegMap(controller, &error))//m_interface_ptr->selectedController(), &error))
+            if(!JsonWorker::loadControllerRegMap(jsonObject, controller, &error))
             {
                 qWarning() << error.errorString();
                 return false;
@@ -107,27 +106,16 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
 
 bool UserInterface::loadDevice(const QUrl &fileName)
 {
-    ParseError error;
+    QJsonObject jsonObject;
+    if(!JsonWorker::jsonObjectFromFile(fileName.toLocalFile(), jsonObject)) return false;
 
-    DUTDevice* newDevice = new DUTDevice;
+    DUTDevice* newDevice = JsonWorker::readDut(jsonObject);
 
-    if(!newDevice->loadFromFile(fileName.toLocalFile(), &error))
-    {
-        qWarning() << error.errorString();
-        return false;
-    }
-
-    // load plugins for device
-    JsonWorker jsonFile;
-    if(!jsonFile.loadFile(fileName.toLocalFile(), &error))
-    {
-        qWarning() << error.errorString();
-        return false;
-    }
+    if(newDevice == nullptr) return false;
 
     std::vector<PluginInfo> plugList;
 
-    jsonFile.readPluginsArray(jsonFile.deviceGlobalObject(), &plugList);
+    JsonWorker::readPluginsArray(jsonObject, &plugList);
 
     for(PluginInfo& it : plugList)
     {

@@ -30,17 +30,11 @@
 class JsonWorker
 {
 public:
-    JsonWorker(){};
-    JsonWorker(const QJsonObject& globalObject);
+    static bool jsonObjectFromFile(const QString& name, QJsonObject &targetObject);
 
-    bool loadFile(const QString& name, ParseError* error = nullptr);
+    static bool loadControllerRegMap(QJsonObject globalObject, std::shared_ptr<AbstractController> controller, ParseError* error);
 
-    bool loadControllerRegMap(std::shared_ptr<AbstractController> controller, ParseError* error);
-
-    bool readHeader(DUTHeader *header, ParseError* error = nullptr);
-//    void saveHeader(const DUTHeader &header);
-
-    bool readRegisterArray(std::vector<std::shared_ptr<Register> > *registerMap, DUTHeader* deviceHeader, ParseError* error = nullptr);
+    static bool readRegisterArray(QJsonObject deviceGlobalObject, std::vector<std::shared_ptr<Register> > *registerMap, DUTHeader* deviceHeader, ParseError* error = nullptr);
 
     static QJsonObject saveDut(DUTDevice &device);
     static QJsonArray saveDutList(std::vector<std::shared_ptr<DUTDevice> > *dutList);
@@ -56,12 +50,7 @@ public:
     static bool readPluginsArray(QJsonObject globalObject, std::vector<PluginInfo> *pluginsList, QMap<qint16, DUTHeader *>* deviceReferenceList = nullptr);
     static QJsonArray savePlugInsArray(const std::vector<PluginInfo>& pluginsList);
 
-    const QJsonObject &deviceGlobalObject() const;
-    void setDeviceGlobalObject(const QJsonObject &newDeviceGlobalObject);
-
 private:
-    QJsonObject m_deviceGlobalObject;
-
     static bool readRegister(const QJsonObject &jsonObject, Register* deviceRegister, ParseError* error = nullptr);
     static void saveRegister(const Register& deviceRegister, QJsonObject& jsonRegister);
 
