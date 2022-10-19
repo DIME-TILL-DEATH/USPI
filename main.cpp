@@ -10,12 +10,9 @@
 #include <functional>
 
 #include "logger.h"
-#include "dutdevice.h"
 #include "interfacessettingsadapter.h"
 
-//#include "fieldadapter.h"
 #include "userinterface.h"
-#include "extensionmanager.h"
 
 Logger* Logger::currentHandler = nullptr;
 

@@ -37,7 +37,7 @@ UserInterface::UserInterface(QHash <QString, AbstractInterface* >* avaliableInte
     QGuiApplication::setFont(font);
 
 
-    connect(&extensionManager, SIGNAL(writeSequenceRequest()), this, SLOT(writeSequence()));
+    connect(&extensionManager, &ExtensionManager::writeSequenceRequest, this, &UserInterface::writeSequence);
     connect(&extensionManager, &ExtensionManager::writeCustomSequenceRequest, this, &UserInterface::writeCustomSequence);
 
     connect(this, &UserInterface::dutUpdated, &m_dutListModel, &DutListModel::dutUpdated);
@@ -59,9 +59,19 @@ UserInterface::~UserInterface()
 //    delete m_usbInterface;
 }
 
-const QString &UserInterface::currentInterface() const
+QString UserInterface::currentInterface() const
 {
-    return m_interface_ptr->interfaceName();
+    QString interfaceName = m_interface_ptr->interfaceName();
+
+//    if(interfaceName == InterfaceNames::USB)
+//    {
+//        if(m_interface_ptr->isAvaliable())
+//        {
+//            interfaceName += "(недоступен)";
+//        }
+//    }
+
+    return interfaceName;
 }
 
 bool UserInterface::setCurrentInterface(const QString &interfaceName)
@@ -80,8 +90,6 @@ bool UserInterface::setCurrentInterface(const QString &interfaceName)
 
             QDir dir = QDir::current();
             dir.cd("Controllers");
-
-            // заменить ATMega на имя файла
 
             if(!JsonWorker::jsonObjectFromFile(dir.absoluteFilePath(m_interface_ptr->selectedController()->regMapFileName()), jsonObject))
             {
@@ -208,7 +216,16 @@ QStringList UserInterface::avaliableInterfaces()
     QStringList resultList;
     for(auto it = m_avaliableInterfaces->begin(); it != m_avaliableInterfaces->end(); ++it)
     {
-        resultList.append(it.key());
+        QString interfaceName = it.key();
+
+//        if(interfaceName == InterfaceNames::USB)
+//        {
+//            if(!(*it)->isAvaliable())
+//            {
+//                interfaceName += "(недоступен)";
+//            }
+//        }
+        resultList.append(interfaceName);
     }
     return resultList;
 }
@@ -246,7 +263,10 @@ void UserInterface::updateAvaliableInterfaces()
     m_avaliableInterfaces->insert(m_fileInterface->interfaceName(), m_fileInterface);
 
     m_usbInterface->refreshUSBDevices();
-    if(m_usbInterface->isAvaliable()) m_avaliableInterfaces->insert(m_usbInterface->interfaceName(), m_usbInterface);
+//    if(m_usbInterface->isAvaliable())
+//    {
+        m_avaliableInterfaces->insert(m_usbInterface->interfaceName(), m_usbInterface);
+//    }
 
     m_avaliableInterfaces->insert(m_ethernetInterface->interfaceName(), m_ethernetInterface);
 

@@ -50,7 +50,7 @@ public:
 
     static void registerTypes();
 
-    const QString& currentInterface() const;
+    QString currentInterface() const;
     bool setCurrentInterface(const QString& interfaceName);
 
     RegisterListModel *currentRegMapModel();

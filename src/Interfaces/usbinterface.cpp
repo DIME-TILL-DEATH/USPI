@@ -10,10 +10,11 @@ USBInterface::USBInterface(QObject *parent)
     int rtnValue;
     rtnValue = libusb_init(&m_USBSession);
 
+    m_isAvaliable = false;
+
     if(rtnValue < 0)
     {
         qWarning() << tr("Не удалось инициализировать libusb: ") << libusb_error_name(rtnValue);
-        m_isAvaliable = false;
     }
     else
     {
