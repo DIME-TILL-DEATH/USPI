@@ -5,6 +5,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 import QtQuick.Dialogs 1.3
+import Qt.labs.settings 1.0
 
 import DeviceManager 1.0
 import Elements 1.0
@@ -34,6 +35,13 @@ ApplicationWindow {
     {
         Backend.userSettings.windowWidth = width
         Backend.userSettings.windowHeight = height
+    }
+
+    Settings
+    {
+        category: "Current_folder"
+        property alias folderSessionSave: _sessionSaveDialog.folder
+        property alias folderSessionLoad: _sessionLoadDialog.folder
     }
 
     menuBar: MenuBar {
@@ -123,7 +131,7 @@ ApplicationWindow {
                     _mainView.registerView.registerView.currentIndex = -1
                     _mainView.updateRegisterMap()
                 }
-            }
+            }         
         }
     }
 

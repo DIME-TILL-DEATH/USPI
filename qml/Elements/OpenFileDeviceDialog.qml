@@ -26,5 +26,6 @@ FileDialog {
 //            mainView.updateRegisterMap()
 //        }
 //    }
+
     Component.onCompleted: visible = false
 }

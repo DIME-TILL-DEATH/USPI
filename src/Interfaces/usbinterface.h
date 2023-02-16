@@ -17,11 +17,15 @@ namespace USBBitPosition
     const quint8 CHANNEL{4};
     const quint8 ORDER{5};
     const quint8 TRIGGER{4};
+
+    const quint8 FRAGMENTED{0};
+    const quint8 FRAGMENT_COUNT{2};
 }
 
 namespace USBFieldSize
 {
     const quint8 HEADER{4};
+    const quint8 REGISTER{2};
 }
 
 class USBInterface : public AbstractInterface
@@ -63,19 +67,21 @@ private:
 
     int m_timeout{30000};
 
-    char* m_rawData{nullptr};
+    unsigned char* m_rawData{nullptr};
 
 
     bool initUSB();
     bool initDevice(USBController &device);
     void closeDevice(USBController &device);
 
+    bool sendPacket(unsigned char *data_ptr, quint8 dataSize);
+
 
     QStringList deviceInfo(libusb_device *dev);
     QString epTypeString(const libusb_endpoint_descriptor& epDescriptor);
     QString deviceSpeedString(libusb_device *dev);
 
-    QByteArray formHeader(quint16 regCount, quint16 packetSize);
+    QByteArray formHeader(quint16 regCount, quint16 packetSize, bool isFragmented, quint8 fragmentNumber);
 };
 
 

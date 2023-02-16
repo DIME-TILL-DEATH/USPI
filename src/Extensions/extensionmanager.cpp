@@ -314,13 +314,13 @@ void ExtensionManager::getFieldValue(QString registerName, QString fieldName, QV
 
 void ExtensionManager::writeRegisterSequence(QStringList registerNames)
 {
-    qInfo() << "Call writeRegisterSequence, object: " << sender()->objectName();
+    //qInfo() << "Call writeRegisterSequence, object: " << sender()->objectName();
 
     ControlPanelInterface* plugin = qobject_cast<ControlPanelInterface*>(sender());
 
     if(plugin)
     {
-        qInfo() << "qobject_cast success";
+        //qInfo() << "qobject_cast success";
         DUTDevice* targetDevice = m_loadedPlugInsInfo.at(plugin->targetDeviceNumber()).targetDevice();
         emit writeCustomSequenceRequest(registerNames, targetDevice);
     }

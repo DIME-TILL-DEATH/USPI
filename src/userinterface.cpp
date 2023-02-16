@@ -354,17 +354,22 @@ void UserInterface::writeCustomSequence(QStringList registerNames, DUTDevice *ta
         return;
     }
 
+    QString resultMessage(tr("Запись через '") + m_interface_ptr->interfaceName() + tr("' в регистры: "));
+
     std::vector<Register*> wrSequence;
     foreach(QString name, registerNames)
     {
         wrSequence.push_back(targetDevice->registerByName(name).get());
+        resultMessage.append("'"+name+"', ");
     }
-
-//    m_interface_ptr->setDeviceHeader(m_device.deviceHeader());
 
     if(!m_interface_ptr->writeSequence(wrSequence))
     {
         qWarning() << (tr("Ошибка записи последовательности через интерфейс '") + m_interface_ptr->interfaceName()+ "'");
+    }
+    else
+    {
+        qInfo() << resultMessage;
     }
 }
 

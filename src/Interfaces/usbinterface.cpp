@@ -19,7 +19,7 @@ USBInterface::USBInterface(QObject *parent)
     else
     {
         libusb_set_option(m_USBSession, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_WARNING);
-        m_rawData = static_cast<char*>(std::malloc(m_activeController.deviceBufferSize));
+        m_rawData = static_cast<unsigned char*>(std::malloc(m_activeController.deviceBufferSize));
     }
 }
 
@@ -70,8 +70,8 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
         return false;
     }
 
-    int actualWrittenBytes = 0;
-    int rtnValue = 0;
+    bool isPacketFragmented = false;
+    quint8 fragmentCount = 0;
 
     QByteArray sequenceData;
     quint16 bytesInPacket = 0;
@@ -92,6 +92,23 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
         {
             QByteArray regData = (*itReg);
             quint16 bitSize = regData.size()*8;
+
+            if((USBFieldSize::HEADER+sequenceData.size()+regData.size()+USBFieldSize::REGISTER)>256) // фрагментированная отсылка
+            {
+                isPacketFragmented = true;
+
+                sequenceData.prepend(formHeader(regInPacket, bytesInPacket, isPacketFragmented, fragmentCount));
+                m_rawData = (unsigned char*)sequenceData.data();
+                if(!sendPacket(m_rawData, sequenceData.size())) return false;
+
+                sequenceData.clear();
+                bytesInPacket=0;
+                regInPacket=0;
+                fragmentCount++;
+
+                // иначе USB теряет пакет
+                QThread::msleep(200);
+            }
 
             if((*itSeq)->parentDUTHeader()->isMSB)
             {
@@ -115,21 +132,24 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
         }
     }
 
-    QByteArray header = formHeader(regInPacket, bytesInPacket);
-    sequenceData.prepend(header);
+    sequenceData.prepend(formHeader(regInPacket, bytesInPacket, isPacketFragmented, fragmentCount));
+    m_rawData = (unsigned char*)sequenceData.data();
+    bool result = sendPacket(m_rawData, sequenceData.size());
 
-    int dataSize = sequenceData.size();
+    return result;
+}
 
-    m_rawData = sequenceData.data();
+bool USBInterface::sendPacket(unsigned char* data_ptr, quint8 dataSize)
+{
+    int actualWrittenBytes = 0;
+    int rtnValue = 0;
 
     rtnValue = libusb_bulk_transfer(m_activeController.handle,
                                     m_activeController.endpointAddress | LIBUSB_ENDPOINT_OUT,
-                                    (unsigned char*)m_rawData,
+                                    data_ptr,//(unsigned char*)data_ptr,
                                     dataSize,
                                     &actualWrittenBytes,
                                     m_timeout);
-
-
     if(rtnValue < 0)
     {
         qWarning() << tr("Ошибка отправки на USB устройство:") << libusb_strerror(rtnValue);
@@ -140,7 +160,7 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
         qWarning() << tr("Отправлено: ") << actualWrittenBytes << tr(", тогда как размер посылки: ") << dataSize;
         return false;
     }
-
+    qInfo() << tr("Отправлено: ") << actualWrittenBytes << tr(" байт");
     return true;
 }
 
@@ -343,16 +363,16 @@ QString USBInterface::deviceSpeedString(libusb_device *dev)
     }
 }
 
-QByteArray USBInterface::formHeader(quint16 regCount, quint16 packetSize)
+QByteArray USBInterface::formHeader(quint16 regCount, quint16 packetSize, bool isFragmented, quint8 fragmentNumber)
 {
-    uchar reservedByte = 0x00;
+    //uchar reservedByte = 0x00;
 
     QByteArray result;
 
     result.append(0<<USBBitPosition::TRIGGER);// | (m_deviceHeader.channelNumber & 0xF));
     result.append(regCount);
     result.append(packetSize + USBFieldSize::HEADER);
-    result.append(reservedByte);
+    result.append(((fragmentNumber&0x3)<<USBBitPosition::FRAGMENT_COUNT) | (isFragmented&0x1));
 
     return result;
 }

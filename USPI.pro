@@ -25,6 +25,8 @@ SOURCES += \
         src/Interfaces/abstractinterface.cpp \
     src/Interfaces/ethernetinterface.cpp \
         src/Interfaces/fileinterface.cpp \
+    src/Interfaces/interfacemanager.cpp \
+    src/Interfaces/interfaceslistmodel.cpp \
         src/Interfaces/usbinterface.cpp \
         src/JsonWorker.cpp \
         src/dutdevice.cpp \
@@ -67,7 +69,9 @@ HEADERS += \
     src/Interfaces/abstractinterface.h \
     src/Interfaces/ethernetinterface.h \
     src/Interfaces/fileinterface.h \
+    src/Interfaces/interfacemanager.h \
     src/Interfaces/interfacenames.h \
+    src/Interfaces/interfaceslistmodel.h \
     src/Interfaces/usbinterface.h \
     src/JsonWorker.h \
     src/dutdevice.h \

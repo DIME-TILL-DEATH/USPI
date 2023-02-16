@@ -6,8 +6,6 @@
 
 #include <QDebug>
 
-#include "dutdevice.h"
-#include "registeradapter.h"
 #include "register.h"
 
 class DutListModel : public QAbstractListModel

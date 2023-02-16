@@ -1,4 +1,5 @@
 #include "dutlistmodel.h"
+#include "dutdevice.h"
 
 DutListModel::DutListModel(std::vector<std::shared_ptr<DUTDevice> > *data, QObject *parent)
     : QAbstractListModel{parent},

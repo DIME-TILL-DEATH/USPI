@@ -338,6 +338,7 @@ bool JsonWorker::readPluginsArray(QJsonObject globalObject, std::vector<PluginIn
                     qWarning() << "Не найден параметр 'parent_uniqueID' для расширения " << name;
                     return false;
                 }
+
                 currentPlugin.setTargetDevice(deviceReferenceList->value(parentUniqueId)->device_ptr);
             }
 

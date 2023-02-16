@@ -2,6 +2,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
 
+import Qt.labs.settings 1.0
+
 import Elements 1.0
 import StyleSettings 1.0
 
@@ -71,6 +73,12 @@ ApplicationWindow {
         moveDisplaced: Transition {
                  NumberAnimation { properties: "y"; duration: 150 }
         }
+    }
+
+    Settings
+    {
+        category: "Current_folder"
+        property alias currentFolder: _fileDeviceDialog.folder
     }
 
     OpenFileDeviceDialog{
