@@ -139,7 +139,7 @@ bool USBInterface::writeSequence(const std::vector<Register *> &wrSequence)
     return result;
 }
 
-bool USBInterface::sendPacket(unsigned char* data_ptr, quint8 dataSize)
+bool USBInterface::sendPacket(unsigned char* data_ptr, quint16 dataSize)
 {
     int actualWrittenBytes = 0;
     int rtnValue = 0;

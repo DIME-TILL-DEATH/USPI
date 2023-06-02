@@ -74,7 +74,7 @@ private:
     bool initDevice(USBController &device);
     void closeDevice(USBController &device);
 
-    bool sendPacket(unsigned char *data_ptr, quint8 dataSize);
+    bool sendPacket(unsigned char *data_ptr, quint16 dataSize);
 
 
     QStringList deviceInfo(libusb_device *dev);
