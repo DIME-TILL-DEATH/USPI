@@ -1,0 +1,3092 @@
+﻿{
+    "header" : {
+        "name" : "1508ПЛ8Т",
+		"description" : "ЦВС, 10 бит, до 1ГГц",
+        "version" : "1.0",
+        "register_size" : 16,
+        "isMSB" : true
+	},
+	
+	"plugins" : [
+		{
+			"name" : "Контрольная панель 1508ПЛ8Т",
+			"path" : "D:/QTProjects/USPI_plugins/build-Plugin1508PL8T-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/debug/Plugin1508PL8T.dll",
+			"settings": {
+                "Синус_деление": "2",
+                "Синус_канал_1_check": "\u0001",
+                "Синус_канал_2_check": "\u0000",
+                "Синус_частота": "192e6",
+				"ЛЧМ_канал_1_check": "\u0001",
+                "ЛЧМ_канал_2_check": "\u0000",
+                "ЛЧМ_частота": "500e6",
+				"ЛЧМ_длительность_стадия1": "100e-6",
+				"ЛЧМ_нижняя_частота_стадия1": "29.5e6",
+				"ЛЧМ_верхняя_частота_стадия1": "30.5e6",
+				"ЛЧМ_длительность_стадия2": "1000e-6",
+				"ЛЧМ_длительность_стадия3": "0",
+				"ЛЧМ_нижняя_частота_стадия3": "10e6",
+				"ЛЧМ_верхняя_частота_стадия3": "30e6",
+				"ЛЧМ_длительность_стадия4": "0"
+            }
+		}
+	],
+   
+    "registers" : [
+		   {
+            "name" : "SWRST",
+			"size" : 48,
+						
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x100000",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				},
+				{
+					"name" : "RST",
+                    "position" : 0,
+					"size" : 16,
+					"value" : "0x78",
+					"description"  : "СБРОС"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Сброс",
+                    "position" : 23,
+					"description"  : "SWRST + WR DATA"
+				}
+			]
+        },
+	
+        {
+            "name" : "SEL_REG",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "PR1",
+                    "position" : 0,
+                    "size"   : 6,
+					"description"  : "Текущий профиль синтеза в 1 канале"
+                },
+				{
+                    "name" : "LS1 stage",
+                    "position" : 6,
+                    "size"   : 2,
+					"description"  : "Запуск соответствующей стадии ЛЧМ в 1 канале"
+                },
+				{
+                    "name" : "PR2",
+                    "position" : 8,
+                    "size"   : 6,
+					"description"  : "Текущий профиль синтеза в 2 канале"
+                },
+				{
+                    "name" : "LS2 stage",
+                    "position" : 14,
+                    "size"   : 2,
+					"description"  : "запуск соответствующей стадии ЛЧМ в 2 канале"
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x100002",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Выбор текущего профиля синтеза.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CTR",
+			"size" : 48,
+			
+            "bits" : [
+                {
+                    "name" : "CMP on",
+                    "position" : 14,
+					"description"  : "Включение компаратора"
+                },
+				{
+                    "name" : "DAC2 on",
+                    "position" : 13,
+					"description"  : "Вкл. ЦАП 1 "
+                },
+				{
+                    "name" : "DAC1 on",
+                    "position" : 12,
+					"description"  : "Вкл. ЦАП 1 "
+                }
+            ],
+			
+			"variant_lists" : [
+				{
+                    "name" : "cmx",
+					"position" : 0,
+                    "size"   : 5,
+					"description" : "Коэффициент деления тактового сигнала.\nПри CSEL=0, коэффициент деления со входов CLKP, CLKM:\n0: 1:1;\n1: 1:2;\n3: 1:4.\nПри CSEL=1, коэффициент деления частоты со входов CLKDP, CLKDM равен 1.",
+					"default_value" : 3,
+					"variants" : [
+						{
+							"name" : "1:1",
+							"value" : 0
+						},
+						{
+							"name" : "1:2",
+							"value" : 1
+						}
+						,
+						{
+							"name" : "1:4",
+							"value" : 3
+						}
+					]
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x100003",
+					"description"  : "Команда установки адреса в адресном пространстве."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре."
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Общее управление режимами работы микросхемы.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "SYNC",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "SYNC phase",
+                    "position" : 3,
+                    "size"   : 2,
+					"description"  : "Фаза синхронизации. Задержка тактовой частоты вычислительного ядра относительно входного сигнала CSYNC, в тактах частоты дискретизации ЦАП."
+                },
+				{
+                    "name" : "SYNC OUT Phase",
+                    "position" : 0,
+                    "size"   : 2,
+					"description"  : "Задержка выходного сигнала CSYNC, тактов ЦАП."
+                }
+            ],
+			
+			"bits" : [
+                {
+                    "name" : "CSYNC OE",
+                    "position" : 14,
+					"default_value" : true,
+					"description"  : "Разрешение выдачи на CSYNC частоты дискретизации, деленной на 4 (8)."
+                },
+				{
+                    "name" : "CSYNC IE",
+                    "position" : 13,
+					"description"  : "Разрешение использования входного сигнала CSYNC для синхронизации."
+                },
+				{
+                    "name" : "CSYNC DIV",
+                    "position" : 11,
+					"default_value" : true,
+					"description"  : "Разрешение дополнительного деления частоты CSYNC на 2 перед выдачей на CSYNC (т.е. в итоге частота дискретизации делится на 8)."
+                },
+				{
+                    "name" : "SPI master",
+                    "position" : 10,
+					"description"  : "1: разрешение выхода SSCSn."
+                },
+				{
+                    "name" : "SYNC del",
+                    "position" : 9,
+					"description"  : "1: дополнительная задержка входного сигнала CSYNC на 0.5 нс. Для случаев, когда не соблюдается tsucsc."
+                },
+				{
+                    "name" : "SEL IE",
+                    "position" : 8,
+					"description"  : "В не-ЛЧМ режиме:\n0: активный профиль выбирается записью в регистр SEL_REG;\n1: активный профиль выбирается аппаратно сигналами SEL.\nВ режиме ЛЧМ:\n1: положительный фронт на входах SEL[0] – SEL[3] запускает стадию 1-4\nЛЧМ соответственно."
+                },
+				{
+                    "name" : "SEL OE",
+                    "position" : 7,
+					"description"  : "1: сигналы SEL являются выходными в не-ЛЧМ режиме при отключенном LINK-интерфейсе и индицируют номер активного профиля. \nВ режиме ЛЧМ, SEL[5:4] являются выходными и индицируют текущуюстадию ЛЧМ."
+                }
+            ],
+
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x100004",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Управление режимами синхронизации.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CLR",
+			"size" : 48,
+			
+            "bits" : [
+                {
+                    "name" : "Bist CLR",
+                    "position" : 11,
+					"description"  : "Очистка регистров самотестирования."
+                },
+				{
+                    "name" : "Link CLR",
+                    "position" : 10,
+					"description"  : "Очистка очередей данных LINK-интерфейса."
+                },
+				{
+                    "name" : "Link start",
+                    "position" : 9,
+					"description"  : "Сброс Tc и запуск приема данных с LINK-порта для режима внутренней синхронизации."
+                },
+				{
+                    "name" : "Link stop",
+                    "position" : 8,
+					"description"  : "Остановка приема данных с LINK-порта для режима внутренней синхронизации."
+                },
+				{
+                    "name" : "LS2 stop",
+                    "position" : 7,
+					"description"  : "Остановка (переход к стадии 4) ЛЧМ последовательности во 2 канале."
+                },
+				{
+                    "name" : "LS1 stop",
+                    "position" : 6,
+					"description"  : "Остановка (переход к стадии 4) ЛЧМ последовательности в 1 канале."
+                },
+				{
+                    "name" : "LS2 start",
+                    "position" : 5,
+					"description"  : "Запуск (переход к стадии 1) ЛЧМ последовательности в 2-ом канале."
+                },
+				{
+                    "name" : "LS1 start",
+                    "position" : 4,
+					"description"  : "Запуск (переход к стадии 1) ЛЧМ последовательности в 1-ом канале."
+                },
+				{
+                    "name" : "CLR fq2",
+                    "position" : 3,
+					"description"  : "Установка аккумулятора частоты 2-канала в значение CH1_LS_F1."
+                },
+				{
+                    "name" : "CLR fq1",
+                    "position" : 2,
+					"description"  : "Установка аккумулятора частоты 1-канала в значение CH1_LS_F1."
+                },
+				{
+                    "name" : "CLR ph2",
+                    "position" : 1,
+					"description"  : "Очистка аккумулятора фазы 2-канала."
+                },
+				{
+                    "name" : "CLR ph1",
+                    "position" : 0,
+					"description"  : "Очистка аккумулятора фазы 1-канала."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x100005",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Управление очисткой аккумуляторов фазы и запуск/остановка ЛЧМ.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "LINK",
+			"size" : 48,
+			
+            "bits" : [
+                {
+                    "name" : "on",
+                    "position" : 0,
+					"description"  : "1 – включение LINK-интерфейса. В этом режиме линии SEL1 используются под LINK порт.\nВ режиме LINK.on=1, регистры с адресами >=0x1000 недоступны на запись. 
+"
+                }
+            ],
+			
+			"variant_lists" : [
+				{
+                    "name" : "clk mode",
+					"position" : 3,
+                    "size"   : 2,
+					"description" : "Режим тактирования.",
+					"default_value" : 0,
+					"variants" : [
+						{
+							"name" : "Длительность символа равна 4*Tclk*(TC_H*2^16+TC_L)",
+							"value" : 0
+						},
+						{
+							"name" : "Длительность символа равна 4*Tclk*2^32/(TC_H*2^16+TC_L)",
+							"value" : 1
+						}
+						,
+						{
+							"name" : "Внешняя синхронизация",
+							"value" : 3
+						}
+					]
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x100006",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Управление LINK-интерфейсом. ",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "ROUTE",
+			"size" : 48,
+			
+            "bits" : [
+                {
+                    "name" : "pdith2",
+                    "position" : 7,
+					"description"  : "Вкл. рандомизации фазы 2 канала."
+                },
+				{
+                    "name" : "pdith1",
+                    "position" : 6,
+					"description"  : "Вкл. рандомизации фазы 1 канала. "
+                }
+            ],
+			
+			"variant_lists" : [
+				{
+                    "name" : "adith1",
+					"position" : 4,
+                    "size"   : 2,
+					"description" : "Рандомизация амплитуды перед ограничением разрядности в 1 канале.",
+					"default_value" : 0,
+					"variants" : [
+						{
+							"name" : "Выключена",
+							"value" : 0
+						},
+						{
+							"name" : "Амплитуда шума ½*LSB ЦАП",
+							"value" : 1
+						}
+						,
+						{
+							"name" : "Амплитуда шума 8*LSB ЦАП",
+							"value" : 3
+						}
+					]
+				},
+				{
+                    "name" : "adith2",
+					"position" : 2,
+                    "size"   : 2,
+					"description" : "Рандомизация амплитуды перед ограничением разрядности в 2 канале.",
+					"default_value" : 0,
+					"variants" : [
+						{
+							"name" : "Выключена",
+							"value" : 0
+						},
+						{
+							"name" : "Амплитуда шума ½*LSB ЦАП",
+							"value" : 1
+						}
+						,
+						{
+							"name" : "Амплитуда шума 8*LSB ЦАП",
+							"value" : 3
+						}
+					]
+				},
+				{
+                    "name" : "sum",
+					"position" : 0,
+                    "size"   : 2,
+					"description" : "Маршрутизация данных от каналов синтеза к ЦАП.",
+					"default_value" : 0,
+					"variants" : [
+						{
+							"name" : "Сигнал каждого канала поступает на «свой» ЦАП",
+							"value" : 0
+						},
+						{
+							"name" : "Сигнал 1 канала подается на оба ЦАПа",
+							"value" : 1
+						},
+						{
+							"name" : "Сигнал 2 канала подается на оба ЦАПа",
+							"value" : 2
+						},
+						{
+							"name" : "Сигналы каналов суммируются и подаются на оба ЦАПа",
+							"value" : 3
+						}
+					]
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x100007",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Управление маршрутизацией сигнала к ЦАП и амплитудным выбеляющим шумом.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS CTR",
+			"size" : 48,
+			
+			"bits" : [
+				{
+					"name" : "LS on",
+                    "position" : 15,
+					"description"  : "Включение режима ЛЧМ."
+				},
+				{
+					"name" : "PA bypass",
+                    "position" : 14,
+					"description"  : "Отключение преобразования фаза/амплитуда."
+				},
+				{
+					"name" : "frq reset 3",
+                    "position" : 13,
+					"description"  : "Установка частоты в начале стадии 3 в значение CHx_LS_F2."
+				},
+				{
+					"name" : "frq reset 1",
+                    "position" : 12,
+					"description"  : "Установка частоты в начале стадии 1 в значение CHx_LS_F1."
+				},
+				{
+					"name" : "ph reset 3",
+                    "position" : 11,
+					"description"  : "Сброс фазы в CHx_LS_Ph2 в начале стадии 3."
+				},
+				{
+					"name" : "ph reset 1",
+                    "position" : 10,
+					"description"  : "Сброс фазы в CHx_LS_Ph1 в начале стадии 1."
+				},
+				{
+					"name" : "s2 on",
+                    "position" : 9,
+					"description"  : "0 - Выключение сигнала в 2-ой стадии."
+				},
+				{
+					"name" : "s4 on",
+                    "position" : 8,
+					"description"  : "0 - Выключение сигнала в 4-ой стадии."
+				},
+				{
+					"name" : "corr enable",
+                    "position" : 7,
+					"description"  : "В ЛЧМ режиме включение кусочно-линейной коррекции сигнала."
+				},
+				{
+					"name" : "s2 f0",
+                    "position" : 6,
+					"description"  : "Нулевое приращение фазы в стадии 2."
+				},
+				{
+					"name" : "s4 f0",
+                    "position" : 5,
+					"description"  : "Нулевое приращение фазы в стадии 4."
+				},
+				{
+					"name" : "auto",
+                    "position" : 4,
+					"description"  : "Автоповтор ЛЧМ последовательности (переход к стадии 1 по окончании стадии 4)."
+				}
+			],
+			
+            "integers" : [
+                {
+                    "name" : "corr fscale",
+                    "position" : 0,
+                    "size"   : 4,
+					"description"  : "Масштаб диапазона коррекции сигнала."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x101000",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Управление синтезом ЛЧМ.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS CRFMIN",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "tsw",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Установка нижней границы корректируемого диапазона частот, старшие 16 бит."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x101001",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Нижняя граница корректируемого диапазона частот.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 TSW",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "tsw",
+                    "position" : 0,
+                    "size"   : 3,
+					"description"  : "tsw=0: Фильтрация отключена;\ntsw>0: 2^(tsw+4) - время переключения (длина импульсной характеристики\nфильтра) в тактах ЦАП. "
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x101002",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Длина импульсной характеристики гауссового фильтра, канал 1.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		
+		{
+            "name" : "CH1 LS TPH1",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH1 LS TPH1 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Длительность 1-ой стадии ЛЧМ, Tclk*4, разряды [15:0]."
+                },
+				{
+                    "name" : "СH1 LS TPH1 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Длительность 1-ой стадии ЛЧМ, Tclk*4, разряды [31:16]."
+                },
+                {
+                    "name" : "СH1 LS TPH1 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Длительность 1-ой стадии ЛЧМ, Tclk*4, разряды [45:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x101010",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр длительности 1-ой фазы ЛЧМ-сигнала [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 1-ой фазы ЛЧМ-сигнала [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 1-ой фазы ЛЧМ-сигнала [45:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS TPH2",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH1 LS TPH2 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Длительность 2-ой стадии ЛЧМ, Tclk*4, разряды [15:0]."
+                },
+				{
+                    "name" : "СH1 LS TPH2 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Длительность 2-ой стадии ЛЧМ, Tclk*4, разряды [31:16]."
+                },
+                {
+                    "name" : "СH1 LS TPH2 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Длительность 2-ой стадии ЛЧМ, Tclk*4, разряды [45:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x101014",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр длительности 2-ой фазы ЛЧМ-сигнала [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 2-ой фазы ЛЧМ-сигнала [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 2-ой фазы ЛЧМ-сигнала [45:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS TPH3",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH1 LS TPH3 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Длительность 3-ей стадии ЛЧМ, Tclk*4, разряды [15:0]."
+                },
+				{
+                    "name" : "СH1 LS TPH3 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Длительность 3-ей стадии ЛЧМ, Tclk*4, разряды [31:16]."
+                },
+                {
+                    "name" : "СH1 LS TPH3 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Длительность 3-ей стадии ЛЧМ, Tclk*4, разряды [45:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x101018",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр длительности 3-ой фазы ЛЧМ-сигнала [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 3-ой фазы ЛЧМ-сигнала [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 3-ой фазы ЛЧМ-сигнала [45:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS TPH4",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH1 LS TPH4 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Длительность 4-ой стадии ЛЧМ, Tclk*4, разряды [15:0]."
+                },
+				{
+                    "name" : "СH1 LS TPH4 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Длительность 4-ой стадии ЛЧМ, Tclk*4, разряды [31:16]."
+                },
+                {
+                    "name" : "СH1 LS TPH4 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Длительность 4-ой стадии ЛЧМ, Tclk*4, разряды [45:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x10101C",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр длительности 4-ой фазы ЛЧМ-сигнала [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 4-ой фазы ЛЧМ-сигнала [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 4-ой фазы ЛЧМ-сигнала [45:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS F1",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH1 LS F1 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [15:0]."
+                },
+				{
+                    "name" : "СH1 LS F1 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [31:16]."
+                },
+                {
+                    "name" : "СH1 LS F1 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [47:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x101020",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 1 [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 1 [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 1 [47:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS F2",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH1 LS F2 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [15:0]."
+                },
+				{
+                    "name" : "СH1 LS F2 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [31:16]."
+                },
+                {
+                    "name" : "СH1 LS F2 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [47:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x101024",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 2 [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 2 [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 2 [47:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS Ph1",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "value",
+                    "position" : 0,
+                    "size"   : 3,
+					"description"  : "Значение фазы. value – двоично-дополнительное целое. Φ=π*value/2^15"
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x101030",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр начальной фазы ЛЧМ 1.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS Ph2",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "value",
+                    "position" : 0,
+                    "size"   : 3,
+					"description"  : "Значение фазы. value – двоично-дополнительное целое. Φ=π*value/2^15"
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x101031",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр начальной фазы ЛЧМ 2.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH1 LS dF1",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH1 LS dF1 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [15:0]."
+                },
+				{
+                    "name" : "СH1 LS dF1 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [31:16]."
+                },
+                {
+                    "name" : "СH1 LS dF1 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [47:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x101040",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр приращения частоты 1 [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр приращения частоты 1 [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр приращения частоты 1 [47:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+
+		{
+            "name" : "CH1 LS dF2",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH1 LS dF2 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [15:0]."
+                },
+				{
+                    "name" : "СH1 LS dF2 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [31:16]."
+                },
+                {
+                    "name" : "СH1 LS dF2 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [47:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x101044",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр приращения частоты 2 [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр приращения частоты 2 [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр приращения частоты 2 [47:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+
+		{
+            "name" : "CH1 profile",
+			"size" : 192,
+			
+            "integers" : [
+				{
+                    "name" : "dPh L",
+                    "position" : 144,
+                    "size"   : 16,
+					"description"  : "Регистр приращения фазы [15:0]."
+                },
+                {
+                    "name" : "dPh M",
+                    "position" : 120,
+                    "size"   : 16,
+					"description"  : "Регистр приращения фазы [31:16]."
+                },
+				{
+                    "name" : "dPh H",
+                    "position" : 96,
+                    "size"   : 16,
+					"description"  : "Регистр приращения фазы [47:32]."
+                },
+				{
+                    "name" : "Phase",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Регистр управления фазой."
+                },
+				{
+                    "name" : "Mul",
+                    "position" : 24,
+					"default_value" : "0x7ff8",
+                    "size"   : 16,
+					"description"  : "Регистр управления амплитудой."
+                },
+				{
+                    "name" : "Offset",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Регистр упр. смещением выходного сигнала."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "WRI",
+                    "position" : 160,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 136,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 112,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI reserved",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x300000",
+					"description"  : "Увеличение адреса регистра"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Приращение фазы [15:0].",
+                    "position" : 167,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Приращение фазы [31:16].",
+                    "position" : 143,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Приращение фазы [47:32].",
+                    "position" : 119,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: зарезервированный регистр.",
+                    "position" : 95,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Фаза выходного сигнала.",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Амплитуда выходного сигнала.",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Смещение выходного сигнала.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			],
+			
+			"variant_lists" : [
+				{
+                    "name" : "Profile",
+					"position" : 168,
+                    "size"   : 24,
+					"description" : "Выбор профиля для записи.",
+					"default_value" : "0x101300",
+					"variants" : [
+						{
+							"name" : "Все профили",
+							"value" : "0x101300"
+						},
+						{
+							"name" : "Профиль 0",
+							"value" : "0x101400"
+						},
+						{
+							"name" : "Профиль 1",
+							"value" : "0x101410"
+						},
+						{
+							"name" : "Профиль 2",
+							"value" : "0x101420"
+						},
+						{
+							"name" : "Профиль 3",
+							"value" : "0x101430"
+						},
+						{
+							"name" : "Профиль 4",
+							"value" : "0x101440"
+						},
+						{
+							"name" : "Профиль 5",
+							"value" : "0x101450"
+						},
+						{
+							"name" : "Профиль 6",
+							"value" : "0x101460"
+						},
+						{
+							"name" : "Профиль 7",
+							"value" : "0x101470"
+						},
+						{
+							"name" : "Профиль 8",
+							"value" : "0x101480"
+						},
+						{
+							"name" : "Профиль 9",
+							"value" : "0x101490"
+						},
+						{
+							"name" : "Профиль 10",
+							"value" : "0x1014A0"
+						},
+						{
+							"name" : "Профиль 11",
+							"value" : "0x1014B0"
+						},
+						{
+							"name" : "Профиль 12",
+							"value" : "0x1014C0"
+						},
+						{
+							"name" : "Профиль 13",
+							"value" : "0x1014D0"
+						},
+						{
+							"name" : "Профиль 14",
+							"value" : "0x1014E0"
+						},
+						{
+							"name" : "Профиль 15",
+							"value" : "0x1014F0"
+						},
+						{
+							"name" : "Профиль 16",
+							"value" : "0x101500"
+						},
+						{
+							"name" : "Профиль 17",
+							"value" : "0x101510"
+						},
+						{
+							"name" : "Профиль 18",
+							"value" : "0x101520"
+						},
+						{
+							"name" : "Профиль 19",
+							"value" : "0x101530"
+						},
+						{
+							"name" : "Профиль 20",
+							"value" : "0x101540"
+						},
+						{
+							"name" : "Профиль 21",
+							"value" : "0x101550"
+						},
+						{
+							"name" : "Профиль 22",
+							"value" : "0x101560"
+						},
+						{
+							"name" : "Профиль 23",
+							"value" : "0x101570"
+						},
+						{
+							"name" : "Профиль 24",
+							"value" : "0x101580"
+						},
+						{
+							"name" : "Профиль 25",
+							"value" : "0x101590"
+						},
+						{
+							"name" : "Профиль 26",
+							"value" : "0x1015A0"
+						},
+						{
+							"name" : "Профиль 27",
+							"value" : "0x1015B0"
+						},
+						{
+							"name" : "Профиль 28",
+							"value" : "0x1015C0"
+						},
+						{
+							"name" : "Профиль 29",
+							"value" : "0x1015D0"
+						},
+						{
+							"name" : "Профиль 30",
+							"value" : "0x1015E0"
+						},
+						{
+							"name" : "Профиль 31",
+							"value" : "0x1015F0"
+						},
+						{
+							"name" : "Профиль 32",
+							"value" : "0x101600"
+						},
+						{
+							"name" : "Профиль 33",
+							"value" : "0x101610"
+						},
+						{
+							"name" : "Профиль 34",
+							"value" : "0x101620"
+						},
+						{
+							"name" : "Профиль 35",
+							"value" : "0x101630"
+						},
+						{
+							"name" : "Профиль 36",
+							"value" : "0x101640"
+						},
+						{
+							"name" : "Профиль 37",
+							"value" : "0x101650"
+						},
+						{
+							"name" : "Профиль 38",
+							"value" : "0x101660"
+						},
+						{
+							"name" : "Профиль 39",
+							"value" : "0x101670"
+						},
+						{
+							"name" : "Профиль 40",
+							"value" : "0x101680"
+						},
+						{
+							"name" : "Профиль 41",
+							"value" : "0x101690"
+						},
+						{
+							"name" : "Профиль 42",
+							"value" : "0x1016A0"
+						},
+						{
+							"name" : "Профиль 43",
+							"value" : "0x1016B0"
+						},
+						{
+							"name" : "Профиль 44",
+							"value" : "0x1016C0"
+						},
+						{
+							"name" : "Профиль 45",
+							"value" : "0x1016D0"
+						},
+						{
+							"name" : "Профиль 46",
+							"value" : "0x1016E0"
+						},
+						{
+							"name" : "Профиль 47",
+							"value" : "0x1016F0"
+						},
+						{
+							"name" : "Профиль 48",
+							"value" : "0x101700"
+						},
+						{
+							"name" : "Профиль 49",
+							"value" : "0x101710"
+						},
+						{
+							"name" : "Профиль 50",
+							"value" : "0x101720"
+						},
+						{
+							"name" : "Профиль 51",
+							"value" : "0x101730"
+						},
+						{
+							"name" : "Профиль 52",
+							"value" : "0x101740"
+						},
+						{
+							"name" : "Профиль 53",
+							"value" : "0x101750"
+						},
+						{
+							"name" : "Профиль 54",
+							"value" : "0x101760"
+						},
+						{
+							"name" : "Профиль 55",
+							"value" : "0x101770"
+						},
+						{
+							"name" : "Профиль 56",
+							"value" : "0x101780"
+						},
+						{
+							"name" : "Профиль 57",
+							"value" : "0x101790"
+						},
+						{
+							"name" : "Профиль 58",
+							"value" : "0x1017A0"
+						},
+						{
+							"name" : "Профиль 59",
+							"value" : "0x1017B0"
+						},
+						{
+							"name" : "Профиль 60",
+							"value" : "0x1017C0"
+						},
+						{
+							"name" : "Профиль 61",
+							"value" : "0x1017D0"
+						},
+						{
+							"name" : "Профиль 62",
+							"value" : "0x1017E0"
+						},
+						{
+							"name" : "Профиль 63",
+							"value" : "0x1017F0"
+						}
+					]
+				}
+			]
+        },
+
+		{
+            "name" : "CH2 LS CTR",
+			"size" : 48,
+			
+			"bits" : [
+				{
+					"name" : "LS on",
+                    "position" : 15,
+					"description"  : "Включение режима ЛЧМ."
+				},
+				{
+					"name" : "PA bypass",
+                    "position" : 14,
+					"description"  : "Отключение преобразования фаза/амплитуда."
+				},
+				{
+					"name" : "frq reset 3",
+                    "position" : 13,
+					"description"  : "Установка частоты в начале стадии 3 в значение CHx_LS_F2."
+				},
+				{
+					"name" : "frq reset 1",
+                    "position" : 12,
+					"description"  : "Установка частоты в начале стадии 1 в значение CHx_LS_F1."
+				},
+				{
+					"name" : "ph reset 3",
+                    "position" : 11,
+					"description"  : "Сброс фазы в CHx_LS_Ph2 в начале стадии 3."
+				},
+				{
+					"name" : "ph reset 1",
+                    "position" : 10,
+					"description"  : "Сброс фазы в CHx_LS_Ph1 в начале стадии 1."
+				},
+				{
+					"name" : "s2 on",
+                    "position" : 9,
+					"description"  : "0 - Выключение сигнала в 2-ой стадии."
+				},
+				{
+					"name" : "s4 on",
+                    "position" : 8,
+					"description"  : "0 - Выключение сигнала в 4-ой стадии."
+				},
+				{
+					"name" : "corr enable",
+                    "position" : 7,
+					"description"  : "В ЛЧМ режиме включение кусочно-линейной коррекции сигнала."
+				},
+				{
+					"name" : "s2 f0",
+                    "position" : 6,
+					"description"  : "Нулевое приращение фазы в стадии 2."
+				},
+				{
+					"name" : "s4 f0",
+                    "position" : 5,
+					"description"  : "Нулевое приращение фазы в стадии 4."
+				},
+				{
+					"name" : "auto",
+                    "position" : 4,
+					"description"  : "Автоповтор ЛЧМ последовательности (переход к стадии 1 по окончании стадии 4)."
+				}
+			],
+			
+            "integers" : [
+                {
+                    "name" : "corr fscale",
+                    "position" : 0,
+                    "size"   : 4,
+					"description"  : "Масштаб диапазона коррекции сигнала."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x102000",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Управление синтезом ЛЧМ.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 LS CRFMIN",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "tsw",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Установка нижней границы корректируемого диапазона частот, старшие 16 бит."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x102001",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Нижняя граница корректируемого диапазона частот.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 TSW",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "tsw",
+                    "position" : 0,
+                    "size"   : 3,
+					"description"  : "tsw=0: Фильтрация отключена;\ntsw>0: 2^(tsw+4) - время переключения (длина импульсной характеристики\nфильтра) в тактах ЦАП. "
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x102002",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Длина импульсной характеристики гауссового фильтра, канал 2.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		
+		{
+            "name" : "CH2 LS TPH1",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH2 LS TPH1 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Длительность 1-ой стадии ЛЧМ, Tclk*4, разряды [15:0]."
+                },
+				{
+                    "name" : "СH2 LS TPH1 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Длительность 1-ой стадии ЛЧМ, Tclk*4, разряды [31:16]."
+                },
+                {
+                    "name" : "СH2 LS TPH1 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Длительность 1-ой стадии ЛЧМ, Tclk*4, разряды [45:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x102010",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр длительности 1-ой фазы ЛЧМ-сигнала [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 1-ой фазы ЛЧМ-сигнала [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 1-ой фазы ЛЧМ-сигнала [45:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 LS TPH2",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH2 LS TPH2 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Длительность 2-ой стадии ЛЧМ, Tclk*4, разряды [15:0]."
+                },
+				{
+                    "name" : "СH2 LS TPH2 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Длительность 2-ой стадии ЛЧМ, Tclk*4, разряды [31:16]."
+                },
+                {
+                    "name" : "СH2 LS TPH2 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Длительность 2-ой стадии ЛЧМ, Tclk*4, разряды [45:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x102014",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр длительности 2-ой фазы ЛЧМ-сигнала [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 2-ой фазы ЛЧМ-сигнала [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 2-ой фазы ЛЧМ-сигнала [45:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 LS TPH3",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH2 LS TPH3 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Длительность 3-ей стадии ЛЧМ, Tclk*4, разряды [15:0]."
+                },
+				{
+                    "name" : "СH2 LS TPH3 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Длительность 3-ей стадии ЛЧМ, Tclk*4, разряды [31:16]."
+                },
+                {
+                    "name" : "СH2 LS TPH3 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Длительность 3-ей стадии ЛЧМ, Tclk*4, разряды [45:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x102018",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр длительности 3-ой фазы ЛЧМ-сигнала [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 3-ой фазы ЛЧМ-сигнала [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 3-ой фазы ЛЧМ-сигнала [45:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 LS TPH4",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH2 LS TPH4 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Длительность 4-ой стадии ЛЧМ, Tclk*4, разряды [15:0]."
+                },
+				{
+                    "name" : "СH2 LS TPH4 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Длительность 4-ой стадии ЛЧМ, Tclk*4, разряды [31:16]."
+                },
+                {
+                    "name" : "СH2 LS TPH4 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Длительность 4-ой стадии ЛЧМ, Tclk*4, разряды [45:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x10201C",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр длительности 4-ой фазы ЛЧМ-сигнала [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 4-ой фазы ЛЧМ-сигнала [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр длительности 4-ой фазы ЛЧМ-сигнала [45:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 LS F1",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH2 LS F1 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [15:0]."
+                },
+				{
+                    "name" : "СH2 LS F1 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [31:16]."
+                },
+                {
+                    "name" : "СH2 LS F1 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [47:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x102020",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 1 [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 1 [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 1 [47:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 LS F2",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH2 LS F2 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [15:0]."
+                },
+				{
+                    "name" : "СH2 LS F2 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [31:16]."
+                },
+                {
+                    "name" : "СH2 LS F2 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Значение частоты, разряды [47:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x102024",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 2 [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 2 [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр начальной частоты ЛЧМ 2 [47:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 LS Ph1",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "value",
+                    "position" : 0,
+                    "size"   : 3,
+					"description"  : "Значение фазы. value – двоично-дополнительное целое. Φ=π*value/2^15"
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x102030",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр начальной фазы ЛЧМ 1.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 LS Ph2",
+			"size" : 48,
+			
+            "integers" : [
+                {
+                    "name" : "value",
+                    "position" : 0,
+                    "size"   : 3,
+					"description"  : "Значение фазы. value – двоично-дополнительное целое. Φ=π*value/2^15"
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 24,
+					"size" : 24,
+					"value" : "0x102031",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр начальной фазы ЛЧМ 2.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+		
+		{
+            "name" : "CH2 LS dF1",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH2 LS dF1 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [15:0]."
+                },
+				{
+                    "name" : "СH2 LS dF1 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [31:16]."
+                },
+                {
+                    "name" : "СH2 LS dF1 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [47:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x102040",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр приращения частоты 1 [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр приращения частоты 1 [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр приращения частоты 1 [47:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+
+		{
+            "name" : "CH2 LS dF2",
+			"size" : 96,
+			
+            "integers" : [
+				{
+                    "name" : "СH2 LS dF2 L",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [15:0]."
+                },
+				{
+                    "name" : "СH2 LS dF2 M",
+                    "position" : 24,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [31:16]."
+                },
+                {
+                    "name" : "СH2 LS dF2 H",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Приращение частоты, разряды [47:32]."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "SETA",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x102044",
+					"description"  : "Команда установки адреса в адресном пространстве"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Регистр приращения частоты 2 [15:0] .",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр приращения частоты 2 [31:16].",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Регистр приращения частоты 2 [47:32].",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			]
+        },
+
+		{
+            "name" : "CH2 profile",
+			"size" : 192,
+			
+            "integers" : [
+				{
+                    "name" : "dPh L",
+                    "position" : 144,
+                    "size"   : 16,
+					"description"  : "Регистр приращения фазы [15:0]."
+                },
+                {
+                    "name" : "dPh M",
+                    "position" : 120,
+                    "size"   : 16,
+					"description"  : "Регистр приращения фазы [31:16]."
+                },
+				{
+                    "name" : "dPh H",
+                    "position" : 96,
+                    "size"   : 16,
+					"description"  : "Регистр приращения фазы [47:32]."
+                },
+				{
+                    "name" : "Phase",
+                    "position" : 48,
+                    "size"   : 16,
+					"description"  : "Регистр управления фазой."
+                },
+				{
+                    "name" : "Mul",
+                    "position" : 24,
+					"default_value" : "0x7ff8",
+                    "size"   : 16,
+					"description"  : "Регистр управления амплитудой."
+                },
+				{
+                    "name" : "Offset",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Регистр упр. смещением выходного сигнала."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "WRI",
+                    "position" : 160,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 136,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 112,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI reserved",
+                    "position" : 72,
+					"size" : 24,
+					"value" : "0x300000",
+					"description"  : "Увеличение адреса регистра"
+				},
+				{
+					"name" : "WRI",
+                    "position" : 64,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WRI",
+                    "position" : 40,
+					"size" : 8,
+					"value" : "0x30",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре с последующим увеличением адреса."
+				},
+				{
+					"name" : "WR",
+                    "position" : 16,
+					"size" : 8,
+					"value" : "0x20",
+					"description"  : "Команда записи data в регистр по адресу в адресном регистре"
+				}
+			],
+			
+			"separators" :[
+				{
+					"name" : "Data block: Приращение фазы [15:32].",
+                    "position" : 167,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Приращение фазы [31:16].",
+                    "position" : 143,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Приращение фазы [47:32].",
+                    "position" : 119,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: зарезервированный регистр.",
+                    "position" : 95,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Фаза выходного сигнала.",
+                    "position" : 71,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Амплитуда выходного сигнала.",
+                    "position" : 47,
+					"description"  : "SETA + WR DATA"
+				},
+				{
+					"name" : "Data block: Смещение выходного сигнала.",
+                    "position" : 23,
+					"description"  : "SETA + WR DATA"
+				}
+			],
+			
+			"variant_lists" : [
+				{
+                    "name" : "Profile",
+					"position" : 168,
+                    "size"   : 24,
+					"description" : "Выбор профиля для записи.",
+					"default_value" : "0x102300",
+					"variants" : [
+						{
+							"name" : "Все профили",
+							"value" : "0x102300"
+						},
+						{
+							"name" : "Профиль 0",
+							"value" : "0x102400"
+						},
+						{
+							"name" : "Профиль 1",
+							"value" : "0x102410"
+						},
+						{
+							"name" : "Профиль 2",
+							"value" : "0x102420"
+						},
+						{
+							"name" : "Профиль 3",
+							"value" : "0x102430"
+						},
+						{
+							"name" : "Профиль 4",
+							"value" : "0x102440"
+						},
+						{
+							"name" : "Профиль 5",
+							"value" : "0x102450"
+						},
+						{
+							"name" : "Профиль 6",
+							"value" : "0x102460"
+						},
+						{
+							"name" : "Профиль 7",
+							"value" : "0x102470"
+						},
+						{
+							"name" : "Профиль 8",
+							"value" : "0x102480"
+						}
+						,
+						{
+							"name" : "Профиль 9",
+							"value" : "0x102490"
+						},
+						{
+							"name" : "Профиль 10",
+							"value" : "0x1024A0"
+						},
+						{
+							"name" : "Профиль 11",
+							"value" : "0x1024B0"
+						},
+						{
+							"name" : "Профиль 12",
+							"value" : "0x1024C0"
+						},
+						{
+							"name" : "Профиль 13",
+							"value" : "0x1024D0"
+						},
+						{
+							"name" : "Профиль 14",
+							"value" : "0x1024E0"
+						},
+						{
+							"name" : "Профиль 15",
+							"value" : "0x1024F0"
+						},
+						{
+							"name" : "Профиль 16",
+							"value" : "0x102500"
+						},
+						{
+							"name" : "Профиль 17",
+							"value" : "0x102510"
+						},
+						{
+							"name" : "Профиль 18",
+							"value" : "0x102520"
+						},
+						{
+							"name" : "Профиль 19",
+							"value" : "0x102530"
+						},
+						{
+							"name" : "Профиль 20",
+							"value" : "0x102540"
+						},
+						{
+							"name" : "Профиль 21",
+							"value" : "0x102550"
+						},
+						{
+							"name" : "Профиль 22",
+							"value" : "0x102560"
+						},
+						{
+							"name" : "Профиль 23",
+							"value" : "0x102570"
+						},
+						{
+							"name" : "Профиль 24",
+							"value" : "0x102580"
+						},
+						{
+							"name" : "Профиль 25",
+							"value" : "0x102590"
+						},
+						{
+							"name" : "Профиль 26",
+							"value" : "0x1025A0"
+						},
+						{
+							"name" : "Профиль 27",
+							"value" : "0x1025B0"
+						},
+						{
+							"name" : "Профиль 28",
+							"value" : "0x1025C0"
+						},
+						{
+							"name" : "Профиль 29",
+							"value" : "0x1025D0"
+						},
+						{
+							"name" : "Профиль 30",
+							"value" : "0x1025E0"
+						},
+						{
+							"name" : "Профиль 31",
+							"value" : "0x1025F0"
+						},
+						{
+							"name" : "Профиль 32",
+							"value" : "0x102600"
+						},
+						{
+							"name" : "Профиль 33",
+							"value" : "0x102610"
+						},
+						{
+							"name" : "Профиль 34",
+							"value" : "0x102620"
+						},
+						{
+							"name" : "Профиль 35",
+							"value" : "0x102630"
+						},
+						{
+							"name" : "Профиль 36",
+							"value" : "0x102640"
+						},
+						{
+							"name" : "Профиль 37",
+							"value" : "0x102650"
+						},
+						{
+							"name" : "Профиль 38",
+							"value" : "0x102660"
+						},
+						{
+							"name" : "Профиль 39",
+							"value" : "0x102670"
+						},
+						{
+							"name" : "Профиль 40",
+							"value" : "0x102680"
+						},
+						{
+							"name" : "Профиль 41",
+							"value" : "0x102690"
+						},
+						{
+							"name" : "Профиль 42",
+							"value" : "0x1026A0"
+						},
+						{
+							"name" : "Профиль 43",
+							"value" : "0x1026B0"
+						},
+						{
+							"name" : "Профиль 44",
+							"value" : "0x1026C0"
+						},
+						{
+							"name" : "Профиль 45",
+							"value" : "0x1026D0"
+						},
+						{
+							"name" : "Профиль 46",
+							"value" : "0x1026E0"
+						},
+						{
+							"name" : "Профиль 47",
+							"value" : "0x1026F0"
+						},
+						{
+							"name" : "Профиль 48",
+							"value" : "0x102700"
+						},
+						{
+							"name" : "Профиль 49",
+							"value" : "0x102710"
+						},
+						{
+							"name" : "Профиль 50",
+							"value" : "0x102720"
+						},
+						{
+							"name" : "Профиль 51",
+							"value" : "0x102730"
+						},
+						{
+							"name" : "Профиль 52",
+							"value" : "0x102740"
+						},
+						{
+							"name" : "Профиль 53",
+							"value" : "0x102750"
+						},
+						{
+							"name" : "Профиль 54",
+							"value" : "0x102760"
+						},
+						{
+							"name" : "Профиль 55",
+							"value" : "0x102770"
+						},
+						{
+							"name" : "Профиль 56",
+							"value" : "0x102780"
+						},
+						{
+							"name" : "Профиль 57",
+							"value" : "0x102790"
+						},
+						{
+							"name" : "Профиль 58",
+							"value" : "0x1027A0"
+						},
+						{
+							"name" : "Профиль 59",
+							"value" : "0x1027B0"
+						},
+						{
+							"name" : "Профиль 60",
+							"value" : "0x1027C0"
+						},
+						{
+							"name" : "Профиль 61",
+							"value" : "0x1027D0"
+						},
+						{
+							"name" : "Профиль 62",
+							"value" : "0x1027E0"
+						},
+						{
+							"name" : "Профиль 63",
+							"value" : "0x1027F0"
+						}
+					]
+				}
+			]
+        }
+	]
+}

@@ -1,0 +1,480 @@
+{
+    "header" : {
+        "name" : "AD9912",
+		"description" : "1 GSPS(up to 400 MHz analog output), 14-bit DDS",
+        "version" : "1.0",
+        "register_size" : 16,
+        "isMSB" : true
+    },
+	
+    "registers" : [
+		{
+			"name" : "Register update",
+			"size" : 24,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 8,
+					"size" : 16,
+					"value" : "0x0005",
+					"description"  : "Set write mode I15=0, I14:I13=00(1 byte) and  I12:I0 reg address."
+				},
+				{
+					"name" : "Update Mirrored regs",
+					"position" : 0,
+					"size" : 8,
+					"value" : 1,
+					"description"  : "Software access to the register update pin function. Writing a 1 to this bit is identical to performing an I/O update."
+				}
+			]
+		},
+		
+		{
+			"name" : "PWD and EN",
+			"size" : 24,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 8,
+					"size" : 16,
+					"value" : "0x0010",
+					"description"  : "Set write mode I15=0, I14:I13=00(1 byte) and  I12:I0 reg address."
+				}
+			],
+				
+			"bits" : [
+				{
+					"name" : "PD HSTL driver",
+					"position" : 7,
+					"description" : "Powers down HSTL output driver.\n1 = HSTL driver powered down."
+				},
+				{
+					"name" : "Enable CMOS driver",
+					"position" : 6,
+					"description" : "Powers up CMOS output driver.\n1 = CMOS driver on."
+				},
+				{
+					"name" : "Enable output doubler",
+					"position" : 5,
+					"description" : "Powers up output clock generator doubler. Output doubler must still be enabled in Register 0x0200."
+				},
+				{
+					"name" : "PD SYSCLK PLL",
+					"position" : 4,
+					"description" : "System clock multiplier power-down.\n1 = system clock multiplier powered down.\nIf the S4 pin is tied high at power-up or reset, this bit is set,\nand the default value for Register 0x0010 is D0, not C0."
+				},
+				{
+					"name" : "Full PD",
+					"position" : 1,
+					"description" : "Setting this bit is identical to activating the PD pin and puts all blocks\n(except serial port) into power-down mode. SYSCLK is turned off."
+				},
+				{
+					"name" : "Digital PD",
+					"position" : 0,
+					"description" : "Removes clock from most of digital section; leave serial port usable.\nIn contrast to full PD, setting this bit does not debias inputs, allowing for quick wake-up."
+				}
+            ]
+		},
+		
+		{
+			"name" : "RESET",
+			"size" : 32,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 16,
+					"size" : 16,
+					"value" : "0x2013",
+					"description"  : "Set write mode I15=0, I14:I13=01(2 bytes) and  I12:I0 reg address."
+				}
+			],
+				
+			"bits" : [
+				{
+                    "name" : "PD fund DDS",
+                    "position" : 15,
+					"description" : "Setting this bit powers down the DDS fundamental output but not the spurs.\nIt is used during tuning of the SpurKiller circuit."
+				},
+				{
+                    "name" : "S-div/2 reset",
+                    "position" : 11,
+					"description" : "Asynchronous reset for S prescaler."
+				},
+				{
+                    "name" : "S-divider reset",
+                    "position" : 9,
+					"description" : "Synchronous (to S-divider prescaler output) reset for integer divider."
+				},
+				{
+                    "name" : "DDS reset",
+                    "position" : 0,
+					"description" : "Reset of the direct digital synthesis block. Reset of this block is very seldom needed."
+				}
+            ]
+		},
+		
+		{
+			"name" : "N-divider",
+			"size" : 24,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 8,
+					"size" : 16,
+					"value" : "0x0020",
+					"description"  : "Set write mode I15=0, I14:I13=00(1 byte) and  I12:I0 reg address."
+				}
+			],
+				
+			"integers" : [
+                {
+                    "name" : "N-divider",
+                    "position" : 0,
+                    "size"   : 5,
+					"description"  : "These bits set the feedback divider for system clock PLL.\nThere is a fixed divide-by-2 preceding this block, as well as an offset of 2 added to this value.\nTherefore, setting this register to 00000 translates to an overall feedback divider ratio of 4."
+                }
+            ]
+		},
+		
+		{
+			"name" : "PLL Parameters",
+			"size" : 24,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 8,
+					"size" : 16,
+					"value" : "0x0022",
+					"description"  : "Set write mode I15=0, I14:I13=00(1 byte) and  I12:I0 reg address."
+				}
+			],
+			"bits" : [
+				{
+					"name" : "VCO auto range",
+					"position" : 7,
+					"description" : "Automatic VCO range selection. Enabling this bit allows Bit 2 of this register to be set automatically."
+				},
+				{
+					"name" : "2× reference",
+					"position" : 3,
+					"description" : "Enables a frequency doubler prior to the SYSCLK PLL\nand can be useful in reducing jitter induced by the SYSCLK PLL."
+				},
+				{
+					"name" : "VCO range",
+					"position" : 2,
+					"description" : "Selects low range or high range VCO.\n0 = low range (700 MHz to 810 MHz).\n1 = high range (900 MHz to 1000 MHz). For system clock settings between 810 MHz and 900 MHz,\nuse the VCO auto range (Bit 7) to set the correct VCO range automatically."
+				}
+			],
+			"variant_lists" : [
+				{
+					"name" : "Charge pump current.",
+					"position" : 0,
+					"size"   : 2,
+					"description" : "Charge pump current.",
+					"default_value" : 0,
+					"variants" : [
+						{
+							"name" : "250 μA",
+							"value" : 0
+						},
+						{
+							"name" : "375 μA",
+							"value" : 1
+						},
+						{
+							"name" : "off",
+							"value" : 2
+						},
+						{
+							"name" : "125 μA",
+							"value" : 3
+						}
+					]
+				}
+			]
+		},
+		
+		{
+			"name" : "S-Divider",
+			"size" : 40,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 24,
+					"size" : 16,
+					"value" : "0x4106",
+					"description"  : "Set write mode I15=0, I14:I13=10(3 bytes) and  I12:I0 reg address."
+				}
+			],
+				
+			"integers" : [
+                {
+                    "name" : "S-divider",
+                    "position" : 0,
+                    "size"   : 16,
+					"valueFrom"    : 1,
+                    "valueTo"      : 65536,
+					"default_value": 1,
+					"description"  : "CMOS output divider. Divide ratio = 1 − 65,536. If the desired S-divider setting is greater than 65,536,\nor if the signal on FDBK_IN is greater than 400 MHz, then Bit 0 in Register 0x0106 must be set.\nNote that the actual S-divider is the value in this register plus 1."
+                }
+            ],
+				
+			"bits" : [
+				{
+                    "name" : "Falling edge triggered",
+                    "position" : 23,
+					"description" : "Setting this bit inverts the reference clock before S-divider."
+				},
+				{
+                    "name" : "S-divider/2",
+                    "position" : 16,
+					"description" : "Setting this bit enables an additional /2 prescaler.\nSee the CMOS Output Divider (S-Divider) section.\nIf the desired S-divider setting is greater than 65,536,\nor if the signal on FDBK_IN is greater than 400 MHz, this bit must be set."
+				}
+            ]
+		},
+		{
+			"name" : "FTW0",
+			"size" : 64,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 48,
+					"size" : 16,
+					"value" : "0x61AB",
+					"description"  : "Set write mode I15=0, I14:I13=11(stream) and  I12:I0 reg address."
+				}
+			],
+				
+			"integers" : [
+                {
+                    "name" : "Frequency Tuning Word",
+                    "position" : 0,
+                    "size"   : 48,
+					"description"  : "These registers contain the FTW (frequency tuning word) for the DDS.\nThe FTW determines the ratio of the AD9912 output frequency to its DAC system clock."
+                }
+            ]
+		},
+		
+		{
+			"name" : "DDS phase word",
+			"size" : 32,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 16,
+					"size" : 16,
+					"value" : "0x21AD",
+					"description"  : "Set write mode I15=0, I14:I13=01(2 bytes) and  I12:I0 reg address."
+				}
+			],
+				
+			"integers" : [
+                {
+                    "name" : "DDS phase word",
+                    "position" : 0,
+                    "size"   : 16,
+					"description"  : "Allows the user to vary the phase of the DDS output.\nSee the Direct Digital Synthesizer section."
+                }
+            ]
+		},
+		
+		{
+			"name" : "HSTL Driver",
+			"size" : 24,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 8,
+					"size" : 16,
+					"value" : "0x0200",
+					"description"  : "Set write mode I15=0, I14:I13=00(1 byte) and  I12:I0 reg address."
+				}
+			],
+				
+			"bits" : [
+				{
+					"name" : "OPOL",
+					"position" : 4,
+					"description" : "Output polarity. Setting this bit inverts the HSTL driver output polarity."
+				}
+            ],
+			"variant_lists" : [
+				{
+					"name" : "HSTL output doubler.",
+					"position" : 0,
+					"size"   : 2,
+					"description" : "HSTL output doubler.",
+					"default_value" : 1,
+					"variants" : [
+						{
+							"name" : "doubler disabled.",
+							"value" : 1
+						},
+						{
+							"name" : "doubler enabled.",
+							"value" : 2
+						}
+					]
+				}
+			]
+		},
+		
+		{
+			"name" : "CMOS Driver",
+			"size" : 24,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 8,
+					"size" : 16,
+					"value" : "0x0201",
+					"description"  : "Set write mode I15=0, I14:I13=00(1 byte) and  I12:I0 reg address."
+				}
+			],
+				
+			"bits" : [
+				{
+					"name" : "CMOS mux",
+					"position" : 0,
+					"description" : "This bit allows the user to select whether the CMOS driver output is divided by the S-divider.\n0 = S-divider input sent to CMOS driver.\n1 = S-divider output sent to CMOS driver."
+				}
+            ]
+		},
+		
+		{
+			"name" : "DAC full-scale current",
+			"size" : 32,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 16,
+					"size" : 16,
+					"value" : "0x240C",
+					"description"  : "Set write mode I15=0, I14:I13=01(2 bytes) and  I12:I0 reg address."
+				}
+			],
+				
+			"integers" : [
+                {
+                    "name" : "DDS phase word",
+                    "position" : 0,
+                    "size"   : 10,
+					"description"  : "Allows the user to vary the phase of the DDS output.\nSee the Direct Digital Synthesizer section."
+                }
+            ]
+		},
+		{
+			"name" : "Spur A",
+			"size" : 48,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 32,
+					"size" : 16,
+					"value" : "0x6504",
+					"description"  : "Set write mode I15=0, I14:I13=11(stream) and  I12:I0 reg address."
+				}
+			],
+				
+			"integers" : [
+				{
+                    "name" : "Spur A harmonic",
+                    "position" : 0,
+                    "size"   : 4,
+					"valueFrom"    : 1,
+                    "valueTo"      : 15,
+					"default_value": 1,
+					"description"  : "Spur A Harmonic 1 to Spur A Harmonic 15.\nAllows user to choose which harmonic to eliminate."
+                },
+                {
+                    "name" : "Spur A magnitude",
+                    "position" : 8,
+                    "size"   : 8,
+					"description"  : "Linear multiplier for Spur A magnitude."
+                },
+				{
+                    "name" : "Spur A phase",
+                    "position" : 16,
+                    "size"   : 9,
+					"description"  : "Linear offset for Spur A phase."
+                }
+            ],
+				
+			"bits" : [
+				{
+					"name" : "HSR-A enable",
+					"position" : 7,
+					"description" : "Harmonic Spur Reduction A enable."
+				},
+				{
+					"name" : "Amplitude gain × 2",
+					"position" : 6,
+					"description" : "Setting this bit doubles the gain of the cancelling circuit and also doubles the minimum step size."
+				}
+            ]
+		},
+		{
+			"name" : "Spur B",
+			"size" : 48,
+			
+			"fixed" :[
+				{
+					"name" : "Instruction",
+					"position" : 32,
+					"size" : 16,
+					"value" : "0x6509",
+					"description"  : "Set write mode I15=0, I14:I13=11(stream) and  I12:I0 reg address."
+				}
+			],
+				
+			"integers" : [
+				{
+                    "name" : "Spur B harmonic",
+                    "position" : 0,
+                    "size"   : 4,
+					"valueFrom"    : 1,
+                    "valueTo"      : 15,
+					"default_value": 1,
+					"description"  : "Spur B Harmonic 1 to Spur B Harmonic 15.\nAllows user to choose which harmonic to eliminate."
+                },
+                {
+                    "name" : "Spur B magnitude",
+                    "position" : 8,
+                    "size"   : 8,
+					"description"  : "Linear multiplier for Spur B magnitude."
+                },
+				{
+                    "name" : "Spur B phase",
+                    "position" : 16,
+                    "size"   : 9,
+					"description"  : "Linear offset for Spur B phase."
+                }
+            ],
+				
+			"bits" : [
+				{
+					"name" : "HSR-B enable",
+					"position" : 7,
+					"description" : "Harmonic Spur Reduction B enable."
+				},
+				{
+					"name" : "Amplitude gain × 2",
+					"position" : 6,
+					"description" : "Setting this bit doubles the gain of the cancelling circuit and also doubles the minimum step size."
+				}
+            ]
+		}
+	]
+}

@@ -1,0 +1,902 @@
+{
+    "header" : {
+        "name" : "AD9910",
+		"description" : "1 GSPS(up to 400 MHz analog output), 14-bit DDS",
+        "version" : "1.0",
+        "register_size" : 40,
+        "isMSB" : true
+    },
+    "registers" : [
+        {
+            "name" : "CFR1",
+			"size" : 40,
+			
+			"variant_lists" : [
+                {
+                    "name" : "RAM playback dst",
+					"position" : 29,
+                    "size"   : 2,
+					"description" : "RAM playback destination",
+					"default_value" : 0,
+					"variants" : [
+						{
+							"name" : "Frequency",
+							"value" : 0
+						},
+						{
+							"name" : "Phase",
+							"value" : 1
+						},
+						{
+							"name" : "Amplitude",
+							"value" : 2
+						},
+						{
+							"name" : "Polar (phase and amplitude)",
+							"value" : 3
+						}
+					]
+                },
+				{
+                    "name" : "Internal profile control",
+					"position" : 17,
+                    "size"   : 4,
+					"description" : "Ineffective unless CFR1[31] = 1. These bits are effective without the need for an I/O update.",
+					"default_value" : 0,
+					"variants" : [
+						{
+							"name" : "Internal profile control disabled.",
+							"value" : 0
+						},
+						{
+							"name" : "Execute Profile 0, then Profile 1, then halt.",
+							"value" : 1
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 2, then halt.",
+							"value" : 2
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 3, then halt.",
+							"value" : 3
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 4, then halt.",
+							"value" : 4
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 5, then halt.",
+							"value" : 5
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 6, then halt.",
+							"value" : 6
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 7, then halt.",
+							"value" : 7
+						},
+						{
+							"name" : "Execute Profile 0, then Profile 1, continuously.",
+							"value" : 8
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 2, continuously.",
+							"value" : 9
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 3, continuously.",
+							"value" : 10
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 4, continuously.",
+							"value" : 11
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 5, continuously.",
+							"value" : 12
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 6, continuously.",
+							"value" : 13
+						},
+						{
+							"name" : "Execute Profile 0 to Profile 7, continuously.",
+							"value" : 14
+						}
+					]
+                }
+            ],
+			
+            "bits" : [
+				{
+                    "name" : "RAM enable",
+                    "position" : 31,
+					"description" : "0 = disables RAM functionality (default).\n1 = enables RAM functionality (required for both load/retrieve and playback operation)."
+				},
+				{
+                    "name" : "Manual OSK external control",
+                    "position" : 23,
+					"description" : "Ineffective unless CFR1[9:8] = 10b.\n0 = OSK pin inoperative (default).\n1 = OSK pin enabled for manual OSK control (see Output Shift Keying (OSK)\n section for details)."
+				},
+				{
+                    "name" : "Inverse sinc filter enable",
+                    "position" : 22,
+					"description" : "0 = inverse sinc filter bypassed (default).\n1 = inverse sinc filter active."
+				},
+				{
+                    "name" : "Select DDS sine output",
+                    "position" : 16,
+					"description" : "0 = cosine output of the DDS is selected (default).\n1 = sine output of the DDS is selected."
+				},
+				{
+                    "name" : "Load LRR @ I/O update",
+                    "position" : 15,
+					"description" : "Ineffective unless CFR2[19] = 1.\n0 = normal operation of the digital ramp timer (default).\n1 = digital ramp timer loaded any time I/O_UPDATE is asserted\n or a PROFILE[2:0] change occurs."
+				},
+				{
+                    "name" : "Autoclear digital ramp accumulator",
+                    "position" : 14,
+					"description" : "0 = normal operation of the DRG accumulator (default).\n1 = the ramp accumulator is reset for one cycle of the DDS clock after which the accumulator\n automatically resumes normal operation. As long as this bit remains set, the ramp\naccumulator is momentarily reset each time an I/O_UPDATE is asserted or a PROFILE[2:0]\nchange occurs. This bit is synchronized with either an I/O _UPDATE or a PROFILE[2:0]\nchange and the next rising edge of SYNC_CLK."
+				},
+				{
+                    "name" : "Autoclear phase accumulator",
+                    "position" : 13,
+					"description" : "0 = normal operation of the DDS phase accumulator (default).\n1 = synchronously resets the DDS phase accumulator anytime I/O_UPDATE is asserted or a \nprofile change occurs."
+				},
+				{
+                    "name" : "Clear digital ramp accumulator",
+                    "position" : 12,
+					"description" : "0 = normal operation of the DRG accumulator (default).\n1 = asynchronous, static reset of the DRG accumulator. The ramp accumulator remains reset\nas long as this bit remains set. This bit is synchronized with either an I/O_UPDATE or a\nPROFILE[2:0] change and the next rising edge of SYNC_CLK."
+				},
+				{
+                    "name" : "Clear phase accumulator",
+                    "position" : 11,
+					"description" : "0 = normal operation of the DDS phase accumulator (default).\n1 = asynchronous, static reset of the DDS phase accumulator."
+				},
+				{
+                    "name" : "Load ARR @ I/O update",
+                    "position" : 10,
+					"description" : "Ineffective unless CFR1[9:8] = 11b.\n0 = normal operation of the OSK amplitude ramp rate timer (default).\n1 = OSK amplitude ramp rate timer reloaded anytime I/O_UPDATE is asserted or a\nPROFILE[2:0] change occurs."
+				},
+				{
+                    "name" : "OSK enable",
+                    "position" : 9,
+					"description" : "The output shift keying enable bit.\n0 = OSK disabled (default).\n1 = OSK enabled."
+				},
+				{
+                    "name" : "Select auto OSK",
+                    "position" : 8,
+					"description" : "Ineffective unless CFR1[9] = 1.\n0 = manual OSK enabled (default).\n1 = automatic OSK enabled."
+				},
+				{
+                    "name" : "Digital power-down",
+                    "position" : 7,
+					"description" : "This bit is effective without the need for an I/O update.\n0 = clock signals to the digital core are active (default).\n1 = clock signals to the digital core are disabled."
+				},
+				{
+                    "name" : "DAC power-down",
+                    "position" : 6,
+					"description" : "0 = DAC clock signals and bias circuits are active (default).\n1 = DAC clock signals and bias circuits are disabled."
+				},
+				{
+                    "name" : "REFCLK input power-down",
+                    "position" : 5,
+					"description" : " This bit is effective without the need for an I/O update.\n0 = REFCLK input circuits and PLL are active (default).\n1 = REFCLK input circuits and PLL are disabled."
+				},
+				{
+                    "name" : "AUX DAC power-down",
+                    "position" : 4,
+					"description" : "0 = auxiliary DAC clock signals and bias circuits are active (default).\n1 = auxiliary DAC clock signals and bias circuits are disabled."
+				},
+			    {
+                    "name" : "Ext. power-down",
+                    "position" : 3,
+					"description" : "0 = assertion of the EXT_PWR_DWN pin affects full power-down (default).\n1 = assertion of the EXT_PWR_DWN pin affects fast recovery power-down."
+				},
+				
+			    {
+                    "name" : "SDIO input only",
+                    "position" : 1,
+					"description" : "0 = configures the SDIO pin for bidirectional operation; 2-wire serial programming mode(default).\n1 = configures the serial data I/O pin (SDIO) as an input only pin; 3-wire serial programming mode"
+                },
+				
+                {
+                    "name" : "LSB first",
+                    "position" : 0,
+					"description" : "0 = configures the serial I/O port for MSB-first format (default).\n1 = configures the serial I/O port for LSB-first format."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 0,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+		
+		
+        {
+            "name" : "CFR2",
+			"size" : 40,
+			
+			"variant_lists" : [
+                {
+                    "name" : "Digital Ramp Destination",
+					"position" : 20,
+                    "size"   : 2,
+					"description" : "Digital Ramp Destination",
+					"default_value" : 0,
+					"variants" : [
+						{
+							"name" : "Frequency",
+							"value" : 0
+						},
+						{
+							"name" : "Phase",
+							"value" : 1
+						},
+						{
+							"name" : "Amplitude",
+							"value" : 2
+						}
+					]
+                },
+				{
+                    "name" : "I/O update rate control ",
+					"position" : 14,
+                    "size"   : 2,
+					"description" : "Ineffective unless CFR2[23] = 1. Sets the prescale ratio of the divider that\nclocks the auto I/O update timer",
+					"default_value" : 0,
+					"variants" : [
+						{
+							"name" : "divide-by-1",
+							"value" : 0
+						},
+						{
+							"name" : "divide-by-2",
+							"value" : 1
+						},
+						{
+							"name" : "divide-by-4",
+							"value" : 2
+						},
+						{
+							"name" : "divide-by-8",
+							"value" : 3
+						}
+					]
+                }
+            ],
+			
+			"bits" : [
+				{
+                    "name" : "Enable amplitude scale from single tone profiles",
+                    "position" : 24,
+					"description" : "Ineffective if CFR2[19 ] = 1 or CFR1[31] = 1 or CFR1[9] = 1.\n0 = the amplitude scaler is bypassed and shut down for power conservation (default).\n1 = the amplitude is scaled by the ASF from the active profile."
+                },
+				{
+                    "name" : "Internal I/O update active",
+                    "position" : 23,
+					"description" : "This bit is effective without the need for an I/O update.\n0 = serial I/O programming is synchronized with the external assertion of the\nI/O_UPDATE pin, which is configured as an input pin (default).\n1 = serial I/O programming is synchronized with an internally generated I/O\nupdate signal (the internally generated\nsignal appears at the I/O_UPDATE pin, which is configured as an output pin)."
+                },
+				{
+                    "name" : "SYNC_CLK enable",
+                    "position" : 22,
+					"default_value" : true,
+					"description" : "0 = the SYNC_CLK pin is disabled; static Logic 0 output.\n1 = the SYNC_CLK pin generates a clock signal at ¼ fSYSCLK; used for synchronization of the serial I/O port (default)."
+                },
+				{
+                    "name" : "Digital ramp enable",
+                    "position" : 19,
+					"description" : "0 = disables digital ramp generator functionality (default).\n1 = enables digital ramp generator functionality."
+                },
+				{
+                    "name" : "Digital ramp no-dwell high",
+                    "position" : 18,
+					"description" : "See the Digital Ramp Generator (DRG) section for details.\n0 = disables no-dwell high functionality (default).\n1 = enables no-dwell high functionality."
+                },
+				{
+                    "name" : "Digital ramp no-dwell low",
+                    "position" : 17,
+					"description" : "See the Digital Ramp Generator (DRG) section for details.\n0 = disables no-dwell low functionality (default).\n1 = enables no-dwell low functionality."
+                },
+				{
+                    "name" : "Read effective FTW",
+                    "position" : 16,
+					"description" : "0 = a serial I/O port read operation of the FTW register reports the contents of the FTW register (default).\n1 = a serial I/O port read operation of the FTW register reports the actual 32-bit word appearing at the input to the DDS phase accumulator."
+                },
+				{
+                    "name" : "PDCLK enable",
+                    "position" : 11,
+					"default_value" : true,
+					"description" : "0 = the PDCLK pin is disabled and forced to a static Logic 0 state; the internal clock signal continues to operate and provide timing to the data assembler.\n1 = the internal PDCLK signal appears at the PDCLK pin (default)."
+                },
+				{
+                    "name" : "PDCLK invert",
+                    "position" : 10,
+					"description" : "0 = normal PDCLK polarity; Q-data associated with Logic 1, I-data with Logic 0 (default).\n1 = inverted PDCLK polarity."
+                },
+				{
+                    "name" : "TxEnable invert",
+                    "position" : 9,
+					"description" : "0 = no inversion.\n1 = inversion."
+                },
+				{
+                    "name" : "Matched latency enable",
+                    "position" : 7,
+					"description" : "0 = simultaneous application of amplitude, phase, and frequency changes to the DDS\narrive at the output in the order listed (default).\n1 = simultaneous application of amplitude, phase, and frequency changes to the DDS\narrive at the output simultaneously."
+                },
+			    {
+                    "name" : "Data assembler hold last value",
+                    "position" : 6,
+					"description" : "Ineffective unless CFR2[4] = 1.\n0 = the data assembler of the parallel data port internally forces zeros on the data path\nand ignores the signals on the D[15:0] and F[1:0] pins while the TxENABLE pin is Logic 0\n(default). This implies that the destination of the data at the parallel data port is\namplitude when TxENABLE is Logic 0.\n1 = the data assembler of the parallel data port internally forces the last value received\non the D[15:0] and F[1:0] pins while the TxENABLE pin is Logic 1."
+                },
+				
+			    {
+                    "name" : "Sync timing validation disable",
+                    "position" : 5,
+					"description" : "0 = enables the SYNC_SMP_ERR pin to indicate (active high) detection\nof a synchronization pulse sampling error.\n1 = the SYNC_SMP_ERR pin is forced to a static Logic 0 condition (default)."
+                },
+				
+                {
+                    "name" : "Parallel data port enable",
+                    "position" : 4,
+					"description" : "See the Parallel Data Port Modulation Mode section for more details.\n0 = disables parallel data port modulation functionality (default).\n1 = enables parallel data port modulation functionality. "
+                }
+            ],
+			
+			"integers" : [
+                {
+                    "name" : "FM gain",
+                    "position" : 0,
+                    "size"   : 4,
+					"description"  : "The FM gain word allows the user to apply a weighting factor to the 16-bit data-word."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 1,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+		
+		
+		{
+            "name" : "CFR3",
+			"size" : 40,
+			
+			 "bits" : [
+				{
+                    "name" : "REFCLK input divider bypass",
+                    "position" : 15,
+					"description" : "0 = input divider is selected (default).\n1 = input divider is bypassed."
+                },
+				{
+                    "name" : "REFCLK input divider ResetB",
+                    "position" : 14,
+					"default_value" : true,
+					"description" : " 0 = input divider is reset.\n1 = input divider operates normally (default)."
+                },
+			    {
+                    "name" : "PFD reset",
+                    "position" : 10,
+					"description" : "0 = normal operation (default).\n1 = phase detector disabled. "
+                },
+			    {
+                    "name" : "PLL enable",
+                    "position" : 8,
+					"description" : "0 = REFCLK PLL bypassed (default).\n1 = REFCLK PLL enabled."
+                }
+			],
+			
+			"variant_lists" : [
+				{
+                    "name" : "DRV0",
+					"position" : 28,
+                    "size"   : 2,
+					"description" : "Controls the REFCLK_OUT pin.",
+					"default_value" : 1,
+					"variants" : [
+						{
+							"name" : "Disabled (tristate)",
+							"value" : 0
+						},
+						{
+							"name" : "Low output current",
+							"value" : 1
+						},
+						{
+							"name" : "Medium output current",
+							"value" : 2
+						}
+						,
+						{
+							"name" : "High output current",
+							"value" : 3
+						}
+					]
+                },
+				{
+                    "name" : "VCO SEL",
+					"position" : 24,
+                    "size"   : 3,
+					"description" : "Selects the frequency band of the REFCLK PLL VCO.",
+					"default_value" : 6,
+					"variants" : [
+						{
+							"name" : "VCO0",
+							"value" : 0
+						},
+						{
+							"name" : "VCO1",
+							"value" : 1
+						},
+						{
+							"name" : "VCO2",
+							"value" : 2
+						},
+						{
+							"name" : "VCO3",
+							"value" : 3
+						},
+						{
+							"name" : "VCO4",
+							"value" : 4
+						},
+						{
+							"name" : "VCO5",
+							"value" : 5
+						},
+						{
+							"name" : "PLL bypassed",
+							"value" : 6
+						}
+						,
+						{
+							"name" : "PLL bypassed",
+							"value" : 7
+						}
+					]
+                },
+                {
+                    "name" : "Icp",
+					"position" : 19,
+                    "size"   : 3,
+					"description" : "Selects the charge pump current in the REFCLK PLL.",
+					"default_value" : 7,
+					"variants" : [
+						{
+							"name" : "212 uA",
+							"value" : 0
+						},
+						{
+							"name" : "237 uA",
+							"value" : 1
+						},
+						{
+							"name" : "262 uA",
+							"value" : 2
+						},
+						{
+							"name" : "287 uA",
+							"value" : 3
+						},
+						{
+							"name" : "312 uA",
+							"value" : 4
+						},
+						{
+							"name" : "337 uA",
+							"value" : 5
+						},
+						{
+							"name" : "363 uA",
+							"value" : 6
+						}
+						,
+						{
+							"name" : "387 uA",
+							"value" : 7
+						}
+					]
+                }
+            ],
+			
+            "integers" : [
+                {
+                    "name" : "MOD2",
+                    "position" : 1,
+                    "size"   : 7,
+					"description"  : "This 7-bit number is the divide modulus of the REFCLK PLL feedback divider."
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 2,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+		
+		{
+            "name" : "AUX DAC",
+			"size" : 40,
+			
+            "integers" : [
+				{
+					"name" : "I/O update rate",
+					"position" : 0,
+					"size" : 7,
+					"default_value" : 127,
+					"description" : "This 8-bit number controls the full-scale output current of the main DAC."
+				}
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 3,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        }, 
+		
+		{
+            "name" : "I/O Update Rate",
+			"size" : 40,
+			
+            "integers" : [
+				{
+					"name" : "I/O update rate",
+					"position" : 0,
+					"size" : 32,
+					"default_value" : "0xFFFFFFFF",
+					"description" : "Ineffective unless CFR2[23] = 1. This 32-bit number controls the automatic I/O update\nrate (see the Automatic I/O Update section for details)."
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 4,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        }, 
+		
+		{
+            "name" : "FTW",
+			"size" : 40,
+			
+		
+			"integers" : [
+				{
+					"name" : "Frequency tuning word ",
+					"position" : 0,
+					"size" : 32,
+					"description" : "32-bit frequency tuning word.",
+					"scale" : {
+						"units" : "Гц",
+						"coefficient" : 0.2328306437080797
+					}
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 7,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+    
+		{
+            "name" : "POW",
+			"size" : 40,
+			
+			
+			"integers" : [
+				{
+					"name" : "Phase offset word",
+					"position" : 0,
+					"size" : 15,
+					"description" : "16-bit phase offset word."
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 8,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+		
+		{
+            "name" : "ASF",
+			"size" : 40,
+			
+            "integers" : [
+                {
+                    "name" : "Amplitude ramp rate",
+                    "position" : 16,
+                    "size"   : 16,
+					"description"  : "16-bit amplitude ramp rate value. Effective only if CFR1[9:8] = 11b."
+                },
+				{
+                    "name" : "Amplitude scale factor",
+                    "position" : 2,
+                    "size"   : 14,
+					"description"  : "14-bit amplitude scale factor."
+                }
+            ],
+			
+			"variant_lists" : [
+				{
+                    "name" : "Amplitude step size ",
+					"position" : 0,
+                    "size"   : 2,
+					"description" : "Effective only if CFR1[9:8] = 11b.",
+					"variants" : [
+						{
+							"name" : "1",
+							"value" : 0
+						},
+						{
+							"name" : "2",
+							"value" : 1
+						},
+						{
+							"name" : "4",
+							"value" : 2
+						},
+						{
+							"name" : "8",
+							"value" : 3
+						}
+					]
+                }
+			],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 9,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+		
+		{
+            "name" : "Multychip Sync",
+			"size" : 40,
+			
+			"bits" : [
+				{
+                    "name" : "Sync receiver enable",
+                    "position" : 27,
+					"description" : "0 = synchronization clock receiver disabled (default).\n1 = synchronization clock receiver enabled."
+                },
+				{
+                    "name" : "Sync generator enable",
+                    "position" : 26,
+					"description" : "0 = synchronization clock generator disabled (default).\n1 = synchronization clock generator enabled."
+                },
+			    {
+                    "name" : "Sync generator polarity",
+                    "position" : 25,
+					"description" : "0 = synchronization clock generator coincident with the rising edge of SYSCLK (default).\n1 = synchronization clock generator coincident with the falling edge of SYSCLK."
+                }
+			],
+			
+            "integers" : [
+				{
+                    "name" : "Sync validation delay",
+                    "position" : 28,
+                    "size"   : 4,
+					"description"  : "This 4-bit number sets the timing skew (in ~75ps increments) between SYSCLK and the\ndelayed SYNC_INx signal for the sync validation block in the sync receiver. ",
+					"scale" : {
+						"units" : "ps",
+						"coefficient" : 75,
+						"offset" : 0
+					}
+                },
+				{
+                    "name" : "Sync state preset value",
+                    "position" : 18,
+                    "size"   : 6,
+					"description"  : "This 6-bit number is the state that the internal clock generator assumes when it receives a sync pulse."
+                },
+                {
+                    "name" : "Output sync generator delay",
+                    "position" : 11,
+                    "size"   : 5,
+					"description"  : "This 5-bit number sets the output delay (in ~75 ps increments) of the sync generator.",
+					"scale" : {
+						"units" : "ps",
+						"coefficient" : 75,
+						"offset" : 0
+					}
+                },
+				{
+                    "name" : "Input sync receiver delay",
+                    "position" : 3,
+                    "size"   : 5,
+					"description"  : "This 5-bit number sets the input delay (in ~75 ps increments) of the sync receiver.",
+					"scale" : {
+						"units" : "ps",
+						"coefficient" : 75,
+						"offset" : 0
+					}
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 10,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+		
+		{
+            "name" : "Digital Ramp Limit",
+			"size" : 72,
+			
+		
+			"integers" : [
+				{
+					"name" : "Digital ramp upper limit",
+					"position" : 32,
+					"size" : 32,
+					"description" : "32-bit digital ramp upper limit value."
+				},
+				{
+					"name" : "Digital ramp lower limit",
+					"position" : 0,
+					"size" : 32,
+					"description" : "32-bit digital ramp lower limit value."
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 64,
+					"size" : 8,
+					"value" : 11,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+		
+		{
+            "name" : "Digital Ramp Step Size",
+			"size" : 72,
+			
+			
+			"integers" : [
+				{
+					"name" : "Digital ramp decrement step size",
+					"position" : 32,
+					"size" : 32,
+					"description" : "32-bit digital ramp decrement step size value."
+				},
+				{
+					"name" : "Digital ramp increment step size",
+					"position" : 0,
+					"size" : 32,
+					"description" : "32-bit digital ramp increment step size value."
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 64,
+					"size" : 8,
+					"value" : 12,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+		
+		{
+            "name" : "Digital Ramp Rate",
+			"size" : 40,
+					
+			"integers" : [
+				{
+					"name" : "Digital ramp negative slope rate",
+					"position" : 16,
+					"size" : 16,
+					"description" : "16-bit digital ramp negative slope value that defines the\n time interval between decrement values."
+				},
+				{
+					"name" : "Digital ramp positive slope rate",
+					"position" : 0,
+					"size" : 16,
+					"description" : "16-bit digital ramp positive slope value that defines the\n time interval between increment values.
+"
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 32,
+					"size" : 8,
+					"value" : 13,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        },
+		
+		{
+            "name" : "Single tone P1",
+			"size" : 72,
+					
+			"integers" : [
+				{
+					"name" : "Amplitude scale factor",
+					"position" : 48,
+					"size" : 14,
+					"description" : "This 14-bit number controls the DDS output amplitude."
+				},
+				{
+					"name" : "Phase offset word",
+					"position" : 32,
+					"size" : 16,
+					"description" : "This 16-bit number controls the DDS phase offset."
+				},
+				{
+					"name" : "Frequency tuning word",
+					"position" : 0,
+					"size" : 32,
+					"description" : "This 32-bit number controls the DDS frequency."
+				}
+			],
+			
+			"fixed" :[
+				{
+					"name" : "Intsruction word",
+                    "position" : 64,
+					"size" : 8,
+					"value" : 14,
+					"description"  : "D4-D0 - address, D7 - R/nW (0 - is write)"
+				}
+			]
+        }
+    
+		
+	]
+}

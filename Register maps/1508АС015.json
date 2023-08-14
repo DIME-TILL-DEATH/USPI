@@ -1,0 +1,360 @@
+{
+    "header" : {
+        "name" : "1508АС015",
+		"description" : "Синтезатор до 12ГГц",
+        "version" : "1.0",
+        "register_size" : 32,
+        "isMSB" : true
+    },
+    "registers" : [
+        {
+            "name" : "Регистр 1",
+			"size" : 32,
+			
+            "integers" : [
+                {
+                    "name" : "DREF",
+                    "position" : 0,
+                    "size"   : 14,
+					"valueFrom"    : 1,
+					"description"  : "Коэффициент деления опорной частоты"
+                },
+				{
+                    "name" : "DN",
+                    "position" : 14,
+                    "size"   : 15,
+					"description"  : "Величина динамической изменяемой добавки к целой части делителя \n основной частоты для реализации функции “предотвращение проскальзывания циклов"
+                }
+            ],
+			
+			"bits" : [
+			    {
+                    "name" : "ENCSP",
+                    "position" : 29,
+					"default_value": true,
+					"description" : "Сигнал включения функции «Предотвращение проскальзывания циклов»"
+                }
+			],
+			
+			"fixed" :[
+				{
+					"name" : "ADDR",
+                    "position" : 30,
+					"size" : 2,
+					"value" : 0,
+					"description"  : "Адрес регистра"
+				}
+			]
+        },
+		
+		
+        {
+            "name" : "Регистр 2",
+			"size" : 32,
+			
+			
+            "integers" : [
+				{
+                    "name" : "INT",
+                    "position" : 0,
+                    "size"   : 18,
+                    "valueFrom"    : 24,
+                    "valueTo"      :  262143,
+					"default_value": 48,
+					"description"  : "Целая часть коэффициента деления основной частоты"
+                },
+				{
+					"name" : "CPOFFSETP",
+                    "position" : 18,
+                    "size"   : 6,
+					"description"  : "Величина постоянной добавки к вытекающему току зарядно-разрядного блока",
+					"scale" : {
+						"units" : "мкА",
+						"coefficient" : 6.25
+					}
+				}
+				,
+				{
+					"name" : "CPOFFSETN",
+                    "position" : 24,
+                    "size"   : 6,
+					"description"  : "Величина постоянной добавки к втекающему току зарядно-разрядного блока",
+					"scale" : {
+						"units" : "мкА",
+						"coefficient" : 6.25
+					}
+				}
+						
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "ADDR",
+                    "position" : 30,
+					"size" : 2,
+					"value" : 1,
+					"description"  : "Адрес регистра"
+				}
+			]
+        },
+		
+		
+		{
+            "name" : "Регистр 3",
+			"size" : 32,
+			
+			 "bits" : [
+			    {
+                    "name" : "SELPRESC",
+                    "position" : 26,
+					"default_value": true,
+					"description" : "Выбор используемого прескалера",
+					"comment": "0 – прескалер 8/9\n1 – прескалер 4/5"
+                },
+				{
+                    "name" : "SELREF",
+                    "position" : 27,
+					"default_value": false,
+					"description" : "Выбор источника опорной частоты",
+					"comment": "0 – синус\n1 – прямоугольный сигнал"
+                },
+				{
+                    "name" : "SYNTMOD",
+                    "position" : 28,
+					"default_value": false,
+					"description" : "Режим работы синтезатора",
+					"comment": "0 – целочисленный\n1 – дробный"
+                },
+				{
+                    "name" : "PFDSIGN",
+                    "position" : 29,
+					"default_value": false,
+					"description" : "Выбор полярности сигналов фазового детектора",
+					"comment": "0 – прямая полярность\n1 – обратная полярность"
+                }
+				
+			],
+			
+            "integers" : [
+                {
+                    "name" : "FRAC",
+                    "position" : 0,
+                    "size"   : 26,
+					"description"  : "Числитель дробной части коэффициента деления основной частоты "
+                }
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "ADDR",
+                    "position" : 30,
+					"size" : 2,
+					"value" : 2,
+					"description"  : "Адрес регистра"
+				}
+			]
+        },
+		
+		{
+            "name" : "Регистр 4",
+			"size" : 32,
+			
+			"variant_lists" : [
+				{
+                    "name" : "LDPT",
+					"position" : 7,
+                    "size"   : 2,
+					"default_value": 0,
+					"description" : "Величина пороговой разности фаз входных сигналов фазового детектора, при которой детектируется захват петли ФАПЧ в дробном режиме",
+					"variants" : [
+						{
+							"name" : "4,5 нс",
+							"value" : 3
+						},
+						{
+							"name" : "5,5 нс",
+							"value" : 2
+						},
+						{
+							"name" : "8 нс",
+							"value" : 1
+						},
+						{
+							"name" : "35 нс",
+							"value" : 0
+						}
+					]
+                },
+				{
+					"name" : "Тест ЗРБ",
+					"position" : 11,
+                    "size" : 4,
+					"default_value" : 0,
+					"description" : "Выбор типа выходного сигнала на выводе MUXOUT",
+					"variants" : [
+						{
+							"name" : "Обычный режим",
+							"value" : 0
+						},
+						{
+							"name" : "Включение вытекающего тока ЗРБ",
+							"value" : 9
+						},
+						{
+							"name" : "Включение втекающего тока ЗРБ",
+							"value" : 6
+						},
+						{
+							"name" : "Включение втекающего и вытекающего\nтоков ЗРБ одновременно",
+							"value" : 5
+						},
+						{
+							"name" : "Выключение токов ЗРБ",
+							"value" : 10
+						}
+					]
+				},
+				{
+                    "name" : "SELMUX",
+					"position" : 26,
+                    "size" : 3,
+					"default_value" : 1,
+					"description" : "Выбор типа выходного сигнала на выводе MUXOUT",
+					"variants" : [
+						{
+							"name" : "выход делителя сигнала опорной частоты",
+							"value" : 0
+						},
+						{
+							"name" : "выход делителя сигнала основной частоты",
+							"value" : 1
+						},
+						{
+							"name" : "логическая 1",
+							"value" : 2
+						},
+						{
+							"name" : "логический 0",
+							"value" : 3
+						},
+
+						{
+							"name" : "выход сигнала детектора захвата",
+							"value" : 7
+						}
+					]
+                }
+			],
+			
+            "bits" : [
+				{
+                    "name" : "ENOFFSETCP",
+                    "position" : 9,
+					"default_value": false,
+					"description" : "Включение добавочного тока ЗРБ"
+				},
+				
+				{
+                    "name" : "ENBIAS",
+                    "position" : 15,
+					"default_value": true,
+					"description" : "Выбор режима работы зарядно-разрядного блока"
+				},
+				{
+                    "name" : "ENCP",
+                    "position" : 16,
+					"default_value": true,
+					"description" : "Выбор режима работы зарядно-разрядного блока"
+				},
+				{
+                    "name" : "ENHDIV",
+                    "position" : 17,
+					"default_value": true,
+					"description" : "Выбор режима работы делителя основной частоты"
+				},
+				{
+                    "name" : "ENLDO",
+                    "position" : 18,
+					"default_value": true,
+					"description" : "Выбор режима работы стабилизатора напряжения усилителя сигнала опорной частоты синусоидальной формы"
+				},
+				{
+                    "name" : "ENSIN",
+                    "position" : 19,
+					"default_value": true,
+					"description" : "Выбор режима работы усилителя сигнала опорной частоты синусоидальной формы"
+				},
+				{
+                    "name" : "ENSQ",
+                    "position" : 20,
+					"default_value": false,
+					"description" : "Выбор режима работы усилителя сигнала опорной частоты прямоугольной формы"
+				},
+				{
+                    "name" : "DSMSINEN",
+                    "position" : 21,
+					"default_value": false,
+					"description" : "Разрешение использования сигнала опорной частоты синусоидальной формы в качестве тактовой частоты дельта-сигма модулятора"
+				},
+				{
+                    "name" : "DSMSQEN",
+                    "position" : 22,
+					"default_value": false,
+					"description" : "Разрешение использования сигнала опорной частоты прямоугольной формы в качестве тактовой частоты дельта-сигма модулятора"
+				},
+				{
+                    "name" : "DSMCLKSET",
+                    "position" : 23,
+					"default_value": false,
+					"description" : "Выбор источника тактового сигнала дельта-сигма модулятора",
+					"comment": "0 – сигнал опорной частоты синусоидальной формы\n1 – сигнал опорной частоты прямоугольной формы"
+				},
+				{
+                    "name" : "ENREFDIV",
+                    "position" : 24,
+					"default_value": true,
+					"description" : "Выбор режима работы делителя опорной частоты"
+				},
+				{
+                    "name" : "DIVBP",
+                    "position" : 25,
+					"default_value": false,
+					"description" : "Разрешение прямого прохождения сигнала опорной частоты через делитель"
+				},
+				{
+                    "name" : "POWERDOWN",
+                    "position" : 29,
+					"default_value": false,
+					"description" : "Режим пониженного энергопотребления микросхемы"
+				}
+            ],
+			
+            "integers" : [
+				{
+					"name" : "ICP",
+					"position" : 0,
+					"size" : 5,
+					"default_value" : 31,
+					"description" : "Значение выходного тока зарядно-разрядного блока",
+					"scale": {
+                            "coefficient": 125,
+                            "exponent": 1,
+                            "offset1": 1,
+                            "offset2": 0,
+                            "units": "мкА"
+                    }
+				}
+            ],
+			
+			"fixed" :[
+				{
+					"name" : "ADDR",
+                    "position" : 30,
+					"size" : 2,
+					"value" : 3,
+					"description"  : "Адрес регистра"
+				}
+			]
+        }
+	]
+}
