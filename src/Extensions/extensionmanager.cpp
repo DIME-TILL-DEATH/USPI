@@ -121,13 +121,11 @@ void ExtensionManager::loadPlugin(PluginInfo &pluginInfo)
 
 void ExtensionManager::unloadPlugins()
 {
-//    foreach(PluginInfo* plugin, &m_loadedPlugInsInfo)
-//    {
-//        plugin->loader()->unload();
-////        delete plugin;
-//        m_loadedPlugInsInfo.pop
-//    }
-//    m_loadedPlugInsInfo.clear();
+    foreach(auto plugin, m_loadedPlugInsInfo)
+    {
+        plugin.loader()->unload();
+    }
+    m_loadedPlugInsInfo.clear();
 }
 
 

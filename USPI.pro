@@ -5,7 +5,7 @@ QT += widgets
 CONFIG += c++11
 
 
-VERSION = 0.5.0.1
+VERSION = 0.5.0.2
 
 SOURCES += \
         main.cpp \
