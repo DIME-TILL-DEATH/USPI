@@ -70,6 +70,7 @@ QString RegisterAdapter::registerType()
     {
         case DeviceType::DUT: return "DUT";
         case DeviceType::Controller: return "Controller";
+        default: return {};
     }
 }
 

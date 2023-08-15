@@ -16,8 +16,6 @@ bool SessionSaver::saveSession(const QString &filePath)
     QFile file(filePath);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        JsonWorker saver;
-
         QJsonObject jsonGlobalObject;
 
         jsonGlobalObject["devices"] = JsonWorker::saveDutList(m_deviceList);

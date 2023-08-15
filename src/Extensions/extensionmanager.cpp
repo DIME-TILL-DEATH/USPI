@@ -98,9 +98,8 @@ void ExtensionManager::loadPlugin(PluginInfo &pluginInfo)
         connect(this, SIGNAL(saveRequest(QString,QMap<QString,QString>&)),
                 dynamic_cast<QObject*>(plugin), SLOT(saveRequest(QString,QMap<QString,QString>&)));
 
-        connect(this, SIGNAL(loadRequest(QString, const QMap<QString,QString>&)),
-                dynamic_cast<QObject*>(plugin), SLOT(loadRequest(QString, const QMap<QString,QString>&)));
-
+        connect(this, SIGNAL(loadRequest(QString, QMap<QString,QString>)),
+                dynamic_cast<QObject*>(plugin), SLOT(loadRequest(QString, QMap<QString,QString>)));
 
         emit loadRequest(pluginInfo.name(), pluginInfo.settings());
     }

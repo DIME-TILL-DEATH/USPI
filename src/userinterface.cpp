@@ -151,7 +151,6 @@ void UserInterface::removeDevice(quint16 index)
     {
         if(pluginsList.at(i).targetDevice() == removedDevice)
         {
-            qInfo() << "Найден плагин к устройству";
             extensionManager.unloadPlugin(pluginsList.at(i));
             emit avaliablePluginsUpdated();
         }
