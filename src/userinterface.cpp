@@ -143,6 +143,20 @@ bool UserInterface::loadDevice(const QUrl &fileName)
 
 void UserInterface::removeDevice(quint16 index)
 {
+    DUTDevice* removedDevice = m_dutListModel.getDeviceByIndex(index).get();
+
+    std::vector<PluginInfo> pluginsList = extensionManager.loadedPlugInsInfo();
+
+    for(size_t i=0; i < pluginsList.size(); ++i)
+    {
+        if(pluginsList.at(i).targetDevice() == removedDevice)
+        {
+            qInfo() << "Найден плагин к устройству";
+            extensionManager.unloadPlugin(pluginsList.at(i));
+            emit avaliablePluginsUpdated();
+        }
+    }
+
     m_dutListModel.removeDutFromList(index);
 }
 

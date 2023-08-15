@@ -23,6 +23,8 @@ public:
     void addDutToList(DUTDevice* newDevice);
     void removeDutFromList(quint16 index);
 
+    std::shared_ptr<DUTDevice> getDeviceByIndex(quint16 index);
+
 public slots:
     void dutUpdated();
     void refreshModel();

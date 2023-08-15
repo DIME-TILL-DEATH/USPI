@@ -73,7 +73,7 @@ bool SessionSaver::loadSession(const QString &filePath)
         std::vector<PluginInfo> plugList;
 
         if(!JsonWorker::readPluginsArray(globalObject ,&plugList, &deviceReferenceList)) return false;
-        m_extensionManager->unloadPlugins();
+        m_extensionManager->unloadAllPlugins();
         m_extensionManager->loadPlugins(plugList);
 
         file.close();

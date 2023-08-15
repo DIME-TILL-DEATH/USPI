@@ -119,7 +119,17 @@ void ExtensionManager::loadPlugin(PluginInfo &pluginInfo)
     m_loadedPlugInsInfo.push_back(pluginInfo);
 }
 
-void ExtensionManager::unloadPlugins()
+void ExtensionManager::unloadPlugin(PluginInfo &pluginInfo)
+{
+    pluginInfo.loader()->unload();
+
+    DUTDevice* targetDevice = pluginInfo.targetDevice();
+    auto plugIt = std::find_if(m_loadedPlugInsInfo.begin(), m_loadedPlugInsInfo.end(), [targetDevice](PluginInfo seekPluginInfo)
+                                                                                         {return seekPluginInfo.targetDevice() == targetDevice;});
+    m_loadedPlugInsInfo.erase(plugIt);
+}
+
+void ExtensionManager::unloadAllPlugins()
 {
     foreach(auto plugin, m_loadedPlugInsInfo)
     {

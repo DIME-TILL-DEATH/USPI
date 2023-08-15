@@ -73,6 +73,17 @@ void DutListModel::removeDutFromList(quint16 index)
     emit dataChanged(createIndex(0, 0), createIndex(m_data->size(), 0));
 }
 
+std::shared_ptr<DUTDevice> DutListModel::getDeviceByIndex(quint16 index)
+{
+    if(index > m_data->size())
+    {
+            qWarning() << __FUNCTION__ << ": index is bigger than device list size";
+            return {};
+    }
+
+    return m_data->at(index);
+}
+
 void DutListModel::dutUpdated()
 {
     emit dataChanged(createIndex(0, 0), createIndex(m_data->size(), 0));

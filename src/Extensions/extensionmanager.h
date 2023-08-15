@@ -18,9 +18,11 @@ public:
     QStringList avaliablePlugIns();
     void loadPlugins(const std::vector<PluginInfo>& pluginsList);
     std::vector<PluginInfo> loadedPlugInsInfo();
-    void loadPlugin(PluginInfo &pluginInfo);
 
-    void unloadPlugins();
+    void loadPlugin(PluginInfo &pluginInfo);
+    void unloadPlugin(PluginInfo &pluginInfo);
+
+    void unloadAllPlugins();
 
 //    void runPlugin(const QString& pluginName);
     void runPlugin(quint16 number);
