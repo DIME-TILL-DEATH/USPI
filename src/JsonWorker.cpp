@@ -303,10 +303,20 @@ bool JsonWorker::readPluginsArray(QJsonObject globalObject, std::vector<PluginIn
                 qWarning() << QObject::tr("Error parsing json file. Plugin name not found!");
                 return false;
             }
+
             if(!parseFieldStringObject(pluginObject, "path", path, "", true))
             {
-                qWarning() << QObject::tr("Error parsing json file. Plugin path not found!");
-                return false;
+//                qWarning() << QObject::tr("Error parsing json file. Plugin path not found!");
+                qInfo() << QObject::tr("Plugin path not found. Using default 'plugins' folder");
+
+                QString filename;
+                if(!parseFieldStringObject(pluginObject, "filename", filename, "", true))
+                {
+                    qWarning() << QObject::tr("Error parsing json file. Plugin path not found!");
+                    return false;
+                }
+
+                path = "plugins/" + filename;
             }
             parseFieldStringObject(pluginObject, "description", description);
 
