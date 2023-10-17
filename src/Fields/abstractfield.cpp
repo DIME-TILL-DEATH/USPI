@@ -56,20 +56,23 @@ QByteArray AbstractField::shiftBitData(quint64 data)
 
     maskedData = maskedData << numBit;
 
-    QByteArray resultData(5, 0);
+    QByteArray resultData(8, 0);
 
-    char byteData[5];
+    char byteData[sizeof(quint64)];
 
     // дополнительно используется один байт для
     // возможности смещения поля на 8 бит
 
-    byteData[0] =   maskedData & 0x00000000ff;
-    byteData[1] = ( maskedData & 0x000000ff00 ) >> 8;
-    byteData[2] = ( maskedData & 0x0000ff0000 ) >> 16;
-    byteData[3] = ( maskedData & 0x00ff000000 ) >> 24;
-    byteData[4] = ( maskedData & 0xff00000000 ) >> 32;
+    byteData[0] =   maskedData & 0x00000000000000ff;
+    byteData[1] = ( maskedData & 0x000000000000ff00 ) >> 8;
+    byteData[2] = ( maskedData & 0x0000000000ff0000 ) >> 16;
+    byteData[3] = ( maskedData & 0x00000000ff000000 ) >> 24;
+    byteData[4] = ( maskedData & 0x000000ff00000000 ) >> 32;
+    byteData[5] = ( maskedData & 0x0000ff0000000000 ) >> 40;
+    byteData[6] = ( maskedData & 0x00ff000000000000 ) >> 48;
+    byteData[7] = ( maskedData & 0xff00000000000000 ) >> 56;
 
-    resultData.replace(0, 5, byteData, 5);
+    resultData.replace(0, 8, byteData, 8);
 
     return resultData;
 }

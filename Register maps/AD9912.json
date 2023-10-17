@@ -7,6 +7,19 @@
         "isMSB" : true
     },
 	
+		"plugins" : [
+		{
+			"name" : "Контрольная панель AD9912",
+			"filename" : "PluginAD9912.dll",
+			"path" : "D:/QTProjects/USPI_plugins/build-PluginAD9912-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/debug/PluginAD9912.dll",
+			"settings": {
+                "Синус_выходная_частота": "100e6",
+				"Синус_деление": "4",
+                "Синус_частота": "1000e6"
+            }
+		}
+	],
+	
     "registers" : [
 		{
 			"name" : "Register update",

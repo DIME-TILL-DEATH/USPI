@@ -8,7 +8,7 @@ QByteArray VariantListField::rawData(quint16 targetRegisterByteSize)
 
     QByteArray resultData(targetRegisterByteSize, 0);
 
-    resultData.replace(numByte, 5, shiftBitData(data));
+    resultData.replace(numByte, sizeof(quint64), shiftBitData(data));
     resultData.resize(targetRegisterByteSize);
 
     return resultData;
