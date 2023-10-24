@@ -160,21 +160,6 @@ void ExtensionManager::runPlugin(quint16 number)
     {
         qWarning() << tr("Could not cast: ") << m_loadedPlugInsInfo.at(number).name() << " : " << loader->fileName();
     }
-
-    // в примере определяют простым перебором вариантов:
-    //    if (plugin) {
-    //             auto iBrush = qobject_cast<BrushInterface *>(plugin);
-    //             if (iBrush)
-    //                 addItems(pluginItem, "BrushInterface", iBrush->brushes());
-
-    //             auto iShape = qobject_cast<ShapeInterface *>(plugin);
-    //             if (iShape)
-    //                 addItems(pluginItem, "ShapeInterface", iShape->shapes());
-
-    //             auto iFilter = qobject_cast<FilterInterface *>(plugin);
-    //             if (iFilter)
-    //                 addItems(pluginItem, "FilterInterface", iFilter->filters());
-    //         }
 }
 
 QMap<QString, QString> ExtensionManager::getPlugInSettings(const QString &plugInName)
@@ -236,6 +221,11 @@ void ExtensionManager::setFieldValue(QString registerName, QString fieldName, QV
                 if(variantListField) variantListField->setSelected(setVal);
                 else qWarning() << tr("Не удается преобразовать тип поля");
 
+                break;
+            }
+
+            case AbstractField::FieldType::FixedField:
+            {
                 break;
             }
 
